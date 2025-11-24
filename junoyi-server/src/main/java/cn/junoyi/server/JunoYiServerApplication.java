@@ -1,7 +1,7 @@
 package cn.junoyi.server;
 
 
-import org.springframework.boot.SpringApplication;
+import cn.junoyi.framework.stater.JunoYiApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
@@ -12,6 +12,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(scanBasePackages= {"cn.junoyi"})
 public class JunoYiServerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(JunoYiServerApplication.class);
+        JunoYiApplication.run(JunoYiServerApplication.class,args);
     }
 }
