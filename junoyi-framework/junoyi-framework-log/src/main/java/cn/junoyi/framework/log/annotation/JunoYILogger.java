@@ -7,11 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * JunoYi框架日志注解
- * 在类上使用，可以在在此类中全局调用log对象去调用info()、warn()、error()等日志方法
  *
  * @author Fan
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.SOURCE)
 public @interface JunoYILogger {
 }

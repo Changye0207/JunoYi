@@ -37,13 +37,12 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- 注解处理器依赖 -->
         <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy-agent</artifactId>
+            <groupId>com.squareup</groupId>
+            <artifactId>javapoet</artifactId>
+            <version>1.13.0</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>
