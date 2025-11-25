@@ -19,7 +19,7 @@ junoyi:
 
     # 文件输出配置
     file:
-      enabled: true
+      enabled: false
       path: logs/junoyi.log
       max-size: 100MB
       max-history: 30
