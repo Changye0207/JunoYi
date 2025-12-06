@@ -37,6 +37,8 @@ public class JunoYiProperties {
      */
     private String registration;
 
+    private String logo;
+
     /**
      * 服务器端口号
      */
@@ -80,6 +82,14 @@ public class JunoYiProperties {
 
     public void setRegistration(String registration){
         this.registration = registration;
+    }
+
+    public String getLogo(){
+        return logo;
+    }
+
+    public void setLogo(String logo){
+        this.logo = logo;
     }
 
     public int getPort(){

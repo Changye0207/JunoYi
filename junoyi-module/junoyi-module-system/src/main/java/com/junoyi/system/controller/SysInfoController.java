@@ -29,6 +29,13 @@ public class SysInfoController {
      */
     @GetMapping
     public R<SystemInfoVo> getSystemInfo(){
-        return R.ok();
+        SystemInfoVo systemInfoVo = SystemInfoVo.builder()
+                .name(junoYiProperties.getName())
+                .version(junoYiProperties.getVersion())
+                .copyrightYear(junoYiProperties.getCopyrightYear())
+                .copyright(junoYiProperties.getCopyright())
+                .registration(junoYiProperties.getRegistration())
+                .build();
+        return R.ok(systemInfoVo);
     }
 }
