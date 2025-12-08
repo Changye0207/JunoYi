@@ -22,6 +22,7 @@
         <module>junoyi-framework-security</module>
         <module>junoyi-framework-datasource</module>
         <module>junoyi-framework-excel</module>
+        <module>junoyi-framework-json</module>
     </modules>
 
 
