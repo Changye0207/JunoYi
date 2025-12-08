@@ -13,26 +13,26 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Fan
  */
-public class JunoLogFactory {
+public class JunoYiLogFactory {
     
     /**
      * 获取指定类的增强Logger实例
      */
-    public static JunoLog getLogger(Class<?> clazz) {
-        return new JunoLog(LoggerFactory.getLogger(clazz));
+    public static JunoYiLog getLogger(Class<?> clazz) {
+        return new JunoYiLog(LoggerFactory.getLogger(clazz));
     }
     
     /**
      * 获取指定名称的增强Logger实例
      */
-    public static JunoLog getLogger(String name) {
-        return new JunoLog(LoggerFactory.getLogger(name));
+    public static JunoYiLog getLogger(String name) {
+        return new JunoYiLog(LoggerFactory.getLogger(name));
     }
     
     /**
      * 从原始Logger创建增强Logger
      */
-    public static JunoLog wrap(org.slf4j.Logger logger) {
-        return new JunoLog(logger);
+    public static JunoYiLog wrap(org.slf4j.Logger logger) {
+        return new JunoYiLog(logger);
     }
 }

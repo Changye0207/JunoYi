@@ -5,7 +5,6 @@ import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 /**
@@ -20,11 +19,11 @@ import java.util.function.Supplier;
  *
  * @author Fan
  */
-public class JunoLog {
+public class JunoYiLog {
 
     private final Logger delegate;
 
-    public JunoLog(Logger delegate) {
+    public JunoYiLog(Logger delegate) {
         this.delegate = delegate;
     }
 
