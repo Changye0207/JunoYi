@@ -7,6 +7,7 @@ import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.alibaba.excel.exception.ExcelDataConvertException;
 import com.junoyi.framework.core.utils.StreamUtils;
 import com.junoyi.framework.core.utils.ValidatorUtils;
+import com.junoyi.framework.json.utils.JsonUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import jakarta.validation.ConstraintViolation;
@@ -87,8 +88,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
     @Override
     public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
         this.headMap = headMap;
-        // TODO: JsonUtils工具未完成
-//        log.debug("解析到一条表头数据: {}", JsonUtils.toJsonString(headMap));
+        log.debug("Parse to a header data: {}", JsonUtils.toJsonString(headMap));
     }
 
     /**
