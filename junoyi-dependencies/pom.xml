@@ -28,6 +28,8 @@
         <hutool.version>5.8.23</hutool.version>
         <dynamic-datasource.version>4.2.0</dynamic-datasource.version>
         <easyexcel.version>3.2.1</easyexcel.version>
+        <redisson.version>3.20.1</redisson.version>
+        <lock4j.version>2.2.4</lock4j.version>
         <!-- Apache Commons Compress 版本 -->
         <commons-compress.version>1.26.2</commons-compress.version>
         <fastjson2.version>2.0.43</fastjson2.version>
@@ -92,6 +94,11 @@
             </dependency>
             <dependency>
                 <groupId>com.junoyi</groupId>
+                <artifactId>junoyi-framework-redis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.junoyi</groupId>
                 <artifactId>junoyi-framework-security</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -142,6 +149,18 @@
                         <artifactId>poi-ooxml-schemas</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!--      Redisson      -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+                <version>${lock4j.version}</version>
             </dependency>
 
             <dependency>

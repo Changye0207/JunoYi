@@ -172,3 +172,4 @@ mybatis-plus:
       
       # 逻辑未删除值
       logic-not-delete-value: 0
+
