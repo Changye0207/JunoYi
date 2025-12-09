@@ -36,7 +36,7 @@ public class JacksonConfig {
      */
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer customizer(){
-        log.info("Initialize jackson configuration.");
+        log.info("Start initializing jackson configuration.");
         return builder -> {
             // 配置Java时间模块，处理日期时间类型的序列化和反序列化
             JavaTimeModule javaTimeModule = new JavaTimeModule();
@@ -49,6 +49,7 @@ public class JacksonConfig {
             javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
             builder.modules(javaTimeModule);
             builder.timeZone(TimeZone.getDefault());
+            log.info("Initialization jackson configuration completed.");
         };
     }
 }
