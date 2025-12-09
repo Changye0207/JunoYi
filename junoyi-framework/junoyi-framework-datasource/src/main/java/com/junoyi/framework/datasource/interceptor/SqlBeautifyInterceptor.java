@@ -37,13 +37,10 @@ public class SqlBeautifyInterceptor implements Interceptor {
         StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
         BoundSql boundSql = statementHandler.getBoundSql();
         String sql = boundSql.getSql();
-
         // 美化 SQL 并打印日志
         String beautifiedSql = beautifySql(sql);
-
         log.debug("Executing SQL:\n{}", beautifiedSql);
         log.debug("Parameters: {}", boundSql.getParameterObject());
-
         return invocation.proceed();
     }
 
@@ -54,21 +51,15 @@ public class SqlBeautifyInterceptor implements Interceptor {
      * @return 美化后的 SQL 字符串
      */
     private String beautifySql(String sql) {
-        if (sql == null || sql.trim().isEmpty()) {
+        if (sql == null || sql.trim().isEmpty())
             return sql;
-        }
-
         // 移除多余空格，统一为单个空格
         sql = sql.replaceAll("\\s+", " ").trim();
-
         // 在关键字前添加换行符以实现基本的格式化
         sql = sql.replaceAll("(?i)\\b(SELECT|FROM|WHERE|AND|OR|ORDER BY|GROUP BY|HAVING|LIMIT|OFFSET|JOIN|LEFT JOIN|RIGHT JOIN|INNER JOIN|ON|AS|INSERT INTO|VALUES|UPDATE|SET|DELETE|CREATE|ALTER|DROP|TRUNCATE)\\b", "\n$1");
-
         // 若首字符是换行符则去除
-        if (sql.startsWith("\n")) {
+        if (sql.startsWith("\n"))
             sql = sql.substring(1);
-        }
-
         return sql;
     }
 
