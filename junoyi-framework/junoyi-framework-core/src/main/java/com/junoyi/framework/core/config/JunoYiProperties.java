@@ -1,4 +1,4 @@
-package com.junoyi.framework.stater.config;
+package com.junoyi.framework.core.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
