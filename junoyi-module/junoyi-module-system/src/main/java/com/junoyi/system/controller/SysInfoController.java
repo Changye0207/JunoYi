@@ -3,7 +3,7 @@ package com.junoyi.system.controller;
 import com.junoyi.framework.core.domain.R;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
-import com.junoyi.framework.core.config.JunoYiProperties;
+import com.junoyi.framework.core.properties.JunoYiProperties;
 import com.junoyi.system.domain.vo.SystemInfoVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
