@@ -1,6 +1,6 @@
 package com.junoyi.system.controller;
 
-import com.junoyi.framework.core.domain.R;
+import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.core.properties.JunoYiProperties;

@@ -1,4 +1,4 @@
-package com.junoyi.framework.core.domain;
+package com.junoyi.framework.core.domain.module;
 
 
 import com.junoyi.framework.core.constant.HttpStatus;
