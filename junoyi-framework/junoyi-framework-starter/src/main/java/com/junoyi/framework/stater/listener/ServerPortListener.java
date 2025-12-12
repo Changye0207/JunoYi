@@ -1,7 +1,9 @@
 package com.junoyi.framework.stater.listener;
 
 import com.junoyi.framework.log.core.JunoYiLogStatic;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -19,29 +21,47 @@ import java.util.Enumeration;
 * @author Fan
 */
 @Component
-public class ServerPortListener implements ApplicationListener<WebServerInitializedEvent> {
+public class ServerPortListener implements ApplicationListener<ApplicationEvent> {
 
+   private volatile Integer port;
+   private volatile String protocol;
+   private volatile boolean printed;
+
+    /**
+     * 应用事件监听器，用于在Web服务器初始化完成后打印应用访问地址信息
+     *
+     * @param event 应用事件对象，支持WebServerInitializedEvent和ApplicationStartedEvent两种事件类型
+     */
    @Override
-   public void onApplicationEvent(@NonNull WebServerInitializedEvent event) {
-       int port = event.getWebServer().getPort();
-       String protocol = event.getApplicationContext().getEnvironment().getProperty("server.ssl.enabled", "false").equals("true") ? "https" : "http";
+   public void onApplicationEvent(@NonNull ApplicationEvent event) {
+       // 处理Web服务器初始化完成事件，获取端口和协议信息
+       if (event instanceof WebServerInitializedEvent webServerInitializedEvent) {
+           this.port = webServerInitializedEvent.getWebServer().getPort();
+           this.protocol = webServerInitializedEvent.getApplicationContext().getEnvironment()
+                   .getProperty("server.ssl.enabled", "false").equals("true") ? "https" : "http";
+           return;
+       }
+        // 处理应用启动完成事件，打印访问地址信息
+       if (event instanceof ApplicationStartedEvent) {
+           // 避免重复打印或在必要信息未准备就绪时跳过打印
+           if (printed || port == null || protocol == null)
+               return;
+           printed = true;
 
-       try {
-           String hostName = InetAddress.getLocalHost().getHostName();
-           String hostAddress = getLocalHostAddress();
+           try {
+               String hostName = InetAddress.getLocalHost().getHostName();
+               String hostAddress = getLocalHostAddress();
 
-           JunoYiLogStatic.info("Application is running...");
-           JunoYiLogStatic.info("Access URLs:");
-           JunoYiLogStatic.info("Local:      {}://localhost:{}", protocol, port);
-           JunoYiLogStatic.info("External:   {}://{}:{}", protocol, hostAddress, port);
-           JunoYiLogStatic.info("Host Name:  " + hostName);
-
-       } catch (Exception e) {
-           // 无法获取主机地址错误处理
-           JunoYiLogStatic.warn("Unable to determine host address: {}", e.getMessage());
-           JunoYiLogStatic.info("Application is running...");
-           JunoYiLogStatic.info("Access URLs:");
-           JunoYiLogStatic.info("Local:      {}://localhost:{}", protocol, port);
+               JunoYiLogStatic.info("Local:      {}://localhost:{}", protocol, port);
+               JunoYiLogStatic.info("External:   {}://{}:{}", protocol, hostAddress, port);
+               JunoYiLogStatic.info("Host Name:  " + hostName);
+           } catch (Exception e) {
+               // 无法获取主机地址时的错误处理，输出简化版访问信息
+               JunoYiLogStatic.warn("Unable to determine host address: {}", e.getMessage());
+               JunoYiLogStatic.info("Application is running...");
+               JunoYiLogStatic.info("Access URLs:");
+               JunoYiLogStatic.info("Local:      {}://localhost:{}", protocol, port);
+           }
        }
    }
 
