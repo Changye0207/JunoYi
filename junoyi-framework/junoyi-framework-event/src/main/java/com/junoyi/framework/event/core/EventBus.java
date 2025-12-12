@@ -36,6 +36,11 @@ public class EventBus {
 
     private final AtomicInteger threadCounter = new AtomicInteger(0);
 
+    /**
+     * 构造方法，初始化异步执行线程池
+     * 核心线程数为CPU核心数，最大线程数为核心数的两倍，
+     * 使用自定义线程工厂创建带有特定名称和守护状态的线程。
+     */
     private EventBus() {
         int corePoolSize = Runtime.getRuntime().availableProcessors();
         int maxPoolSize = corePoolSize * 2;
@@ -66,6 +71,7 @@ public class EventBus {
 
     /**
      * 触发事件，调用所有注册的事件处理器
+     * 处理器根据是否标记为异步来决定同步或异步执行
      *
      * @param event 要触发的事件对象
      * @param <T> 事件类型
@@ -87,7 +93,12 @@ public class EventBus {
         }
     }
 
-
+    /**
+     * 异步触发事件，强制将所有处理器以异步方式提交到线程池中执行
+     *
+     * @param event 要触发的事件对象
+     * @param <T> 事件类型
+     */
     public <T extends Event> void callAsyncEvent(T event){
         // 获取该事件类型对应的所有已注册处理器
         List<RegisteredHandler> handlers = registry.getHandlers(event.getClass());
@@ -101,6 +112,7 @@ public class EventBus {
 
     /**
      * 执行事件处理器
+     * 捕获执行过程中的异常，并记录错误日志
      *
      * @param handler 事件处理器
      * @param event 事件对象
@@ -116,6 +128,7 @@ public class EventBus {
 
     /**
      * 关闭事件总线，释放线程池资源
+     * 先尝试平滑关闭线程池，若超时则强制关闭
      */
     public void shutdown() {
         asyncExecutor.shutdown();
@@ -129,3 +142,4 @@ public class EventBus {
         }
     }
 }
+
