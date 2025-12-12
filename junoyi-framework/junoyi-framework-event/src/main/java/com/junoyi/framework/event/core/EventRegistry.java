@@ -44,8 +44,8 @@ public class EventRegistry {
 
             handlers.computeIfAbsent(eventType, k -> new ArrayList<>()).add(handler);
 
-            // 按照优先级排序
-            handlers.get(eventType).sort(Comparator.comparingInt(h -> h.priority().getLevel()));
+            // 按照优先级排序（从高到低）
+            handlers.get(eventType).sort(Comparator.comparingInt((RegisteredHandler h) -> h.priority().getLevel()).reversed());
 
         }
     }
