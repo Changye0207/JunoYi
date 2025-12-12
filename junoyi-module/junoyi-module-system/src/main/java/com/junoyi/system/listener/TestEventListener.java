@@ -1,6 +1,7 @@
 package com.junoyi.system.listener;
 
 import com.junoyi.framework.event.annotation.EventHandler;
+import com.junoyi.framework.event.annotation.EventListener;
 import com.junoyi.framework.event.core.Listener;
 import com.junoyi.framework.event.enums.EventPriority;
 import com.junoyi.system.event.TestEvent;
@@ -8,9 +9,8 @@ import com.junoyi.system.event.TestEvent;
 /**
  * Test事件监听器
  */
+@EventListener
 public class TestEventListener implements Listener {
-
-
     /**
      * 事件监听器
      * @param event
@@ -32,7 +32,6 @@ public class TestEventListener implements Listener {
 
         System.out.println("优先级：默认");
     }
-
 
     @EventHandler(priority = EventPriority.LOW)
     public void onTest4Event(TestEvent event){
