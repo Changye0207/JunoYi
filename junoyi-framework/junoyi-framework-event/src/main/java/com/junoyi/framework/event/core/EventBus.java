@@ -66,6 +66,10 @@ public class EventBus {
         registry.registerListener(listener);
     }
 
+    /**
+     * 注册时间监听器
+     * @param listener 要注册的监听器对象
+     */
     public void registerListener(Listener listener){
         registerListener((Object) listener);
     }
