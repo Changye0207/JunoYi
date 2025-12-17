@@ -2,8 +2,6 @@ package com.junoyi.system.controller;
 
 import com.junoyi.framework.core.domain.base.BaseController;
 import com.junoyi.framework.core.domain.module.R;
-import com.junoyi.framework.log.core.JunoYiLog;
-import com.junoyi.framework.log.core.JunoYiLogFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class SysAuthController extends BaseController {
-    private final JunoYiLog log = JunoYiLogFactory.getLogger(SysAuthController.class);
 
     /**
      * 用户登录接口
