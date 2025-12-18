@@ -11,10 +11,34 @@ import lombok.Data;
 @Data
 @Builder
 public class SystemInfoVo {
+
+    /**
+     * 系统名
+     */
     private String name;
+
+    /**
+     * 系统版本
+     */
     private String version;
+
+    /**
+     * 版权年份
+     */
     private String copyrightYear;
+
+    /**
+     * 版权信息
+     */
     private String copyright;
+
+    /**
+     * 备案号信息
+     */
     private String registration;
+
+    /**
+     * 系统logo
+     */
     private String logo;
 }
