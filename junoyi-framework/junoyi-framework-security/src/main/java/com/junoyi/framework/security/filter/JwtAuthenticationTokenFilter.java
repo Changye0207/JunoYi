@@ -3,10 +3,10 @@ package com.junoyi.framework.security.filter;
 import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
+import com.junoyi.framework.security.context.SecurityContext;
 import com.junoyi.framework.security.helper.TokenHelper;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.properties.SecurityProperties;
-import com.junoyi.framework.security.utils.SecurityUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +26,6 @@ import java.util.List;
  *
  * @author Fan
  */
-@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
@@ -49,19 +48,19 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        
+
         String requestURI = request.getRequestURI();
         
         // 检查是否在白名单中
         if (isWhitelisted(requestURI)) {
-            log.debug("WhitelistAccess", "URI: " + requestURI);
+            log.info("WhitelistAccess", "白名单放行: " + requestURI);
             filterChain.doFilter(request, response);
             return;
         }
-        
+
         // 从请求头中获取 Token
         String token = getTokenFromRequest(request);
-        
+
         if (StringUtils.isBlank(token)) {
             log.warn("TokenMissing", "URI: " + requestURI);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -69,7 +68,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             response.getWriter().write("{\"code\":401,\"msg\":\"未提供认证令牌\"}");
             return;
         }
-        
+
         try {
             // 验证 Token 有效性
             if (!tokenHelper.validateAccessToken(token)) {
@@ -79,26 +78,26 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 response.getWriter().write("{\"code\":401,\"msg\":\"认证令牌无效或已过期\"}");
                 return;
             }
-            
+
             // 解析 Token 获取用户信息
             LoginUser loginUser = tokenHelper.paresAccessToken(token);
-            
+
             if (loginUser == null) {
                 log.warn("TokenParseError", "URI: " + requestURI);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"code\":401,\"msg\":\"认证令牌解析失败\"}");
+                response.getWriter().write("{\"code\":401,\"msg\":\"认证令牌无效或已过期\"}");
                 return;
             }
-            
+
             // 将用户信息存储到上下文中
-            SecurityUtils.setLoginUser(loginUser);
-            
+            SecurityContext.set(loginUser);
+
             log.debug("TokenValidated", "User: " + loginUser.getUserName() + " | URI: " + requestURI);
-            
+
             // 继续执行过滤器链
             filterChain.doFilter(request, response);
-            
+
         } catch (Exception e) {
             log.error("TokenValidationError", "URI: " + requestURI, e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -106,7 +105,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             response.getWriter().write("{\"code\":401,\"msg\":\"认证失败\"}");
         } finally {
             // 清理上下文
-            SecurityUtils.clearLoginUser();
+            SecurityContext.clear();
         }
     }
 
@@ -119,14 +118,14 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     private String getTokenFromRequest(HttpServletRequest request) {
         // 从请求头中获取
         String token = request.getHeader(securityProperties.getToken().getHeader());
-        
+
         if (StringUtils.isNotBlank(token)) {
             // 移除请求头token前缀（如果存在）
             if (token.startsWith(securityProperties.getToken().getHeader() + " "))
                 token = token.substring(7);
             return token;
         }
-        
+
         // 从请求参数中获取（备用方案）
         token = request.getParameter("token");
         if (StringUtils.isNotBlank(token))
@@ -146,12 +145,11 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         if (whitelist == null || whitelist.isEmpty())
             return false;
 
-        
         for (String pattern : whitelist) {
             if (pathMatcher.match(pattern, requestURI))
                 return true;
         }
-        
+
         return false;
     }
 

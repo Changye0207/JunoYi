@@ -1,6 +1,7 @@
 package com.junoyi.framework.security.config;
 
 import com.junoyi.framework.security.filter.JwtAuthenticationTokenFilter;
+import com.junoyi.framework.security.helper.TokenHelper;
 import com.junoyi.framework.security.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -19,8 +20,9 @@ import org.springframework.util.AntPathMatcher;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     
+    private final TokenHelper tokenHelper;
 
-    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+    private final SecurityProperties securityProperties;
 
     /**
      * 注册 JWT 认证过滤器
@@ -30,13 +32,19 @@ public class SecurityConfiguration {
      */
     @Bean
     public FilterRegistrationBean<JwtAuthenticationTokenFilter> jwtAuthenticationFilter() {
+        // 创建过滤器实例
+        JwtAuthenticationTokenFilter filter = new JwtAuthenticationTokenFilter(tokenHelper, securityProperties);
+        
         FilterRegistrationBean<JwtAuthenticationTokenFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(jwtAuthenticationTokenFilter);
+        registrationBean.setFilter(filter);
         // 拦截所有请求
         registrationBean.addUrlPatterns("/*");
         // 设置过滤器执行顺序（数字越小优先级越高）
         registrationBean.setOrder(1);
         registrationBean.setName("jwtAuthenticationTokenFilter");
+        
+        System.out.println("✅ JWT 认证过滤器已注册");
+        
         return registrationBean;
     }
 

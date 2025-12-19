@@ -1,5 +1,6 @@
 package com.junoyi.framework.security.utils;
 
+import com.junoyi.framework.security.context.SecurityContext;
 import com.junoyi.framework.security.module.LoginUser;
 
 /**
@@ -10,11 +11,6 @@ import com.junoyi.framework.security.module.LoginUser;
  */
 public class SecurityUtils {
 
-    /**
-     * 使用 ThreadLocal 存储当前登录用户信息
-     * 确保线程安全，每个请求线程独立存储
-     */
-    private static final ThreadLocal<LoginUser> LOGIN_USER_HOLDER = new ThreadLocal<>();
 
     /**
      * 私有构造函数，防止实例化
@@ -22,14 +18,6 @@ public class SecurityUtils {
     private SecurityUtils() {
     }
 
-    /**
-     * 设置当前登录用户信息
-     *
-     * @param loginUser 登录用户对象
-     */
-    public static void setLoginUser(LoginUser loginUser) {
-        LOGIN_USER_HOLDER.set(loginUser);
-    }
 
     /**
      * 获取当前登录用户信息
@@ -37,7 +25,7 @@ public class SecurityUtils {
      * @return 登录用户对象，如果未登录则返回 null
      */
     public static LoginUser getLoginUser() {
-        return LOGIN_USER_HOLDER.get();
+        return SecurityContext.get();
     }
 
     /**
@@ -79,13 +67,6 @@ public class SecurityUtils {
         return getLoginUser() != null;
     }
 
-    /**
-     * 清除当前登录用户信息
-     * 通常在请求结束时调用，防止内存泄漏
-     */
-    public static void clearLoginUser() {
-        LOGIN_USER_HOLDER.remove();
-    }
 
     /**
      * 检查当前用户是否拥有指定权限
@@ -95,9 +76,8 @@ public class SecurityUtils {
      */
     public static boolean hasPermission(String permission) {
         LoginUser loginUser = getLoginUser();
-        if (loginUser == null || loginUser.getPermissions() == null) {
+        if (loginUser == null || loginUser.getPermissions() == null)
             return false;
-        }
         return loginUser.getPermissions().contains(permission);
     }
 
@@ -109,9 +89,8 @@ public class SecurityUtils {
      */
     public static boolean hasRole(Long roleId) {
         LoginUser loginUser = getLoginUser();
-        if (loginUser == null || loginUser.getRoles() == null) {
+        if (loginUser == null || loginUser.getRoles() == null)
             return false;
-        }
         return loginUser.getRoles().contains(roleId);
     }
 }

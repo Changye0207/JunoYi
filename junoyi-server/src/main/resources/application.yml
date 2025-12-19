@@ -116,6 +116,7 @@ junoyi:
     whitelist:
       - /auth/login
       - /auth/register
+      - /system/info
     token:
       header: Authorization
       # 令牌密钥
