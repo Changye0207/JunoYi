@@ -14,10 +14,10 @@
 
     <!--  依赖  -->
     <dependencies>
-        <!--   框架核心启动模块     -->
+        <!--   JunoYi框架模块     -->
         <dependency>
             <groupId>com.junoyi</groupId>
-            <artifactId>junoyi-framework-starter</artifactId>
+            <artifactId>junoyi-framework-boot-starter</artifactId>
         </dependency>
 
         <!-- 系统模块 -->
@@ -49,12 +49,12 @@
             
             生产环境部署前，请将下面的依赖整体注释掉：
         -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-devtools</artifactId>-->
-<!--            <scope>runtime</scope>-->
-<!--            <optional>true</optional>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
         <!-- ==================== 开发工具依赖结束 ==================== -->
 
     </dependencies>

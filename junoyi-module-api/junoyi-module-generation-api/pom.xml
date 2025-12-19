@@ -12,5 +12,12 @@
 
     <artifactId>junoyi-module-generation-api</artifactId>
 
+    <dependencies>
+        <!-- JunoYi 框架基础设施封装核心模块 -->
+        <dependency>
+            <groupId>com.junoyi</groupId>
+            <artifactId>junoyi-framework-boot-starter</artifactId>
+        </dependency>
 
+    </dependencies>
 </project>
