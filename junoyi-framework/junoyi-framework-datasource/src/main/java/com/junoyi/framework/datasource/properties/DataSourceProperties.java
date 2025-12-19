@@ -1,6 +1,5 @@
 package com.junoyi.framework.datasource.properties;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -8,7 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @author Fan
  */
-@Data
 @ConfigurationProperties(prefix = "junoyi.datasource")
 public class DataSourceProperties {
 
@@ -31,4 +29,36 @@ public class DataSourceProperties {
      * 是否启用 SQL 日志输出
      */
     private boolean sqlLogEnabled = true;
+
+    public boolean isSqlBeautifyEnabled() {
+        return sqlBeautifyEnabled;
+    }
+
+    public void setSqlBeautifyEnabled(boolean sqlBeautifyEnabled) {
+        this.sqlBeautifyEnabled = sqlBeautifyEnabled;
+    }
+
+    public boolean isSlowSqlEnabled() {
+        return slowSqlEnabled;
+    }
+
+    public void setSlowSqlEnabled(boolean slowSqlEnabled) {
+        this.slowSqlEnabled = slowSqlEnabled;
+    }
+
+    public long getSlowSqlThreshold() {
+        return slowSqlThreshold;
+    }
+
+    public void setSlowSqlThreshold(long slowSqlThreshold){
+        this.slowSqlThreshold = slowSqlThreshold;
+    }
+
+    public boolean isSqlLogEnabled() {
+        return sqlLogEnabled;
+    }
+
+    public void setSqlLogEnabled(boolean sqlLogEnabled) {
+        this.sqlLogEnabled = sqlLogEnabled;
+    }
 }
