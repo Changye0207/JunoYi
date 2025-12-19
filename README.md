@@ -1,4 +1,8 @@
-# JunoYi 钧逸企业级开发框架
+
+
+<div align="center">
+    <img width="160" height="160" alt="Image" src="https://junoyi.eatfan.top/LOGO.png" />
+</div>
 
 <div align="center">
 
@@ -9,6 +13,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-1.0.0-success.svg)](https://github.com/yourusername/JunoYi)
 
+## JunoYi 企业级开发框架
 **一个现代化、模块化、高性能的企业级 Java 开发框架**
 
 [特性](#-核心特性) • [快速开始](#-快速开始) • [文档](#-文档) • [架构](#-项目架构) • [贡献](#-贡献指南)
@@ -238,7 +243,7 @@ spring:
           url: jdbc:mysql://localhost:3306/junoyi?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
           username: root
           password: your_password
-  
+
   data:
     redis:
       host: 127.0.0.1
@@ -347,7 +352,7 @@ log.business("用户模块", "登录", "成功");
 ```java
 @RestController
 public class UserController {
-    
+
     @GetMapping("/user/{id}")
     public Result<User> getUser(@PathVariable Long id) {
         User user = userService.getById(id);
@@ -363,7 +368,7 @@ public class UserController {
 ```java
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    
+
     @ExceptionHandler(BusinessException.class)
     public Result handleBusinessException(BusinessException e) {
         return Result.error(e.getMessage());
@@ -418,8 +423,8 @@ public void processOrder(Long userId) {
 // 发布订阅
 RedisUtils.publish("order:created", orderEvent);
 RedisUtils.subscribe("order:created", OrderEvent.class, event -> {
-    // 处理事件
-});
+        // 处理事件
+        });
 ```
 
 ### 6. 事件总线
@@ -439,7 +444,7 @@ eventBus.callEvent(new UserRegisteredEvent(userId, username));
 // 监听事件
 @EventListener
 public class UserEventListener {
-    
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onUserRegistered(UserRegisteredEvent event) {
         // 发送欢迎邮件
@@ -460,7 +465,7 @@ public class UserEventListener {
 junoyi:
   version: 1.0.0
   name: JunoYi
-  
+
   # 日志配置
   log:
     console:
@@ -468,13 +473,13 @@ junoyi:
       color-enabled: true
     level:
       junoyi: DEBUG
-  
+
   # 数据源配置
   datasource:
     sql-beautify-enabled: true
     slow-sql-enabled: true
     slow-sql-threshold: 3000
-  
+
   # 安全配置
   security:
     whitelist:
