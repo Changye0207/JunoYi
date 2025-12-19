@@ -1,10 +1,11 @@
 package com.junoyi.framework.security.module;
 
+import com.junoyi.framework.security.enums.PlatformType;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 /**
  * 登录用户信息类
@@ -32,14 +33,19 @@ public class LoginUser {
     private String nickName;
 
     /**
+     * 登录平台
+     */
+    private PlatformType platformType;
+
+    /**
      * 用户权限列表
      */
-    private List<?> permissions;
+    private Set<String> permissions;
 
     /**
      * 用户角色列表
      */
-    private List<?> roles;
+    private Set<Long> roles;
 
     /**
      * 登录IP地址

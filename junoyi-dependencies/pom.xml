@@ -277,12 +277,6 @@
                 <scope>runtime</scope>
             </dependency>
 
-            <!--      Sa-Token      -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-boot3-starter</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
 
             <!-- MapStruct 对象转换 -->
             <dependency>

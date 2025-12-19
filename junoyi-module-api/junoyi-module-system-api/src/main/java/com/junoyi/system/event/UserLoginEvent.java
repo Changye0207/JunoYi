@@ -1,7 +1,7 @@
 package com.junoyi.system.event;
 
 import com.junoyi.framework.event.domain.BaseEvent;
-import com.junoyi.system.enums.PlatformType;
+import com.junoyi.framework.security.enums.PlatformType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

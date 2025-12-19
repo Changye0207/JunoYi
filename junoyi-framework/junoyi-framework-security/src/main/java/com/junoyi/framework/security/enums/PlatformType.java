@@ -1,4 +1,4 @@
-package com.junoyi.system.enums;
+package com.junoyi.framework.security.enums;
 
 
 /**
