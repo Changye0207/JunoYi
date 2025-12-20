@@ -4,7 +4,7 @@ import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.security.context.SecurityContext;
-import com.junoyi.framework.security.helper.TokenHelper;
+import com.junoyi.framework.security.token.JwtTokenService;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.properties.SecurityProperties;
 import jakarta.servlet.FilterChain;
@@ -12,7 +12,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,11 +26,11 @@ import java.util.List;
  * @author Fan
  */
 @RequiredArgsConstructor
-public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
+public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
 
-    private final JunoYiLog log = JunoYiLogFactory.getLogger(JwtAuthenticationTokenFilter.class);
+    private final JunoYiLog log = JunoYiLogFactory.getLogger(TokenAuthenticationTokenFilter.class);
 
-    private final TokenHelper tokenHelper;
+    private final JwtTokenService tokenHelper;
 
     private final SecurityProperties securityProperties;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();

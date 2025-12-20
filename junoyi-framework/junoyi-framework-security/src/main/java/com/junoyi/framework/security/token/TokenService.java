@@ -1,24 +1,14 @@
-package com.junoyi.framework.security.helper;
+package com.junoyi.framework.security.token;
 
-import com.junoyi.framework.log.core.JunoYiLog;
-import com.junoyi.framework.log.core.JunoYiLogFactory;
+
 import com.junoyi.framework.security.module.LoginUser;
-import com.junoyi.framework.security.properties.SecurityProperties;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 /**
- * Token工具类
- * 提供Token相关的辅助功能
+ * Token 业务接口类
+ *
  * @author Fan
  */
-@Component
-@RequiredArgsConstructor
-public class TokenHelper {
-
-    private final JunoYiLog log = JunoYiLogFactory.getLogger(TokenHelper.class);
-
-    private SecurityProperties securityProperties;
+public interface TokenService {
 
     /**
      * 创建访问令牌
@@ -26,9 +16,7 @@ public class TokenHelper {
      * @param loginUser 登录用户信息
      * @return 访问令牌字符串
      */
-    public String createAccessToken(LoginUser loginUser) {
-        return null;
-    }
+    public String createAccessToken(LoginUser loginUser);
 
     /**
      * 解析访问令牌
@@ -36,9 +24,7 @@ public class TokenHelper {
      * @param accessToken 访问令牌字符串
      * @return 登录用户信息
      */
-    public LoginUser paresAccessToken(String accessToken) {
-        return null;
-    }
+    public LoginUser paresAccessToken(String accessToken);
 
     /**
      * 验证访问令牌
@@ -46,9 +32,7 @@ public class TokenHelper {
      * @param accessToken 访问令牌字符串
      * @return 验证结果，true表示有效，false表示无效
      */
-    public boolean validateAccessToken(String accessToken) {
-        return false;
-    }
+    public boolean validateAccessToken(String accessToken);
 
     /**
      * 创建刷新令牌
@@ -56,9 +40,7 @@ public class TokenHelper {
      * @param loginUser 登录用户信息
      * @return 刷新令牌字符串
      */
-    public String createRefreshToken(LoginUser loginUser) {
-        return null;
-    }
+    public String createRefreshToken(LoginUser loginUser);
 
     /**
      * 解析刷新令牌
@@ -66,9 +48,7 @@ public class TokenHelper {
      * @param refreshToken 刷新令牌字符串
      * @return 登录用户信息
      */
-    public LoginUser pareRefreshToken(String refreshToken) {
-        return null;
-    }
+    public LoginUser pareRefreshToken(String refreshToken);
 
     /**
      * 验证刷新令牌
@@ -76,7 +56,5 @@ public class TokenHelper {
      * @param refreshToken 刷新令牌字符串
      * @return 验证结果，true表示有效，false表示无效
      */
-    public boolean validateRefreshToken(String refreshToken) {
-        return false;
-    }
+    public boolean validateRefreshToken(String refreshToken);
 }

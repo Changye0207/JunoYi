@@ -3,8 +3,8 @@ package com.junoyi.framework.security.config;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.security.filter.ApiEncryptFilter;
-import com.junoyi.framework.security.filter.JwtAuthenticationTokenFilter;
-import com.junoyi.framework.security.helper.TokenHelper;
+import com.junoyi.framework.security.filter.TokenAuthenticationTokenFilter;
+import com.junoyi.framework.security.token.JwtTokenService;
 import com.junoyi.framework.security.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -25,7 +25,7 @@ public class SecurityConfiguration {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SecurityConfiguration.class);
     
-    private final TokenHelper tokenHelper;
+    private final JwtTokenService tokenHelper;
 
     private final SecurityProperties securityProperties;
 
@@ -60,11 +60,11 @@ public class SecurityConfiguration {
      * @return FilterRegistrationBean 过滤器注册对象
      */
     @Bean
-    public FilterRegistrationBean<JwtAuthenticationTokenFilter> jwtAuthenticationFilter() {
+    public FilterRegistrationBean<TokenAuthenticationTokenFilter> jwtAuthenticationFilter() {
         // 创建过滤器实例
-        JwtAuthenticationTokenFilter filter = new JwtAuthenticationTokenFilter(tokenHelper, securityProperties);
+        TokenAuthenticationTokenFilter filter = new TokenAuthenticationTokenFilter(tokenHelper, securityProperties);
         
-        FilterRegistrationBean<JwtAuthenticationTokenFilter> registrationBean = new FilterRegistrationBean<>();
+        FilterRegistrationBean<TokenAuthenticationTokenFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         // 拦截所有请求
         registrationBean.addUrlPatterns("/*");
@@ -72,7 +72,7 @@ public class SecurityConfiguration {
         registrationBean.setOrder(1);
         registrationBean.setName("jwtAuthenticationTokenFilter");
         
-        log.info("FilterRegistrationBean","JWT authentication filter has been registered.");
+        log.info("FilterRegistrationBean","Token authentication filter has been registered.");
         
         return registrationBean;
     }
