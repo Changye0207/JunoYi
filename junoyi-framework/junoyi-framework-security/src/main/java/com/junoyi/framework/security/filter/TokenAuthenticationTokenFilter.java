@@ -84,6 +84,7 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
 
             // 构建 LoginUser（从会话中获取最新权限）
             LoginUser loginUser = LoginUser.builder()
+                    .tokenId(session.getSessionId())
                     .userId(session.getUserId())
                     .userName(session.getUserName())
                     .nickName(session.getNickName())

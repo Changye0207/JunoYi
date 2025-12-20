@@ -18,7 +18,7 @@ import java.util.Set;
 public class LoginUser {
 
     /**
-     * Token ID（用于关联 AccessToken 和 RefreshToken）
+     * Token ID（用于关联 AccessToken 和 RefreshToken， 这里tokenId即为sessionId）
      */
     private String tokenId;
 
