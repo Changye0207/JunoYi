@@ -45,8 +45,8 @@ public class SecurityConfiguration {
         registrationBean.addUrlPatterns("/*");
         registrationBean.setOrder(0);
         registrationBean.setName("apiEncryptFilter");
-        
-        log.info("FilterRegistered", "API 加密过滤器已注册");
+
+        log.info("FilterRegistered", "API encryption filter registered.");
         
         return registrationBean;
     }
@@ -68,7 +68,7 @@ public class SecurityConfiguration {
         registrationBean.setOrder(1);
         registrationBean.setName("tokenAuthenticationFilter");
         
-        log.info("FilterRegistered", "Token 认证过滤器已注册");
+        log.info("FilterRegistered", "Token authentication filter registered.");
         
         return registrationBean;
     }

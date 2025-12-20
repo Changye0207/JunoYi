@@ -119,7 +119,6 @@ public class JwtTokenService implements TokenService {
      * 构建 RefreshToken（独立生成，使用不透明格式）
      * 格式: {tokenId}.{randomPart}.{signature}
      * 
-     * 与 AccessToken 的 JWT 格式完全不同，更短更安全
      */
     private String buildRefreshToken(LoginUser loginUser, String tokenId, Date now, Date expiration) {
         // 生成随机部分
@@ -161,9 +160,8 @@ public class JwtTokenService implements TokenService {
         try {
             String decoded = new String(Base64.getUrlDecoder().decode(refreshToken), StandardCharsets.UTF_8);
             String[] parts = decoded.split("\\.");
-            if (parts.length != 3) {
+            if (parts.length != 3)
                 return null;
-            }
             return parts; // [tokenId, randomPart, signature]
         } catch (Exception e) {
             return null;
