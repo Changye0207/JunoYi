@@ -2,11 +2,12 @@ package com.junoyi.system.controller;
 
 import com.junoyi.framework.core.domain.base.BaseController;
 import com.junoyi.framework.core.domain.module.R;
+import com.junoyi.framework.core.utils.StringUtils;
+import com.junoyi.system.domain.dto.LoginRequest;
+import com.junoyi.system.domain.vo.AuthVo;
+import com.junoyi.system.service.ISysAuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 系统认证控制器
@@ -19,16 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SysAuthController extends BaseController {
 
+    private final ISysAuthService sysAuthService;
+
     /**
      * 用户登录接口
      * 处理用户登录请求，验证用户身份并返回认证结果
      *
-     * @return R<?> 统一响应结果，包含登录状态和相关信息
+     * @return R<AuthVo> 统一响应结果，包含登录状态和相关信息
      */
     @PostMapping("/login")
-    public R<?> login(){
-
-        return R.ok();
+    public R<AuthVo> login(@RequestBody LoginRequest request){
+        return R.ok(sysAuthService.login(request));
     }
 
     /**

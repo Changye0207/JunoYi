@@ -38,11 +38,11 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public TokenPair login(LoginUser loginUser, String loginIp, String userAgent) {
-        // 1. 创建 Token 对
+        // 创建 Token 对
         TokenPair tokenPair = tokenService.createTokenPair(loginUser);
         String tokenId = tokenPair.getTokenId();
 
-        // 2. 构建会话信息
+        // 构建会话信息
         Date now = new Date();
         UserSession session = UserSession.builder()
                 .sessionId(tokenId)
@@ -61,19 +61,19 @@ public class SessionServiceImpl implements SessionService {
                 .refreshExpireTime(tokenPair.getRefreshExpireTime())
                 .build();
 
-        // 3. 计算 TTL（使用 RefreshToken 的过期时间）
+        // 计算 TTL（使用 RefreshToken 的过期时间）
         long ttlMillis = tokenPair.getRefreshExpireTime() - System.currentTimeMillis();
         Duration ttl = Duration.ofMillis(ttlMillis);
 
-        // 4. 存储会话到 Redis
+        // 存储会话到 Redis
         String sessionKey = SESSION_KEY_PREFIX + tokenId;
         RedisUtils.setCacheObject(sessionKey, session, ttl);
 
-        // 5. 存储 RefreshToken 白名单
+        // 存储 RefreshToken 白名单
         String refreshKey = REFRESH_KEY_PREFIX + tokenId;
         RedisUtils.setCacheObject(refreshKey, loginUser.getUserId(), ttl);
 
-        // 6. 添加到用户会话索引
+        // 添加到用户会话索引
         String userSessionsKey = USER_SESSIONS_KEY_PREFIX + loginUser.getUserId();
         RedisUtils.setCacheSet(userSessionsKey, Set.of(tokenId));
 
@@ -86,15 +86,13 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public boolean logout(String token) {
-        if (StringUtils.isBlank(token)) {
+        if (StringUtils.isBlank(token))
             return false;
-        }
 
         // 获取 tokenId
         String tokenId = tokenService.getTokenId(token);
-        if (StringUtils.isBlank(tokenId)) {
+        if (StringUtils.isBlank(tokenId))
             return false;
-        }
 
         return doLogout(tokenId);
     }
@@ -103,18 +101,18 @@ public class SessionServiceImpl implements SessionService {
      * 执行登出逻辑
      */
     private boolean doLogout(String tokenId) {
-        // 1. 获取会话信息（用于获取 userId）
+        // 获取会话信息（用于获取 userId）
         UserSession session = getSessionByTokenId(tokenId);
         
-        // 2. 删除会话
+        // 删除会话
         String sessionKey = SESSION_KEY_PREFIX + tokenId;
         RedisUtils.deleteObject(sessionKey);
 
-        // 3. 删除 RefreshToken 白名单
+        // 删除 RefreshToken 白名单
         String refreshKey = REFRESH_KEY_PREFIX + tokenId;
         RedisUtils.deleteObject(refreshKey);
 
-        // 4. 从用户会话索引中移除
+        // 从用户会话索引中移除
         if (session != null) {
             String userSessionsKey = USER_SESSIONS_KEY_PREFIX + session.getUserId();
             Set<String> sessions = RedisUtils.getCacheSet(userSessionsKey);
@@ -137,9 +135,8 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public UserSession getSession(String token) {
-        if (StringUtils.isBlank(token)) {
+        if (StringUtils.isBlank(token))
             return null;
-        }
 
         String tokenId = tokenService.getTokenId(token);
         return getSessionByTokenId(tokenId);
@@ -147,9 +144,8 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public UserSession getSessionByTokenId(String tokenId) {
-        if (StringUtils.isBlank(tokenId)) {
+        if (StringUtils.isBlank(tokenId))
             return null;
-        }
 
         String sessionKey = SESSION_KEY_PREFIX + tokenId;
         return RedisUtils.getCacheObject(sessionKey);
@@ -158,9 +154,8 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public LoginUser getLoginUser(String token) {
         UserSession session = getSession(token);
-        if (session == null) {
+        if (session == null)
             return null;
-        }
 
         return LoginUser.builder()
                 .userId(session.getUserId())
@@ -176,30 +171,26 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public TokenPair refreshToken(String refreshToken) {
-        // 1. 验证 RefreshToken
-        if (!tokenService.validateRefreshToken(refreshToken)) {
+        // 验证 RefreshToken
+        if (!tokenService.validateRefreshToken(refreshToken))
             throw new IllegalArgumentException("RefreshToken 无效或已过期");
-        }
 
-        // 2. 获取 tokenId
+        // 获取 tokenId
         String oldTokenId = tokenService.getTokenId(refreshToken);
-        if (StringUtils.isBlank(oldTokenId)) {
+        if (StringUtils.isBlank(oldTokenId))
             throw new IllegalArgumentException("无法解析 RefreshToken");
-        }
 
-        // 3. 检查 RefreshToken 是否在白名单中（是否被主动失效）
+        // 检查 RefreshToken 是否在白名单中（是否被主动失效）
         String refreshKey = REFRESH_KEY_PREFIX + oldTokenId;
-        if (!RedisUtils.isExistsObject(refreshKey)) {
+        if (!RedisUtils.isExistsObject(refreshKey))
             throw new IllegalArgumentException("RefreshToken 已被撤销");
-        }
 
-        // 4. 获取旧会话
+        // 获取旧会话
         UserSession oldSession = getSessionByTokenId(oldTokenId);
-        if (oldSession == null) {
+        if (oldSession == null)
             throw new IllegalArgumentException("会话不存在或已过期");
-        }
 
-        // 5. 构建 LoginUser
+        // 构建 LoginUser
         LoginUser loginUser = LoginUser.builder()
                 .userId(oldSession.getUserId())
                 .userName(oldSession.getUserName())
@@ -211,10 +202,10 @@ public class SessionServiceImpl implements SessionService {
                 .loginTime(oldSession.getLoginTime())
                 .build();
 
-        // 6. 删除旧会话
+        // 删除旧会话
         doLogout(oldTokenId);
 
-        // 7. 创建新会话
+        // 创建新会话
         TokenPair newTokenPair = login(loginUser, oldSession.getLoginIp(), oldSession.getUserAgent());
 
         log.info("TokenRefreshed", "Token 刷新成功 | 用户: " + loginUser.getUserName() 
@@ -226,14 +217,12 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public boolean updateSession(String tokenId, LoginUser loginUser) {
-        if (StringUtils.isBlank(tokenId)) {
+        if (StringUtils.isBlank(tokenId))
             return false;
-        }
 
         UserSession session = getSessionByTokenId(tokenId);
-        if (session == null) {
+        if (session == null)
             return false;
-        }
 
         // 更新会话信息
         session.setUserName(loginUser.getUserName());
@@ -254,16 +243,14 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public List<UserSession> getUserSessions(Long userId) {
-        if (userId == null) {
+        if (userId == null)
             return Collections.emptyList();
-        }
 
         String userSessionsKey = USER_SESSIONS_KEY_PREFIX + userId;
         Set<String> tokenIds = RedisUtils.getCacheSet(userSessionsKey);
         
-        if (tokenIds == null || tokenIds.isEmpty()) {
+        if (tokenIds == null || tokenIds.isEmpty())
             return Collections.emptyList();
-        }
 
         return tokenIds.stream()
                 .map(this::getSessionByTokenId)
@@ -273,9 +260,8 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public boolean kickOut(String tokenId) {
-        if (StringUtils.isBlank(tokenId)) {
+        if (StringUtils.isBlank(tokenId))
             return false;
-        }
 
         UserSession session = getSessionByTokenId(tokenId);
         if (session != null) {
@@ -288,17 +274,15 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public int kickOutAll(Long userId) {
-        if (userId == null) {
+        if (userId == null)
             return 0;
-        }
 
         List<UserSession> sessions = getUserSessions(userId);
         int count = 0;
         
         for (UserSession session : sessions) {
-            if (doLogout(session.getSessionId())) {
+            if (doLogout(session.getSessionId()))
                 count++;
-            }
         }
 
         log.info("AllSessionsKicked", "用户所有会话被踢出 | userId: " + userId + " | 数量: " + count);
@@ -312,16 +296,14 @@ public class SessionServiceImpl implements SessionService {
             return false;
         }
 
-        // 1. 验证 Token 签名
-        if (!tokenService.validateAccessToken(token) && !tokenService.validateRefreshToken(token)) {
+        // 验证 Token 签名
+        if (!tokenService.validateAccessToken(token) && !tokenService.validateRefreshToken(token))
             return false;
-        }
 
-        // 2. 检查会话是否存在
+        // 检查会话是否存在
         String tokenId = tokenService.getTokenId(token);
-        if (StringUtils.isBlank(tokenId)) {
+        if (StringUtils.isBlank(tokenId))
             return false;
-        }
 
         String sessionKey = SESSION_KEY_PREFIX + tokenId;
         return RedisUtils.isExistsObject(sessionKey);
@@ -329,9 +311,8 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public void touch(String tokenId) {
-        if (StringUtils.isBlank(tokenId)) {
+        if (StringUtils.isBlank(tokenId))
             return;
-        }
 
         UserSession session = getSessionByTokenId(tokenId);
         if (session != null) {
@@ -345,10 +326,9 @@ public class SessionServiceImpl implements SessionService {
      * 解析设备类型
      */
     private String parseDeviceType(String userAgent) {
-        if (StringUtils.isBlank(userAgent)) {
+        if (StringUtils.isBlank(userAgent))
             return "Unknown";
-        }
-        
+
         userAgent = userAgent.toLowerCase();
         
         if (userAgent.contains("mobile") || userAgent.contains("android") || userAgent.contains("iphone")) {
