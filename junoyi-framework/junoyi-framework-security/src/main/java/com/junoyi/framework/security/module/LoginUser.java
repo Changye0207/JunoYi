@@ -18,6 +18,11 @@ import java.util.Set;
 public class LoginUser {
 
     /**
+     * Token ID（用于关联 AccessToken 和 RefreshToken）
+     */
+    private String tokenId;
+
+    /**
      * 用户ID
      */
     private Long userId;

@@ -116,23 +116,58 @@ public class JwtTokenService implements TokenService {
     }
 
     /**
-     * 构建 RefreshToken（独立生成，不依赖 AccessToken）
+     * 构建 RefreshToken（独立生成，使用不透明格式）
+     * 格式: {tokenId}.{randomPart}.{signature}
+     * 
+     * 与 AccessToken 的 JWT 格式完全不同，更短更安全
      */
     private String buildRefreshToken(LoginUser loginUser, String tokenId, Date now, Date expiration) {
-        String jti = UUID.randomUUID().toString().replace("-", "");
+        // 生成随机部分
+        String randomPart = UUID.randomUUID().toString().replace("-", "");
         
-        // RefreshToken 只包含最少必要信息
-        return Jwts.builder()
-                .subject(String.valueOf(loginUser.getUserId()))
-                .claim(CLAIM_TYPE, TOKEN_TYPE_REFRESH)
-                .claim(CLAIM_TOKEN_ID, tokenId)          // 关联标识
-                .claim(CLAIM_JTI, jti)                   // 独立唯一标识
-                .claim(CLAIM_PLATFORM, loginUser.getPlatformType().getCode())
-                .claim(CLAIM_USERNAME, loginUser.getUserName())
-                .issuedAt(now)
-                .expiration(expiration)
-                .signWith(getSecretKey(), Jwts.SIG.HS512)
-                .compact();
+        // 构建待签名数据: userId|tokenId|platform|expiration
+        String payload = String.format("%d|%s|%d|%d", 
+                loginUser.getUserId(), 
+                tokenId, 
+                loginUser.getPlatformType().getCode(),
+                expiration.getTime());
+        
+        // 使用 HMAC 签名
+        String signature = generateHmacSignature(payload + randomPart);
+        
+        // 最终格式: tokenId.randomPart.signature (Base64 编码)
+        String rawToken = tokenId + "." + randomPart + "." + signature;
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(rawToken.getBytes(StandardCharsets.UTF_8));
+    }
+    
+    /**
+     * 生成 HMAC 签名
+     */
+    private String generateHmacSignature(String data) {
+        try {
+            javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
+            mac.init(getSecretKey());
+            byte[] hash = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash).substring(0, 32);
+        } catch (Exception e) {
+            throw new RuntimeException("生成签名失败", e);
+        }
+    }
+    
+    /**
+     * 解析不透明格式的 RefreshToken
+     */
+    private String[] parseOpaqueRefreshToken(String refreshToken) {
+        try {
+            String decoded = new String(Base64.getUrlDecoder().decode(refreshToken), StandardCharsets.UTF_8);
+            String[] parts = decoded.split("\\.");
+            if (parts.length != 3) {
+                return null;
+            }
+            return parts; // [tokenId, randomPart, signature]
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -199,20 +234,24 @@ public class JwtTokenService implements TokenService {
     }
 
     /**
-     * 解析刷新令牌
+     * 解析刷新令牌（不透明格式）
+     * RefreshToken 不包含用户详细信息，需要从 Redis Session 获取
      */
     @Override
     public LoginUser parseRefreshToken(String refreshToken) {
         try {
-            Claims claims = parseToken(refreshToken);
-
-            String tokenType = claims.get(CLAIM_TYPE, String.class);
-            if (!TOKEN_TYPE_REFRESH.equals(tokenType)) {
-                log.warn("TokenTypeError", "Token 类型不匹配，期望: refresh，实际: " + tokenType);
+            String[] parts = parseOpaqueRefreshToken(refreshToken);
+            if (parts == null) {
+                log.warn("TokenParseError", "RefreshToken 格式无效");
                 return null;
             }
-
-            return extractLoginUser(claims);
+            
+            // 从不透明 token 中只能获取 tokenId
+            // 完整的用户信息需要从 Redis Session 中获取
+            // 这里返回一个只包含 tokenId 的占位 LoginUser
+            return LoginUser.builder()
+                    .tokenId(parts[0])  // tokenId
+                    .build();
 
         } catch (Exception e) {
             log.error("TokenParseError", "解析 RefreshToken 失败", e);
@@ -221,7 +260,7 @@ public class JwtTokenService implements TokenService {
     }
 
     /**
-     * 验证刷新令牌
+     * 验证刷新令牌（不透明格式）
      */
     @Override
     public boolean validateRefreshToken(String refreshToken) {
@@ -229,13 +268,19 @@ public class JwtTokenService implements TokenService {
             return false;
 
         try {
-            Claims claims = parseToken(refreshToken);
-            String tokenType = claims.get(CLAIM_TYPE, String.class);
-            
-            if (!TOKEN_TYPE_REFRESH.equals(tokenType))
+            String[] parts = parseOpaqueRefreshToken(refreshToken);
+            if (parts == null || parts.length != 3) {
                 return false;
-
-            return claims.getSubject() != null && claims.getExpiration() != null;
+            }
+            
+            // 验证格式有效性
+            String tokenId = parts[0];
+            String randomPart = parts[1];
+            String signature = parts[2];
+            
+            return StringUtils.isNotBlank(tokenId) 
+                    && StringUtils.isNotBlank(randomPart) 
+                    && StringUtils.isNotBlank(signature);
 
         } catch (Exception e) {
             log.debug("TokenValidationFailed", "RefreshToken 验证失败: " + e.getMessage());
@@ -245,25 +290,25 @@ public class JwtTokenService implements TokenService {
 
     /**
      * 使用刷新令牌刷新 Token 对
-     * 生成全新的 Token 对（新的 tokenId）
+     * 注意：RefreshToken 是不透明格式，需要配合 SessionService 使用
+     * 完整的用户信息从 Redis Session 获取
      */
     @Override
     public TokenPair refreshTokenPair(String refreshToken) {
         try {
             if (!validateRefreshToken(refreshToken))
-                throw new IllegalArgumentException("RefreshToken 无效或已过期");
+                throw new IllegalArgumentException("RefreshToken 无效或格式错误");
 
-            LoginUser loginUser = parseRefreshToken(refreshToken);
-            if (loginUser == null)
-                throw new IllegalArgumentException("无法从 RefreshToken 中解析用户信息");
+            // 从不透明 token 中提取 tokenId
+            String tokenId = getTokenIdFromRefreshToken(refreshToken);
+            if (tokenId == null)
+                throw new IllegalArgumentException("无法从 RefreshToken 中解析 tokenId");
 
-            // 创建全新的 Token 对（新的 tokenId）
-            TokenPair newTokenPair = createTokenPair(loginUser);
+            // 注意：这里只返回 tokenId，完整的刷新逻辑需要在 AuthService 中配合 SessionService 完成
+            log.info("TokenRefreshParsed", "解析 RefreshToken 成功 | tokenId: " + tokenId.substring(0, 8) + "...");
 
-            log.info("TokenPairRefreshed", "刷新 Token 对成功 | 用户: " + loginUser.getUserName() 
-                    + " | 新 tokenId: " + newTokenPair.getTokenId().substring(0, 8) + "...");
-
-            return newTokenPair;
+            // 返回 null 表示需要调用方从 Session 获取用户信息后再创建新 Token
+            return null;
 
         } catch (IllegalArgumentException e) {
             log.warn("TokenRefreshFailed", e.getMessage());
@@ -273,13 +318,29 @@ public class JwtTokenService implements TokenService {
             throw new RuntimeException("刷新令牌失败", e);
         }
     }
+    
+    /**
+     * 从 RefreshToken 中提取 tokenId
+     */
+    public String getTokenIdFromRefreshToken(String refreshToken) {
+        String[] parts = parseOpaqueRefreshToken(refreshToken);
+        return parts != null ? parts[0] : null;
+    }
 
     /**
      * 获取 Token 中的 tokenId
+     * 支持 AccessToken (JWT) 和 RefreshToken (不透明格式)
      */
     @Override
     public String getTokenId(String token) {
         try {
+            // 先尝试作为不透明 RefreshToken 解析
+            String[] parts = parseOpaqueRefreshToken(token);
+            if (parts != null && parts.length == 3) {
+                return parts[0];
+            }
+            
+            // 再尝试作为 JWT AccessToken 解析
             Claims claims = parseToken(token);
             return claims.get(CLAIM_TOKEN_ID, String.class);
         } catch (Exception e) {
@@ -287,8 +348,6 @@ public class JwtTokenService implements TokenService {
             return null;
         }
     }
-
-    // ==================== 私有辅助方法 ====================
 
     /**
      * 解析 Token
@@ -342,8 +401,8 @@ public class JwtTokenService implements TokenService {
     private SecretKey getSecretKey() {
         String secret = securityProperties.getToken().getSecret();
         
-        if (secret == null || secret.length() < 32)
-            throw new IllegalStateException("JWT 密钥长度不足，至少需要 32 个字符");
+        if (secret == null || secret.length() < 64)
+            throw new IllegalStateException("JWT 密钥长度不足，至少需要 64 个字符");
 
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }

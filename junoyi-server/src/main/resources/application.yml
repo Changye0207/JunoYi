@@ -132,8 +132,8 @@ junoyi:
       - /system/info
     token:
       header: Authorization
-      # 令牌密钥
-      secret: fd5K48pq6pyZaBoYk56mGiEWVM4qcX0k9PHR
+      # 令牌密钥 (HS512 算法要求至少 64 字符)
+      secret: fd5K48pq6pyZaBoYk56mGiEWVM4qcX0k9PHRjunoyi2025SecureTokenKeyForHS512Algorithm
       # Access Token 有效期
       access-expire:
         web: 30m

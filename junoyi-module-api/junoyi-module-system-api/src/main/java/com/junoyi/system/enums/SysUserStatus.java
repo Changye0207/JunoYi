@@ -9,12 +9,12 @@ public enum SysUserStatus {
     /**
      * 正常状态
      */
-    NORMAL(0, "正常"),
+    NORMAL(1, "正常"),
 
     /**
      * 禁用状态
      */
-    DISABLED(1, "禁用"),
+    DISABLED(0, "禁用"),
 
     /**
      * 锁定状态（密码错误次数过多）
