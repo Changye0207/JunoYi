@@ -7,6 +7,7 @@ import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.service.AuthService;
 import com.junoyi.framework.security.token.TokenPair;
+import com.junoyi.framework.security.utils.PasswordUtils;
 import com.junoyi.system.domain.dto.LoginRequest;
 import com.junoyi.system.domain.po.LoginIdentity;
 import com.junoyi.system.domain.po.SysUser;
@@ -31,9 +32,6 @@ public class SysAuthServiceImpl implements ISysAuthService {
 
     private final AuthService authService;
     private final SysUserMapper sysUserMapper;
-    
-    // 密码加密器（可以注入为 Bean）
-//    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public AuthVo login(LoginRequest loginRequest) {
@@ -47,7 +45,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
         validateUser(user);
 
         // 校验密码
-        validatePassword(loginRequest.getPassword(), user.getPassword());
+        validatePassword(loginRequest.getPassword(), user.getSalt(), user.getPassword());
 
         // 构建 LoginUser
         LoginUser loginUser = buildLoginUser(user);
@@ -125,14 +123,12 @@ public class SysAuthServiceImpl implements ISysAuthService {
     /**
      * 校验密码
      */
-    private void validatePassword(String rawPassword, String encodedPassword) {
-        if (StringUtils.isBlank(rawPassword)) {
+    private void validatePassword(String rawPassword, String salt, String encodedPassword) {
+        if (StringUtils.isBlank(rawPassword))
             throw new RuntimeException("密码不能为空");
-        }
 
-//        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-//            throw new RuntimeException("密码错误");
-//        }
+        if (!PasswordUtils.matches(rawPassword, salt, encodedPassword))
+            throw new RuntimeException("密码错误");
     }
 
     /**
