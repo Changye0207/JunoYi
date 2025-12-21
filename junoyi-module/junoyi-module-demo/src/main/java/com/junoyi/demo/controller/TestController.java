@@ -45,7 +45,7 @@ public class TestController {
     /**
      * 只允许桌面端使用
      */
-    @PlatformScope( PlatformType.DESKTOP_APP )
+    @PlatformScope( {PlatformType.DESKTOP_APP, PlatformType.ADMIN_WEB} )
     @GetMapping("/desktop")
     public R<String> helloWorldDesktop() {
         return R.ok();
