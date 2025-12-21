@@ -5,8 +5,8 @@ import com.junoyi.framework.core.utils.ServletUtils;
 import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
-import com.junoyi.framework.security.service.AuthService;
-import com.junoyi.framework.security.token.TokenPair;
+import com.junoyi.framework.security.helper.AuthHelper;
+import com.junoyi.framework.security.module.TokenPair;
 import com.junoyi.framework.security.utils.PasswordUtils;
 import com.junoyi.system.domain.dto.LoginRequest;
 import com.junoyi.system.domain.po.LoginIdentity;
@@ -30,7 +30,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SysAuthServiceImpl implements ISysAuthService {
 
-    private final AuthService authService;
+    private final AuthHelper authHelper;
     private final SysUserMapper sysUserMapper;
 
     @Override
@@ -58,7 +58,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
         PlatformType platformType = loginRequest.getPlatformType() != null 
                 ? loginRequest.getPlatformType() 
                 : PlatformType.ADMIN_WEB;
-        TokenPair tokenPair = authService.login(loginUser, platformType, loginIp, userAgent);
+        TokenPair tokenPair = authHelper.login(loginUser, platformType, loginIp, userAgent);
 
         // 构建返回结果
         AuthVo authVo = new AuthVo();

@@ -1,4 +1,4 @@
-package com.junoyi.framework.security.session;
+package com.junoyi.framework.security.helper;
 
 import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
@@ -7,8 +7,8 @@ import com.junoyi.framework.redis.utils.RedisUtils;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.properties.SecurityProperties;
-import com.junoyi.framework.security.token.JwtTokenService;
-import com.junoyi.framework.security.token.TokenPair;
+import com.junoyi.framework.security.module.UserSession;
+import com.junoyi.framework.security.module.TokenPair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 会话服务实现类
+ * 会话服务助手实现类
  *
  * Redis 存储结构：
  * 1. session:{tokenId}     -> UserSession（会话详情）
@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-public class SessionServiceImpl implements SessionService {
+public class SessionHelperImpl implements SessionHelper {
 
-    private final JunoYiLog log = JunoYiLogFactory.getLogger(SessionServiceImpl.class);
-    private final JwtTokenService tokenService;
+    private final JunoYiLog log = JunoYiLogFactory.getLogger(SessionHelperImpl.class);
+    private final JwtTokenHelper tokenService;
     private final SecurityProperties securityProperties;
 
     // Redis Key 前缀

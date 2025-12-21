@@ -1,4 +1,4 @@
-package com.junoyi.framework.security.token;
+package com.junoyi.framework.security.helper;
 
 import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
@@ -6,6 +6,7 @@ import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.properties.SecurityProperties;
+import com.junoyi.framework.security.module.TokenPair;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 import static com.junoyi.framework.core.constant.Constants.*;
 
 /**
- * JWT Token 服务实现类
+ * JWT Token 服务助手实现类
  * 
  * 设计原则：AccessToken 和 RefreshToken 逻辑关联，但生成上完全独立
  * - 通过共享的 tokenId 建立关联
@@ -39,9 +40,9 @@ import static com.junoyi.framework.core.constant.Constants.*;
  */
 @Component
 @RequiredArgsConstructor
-public class JwtTokenService implements TokenService {
+public class JwtTokenHelper implements TokenHelper {
 
-    private final JunoYiLog log = JunoYiLogFactory.getLogger(JwtTokenService.class);
+    private final JunoYiLog log = JunoYiLogFactory.getLogger(JwtTokenHelper.class);
 
     private final SecurityProperties securityProperties;
 

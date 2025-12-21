@@ -1,25 +1,24 @@
-package com.junoyi.framework.security.service;
+package com.junoyi.framework.security.helper;
 
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
-import com.junoyi.framework.security.session.SessionService;
-import com.junoyi.framework.security.session.UserSession;
-import com.junoyi.framework.security.token.TokenPair;
+import com.junoyi.framework.security.module.UserSession;
+import com.junoyi.framework.security.module.TokenPair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
- * 认证服务实现类
+ * 认证服务助手实现
  *
  * @author Fan
  */
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class AuthHelperImpl implements AuthHelper {
 
-    private final SessionService sessionService;
+    private final SessionHelper sessionHelper;
 
     /**
      * 用户登录认证（推荐使用）
@@ -34,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
     public TokenPair login(LoginUser loginUser, PlatformType platformType, String loginIp, String userAgent) {
         // 设置平台类型
         loginUser.setPlatformType(platformType);
-        return sessionService.login(loginUser, loginIp, userAgent);
+        return sessionHelper.login(loginUser, loginIp, userAgent);
     }
 
     /**
@@ -85,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public boolean logout(String token) {
-        return sessionService.logout(token);
+        return sessionHelper.logout(token);
     }
 
     /**
@@ -96,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public TokenPair refresh(String refreshToken) {
-        return sessionService.refreshToken(refreshToken);
+        return sessionHelper.refreshToken(refreshToken);
     }
 
     /**
@@ -107,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public LoginUser getLoginUser(String token) {
-        return sessionService.getLoginUser(token);
+        return sessionHelper.getLoginUser(token);
     }
 
     /**
@@ -118,7 +117,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public UserSession getSession(String token) {
-        return sessionService.getSession(token);
+        return sessionHelper.getSession(token);
     }
 
     /**
@@ -129,7 +128,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public UserSession getSessionByTokenId(String tokenId) {
-        return sessionService.getSessionByTokenId(tokenId);
+        return sessionHelper.getSessionByTokenId(tokenId);
     }
 
     /**
@@ -140,7 +139,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public boolean isValid(String token) {
-        return sessionService.isValid(token);
+        return sessionHelper.isValid(token);
     }
 
     /**
@@ -152,7 +151,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public boolean updatePermissions(String tokenId, LoginUser loginUser) {
-        return sessionService.updateSession(tokenId, loginUser);
+        return sessionHelper.updateSession(tokenId, loginUser);
     }
 
     /**
@@ -163,7 +162,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public List<UserSession> getUserSessions(Long userId) {
-        return sessionService.getUserSessions(userId);
+        return sessionHelper.getUserSessions(userId);
     }
 
     /**
@@ -174,7 +173,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public boolean kickOut(String tokenId) {
-        return sessionService.kickOut(tokenId);
+        return sessionHelper.kickOut(tokenId);
     }
 
     /**
@@ -185,7 +184,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public int kickOutAll(Long userId) {
-        return sessionService.kickOutAll(userId);
+        return sessionHelper.kickOutAll(userId);
     }
 }
 

@@ -5,8 +5,8 @@ import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.security.filter.ApiEncryptFilter;
 import com.junoyi.framework.security.filter.TokenAuthenticationTokenFilter;
 import com.junoyi.framework.security.properties.SecurityProperties;
-import com.junoyi.framework.security.session.SessionService;
-import com.junoyi.framework.security.token.JwtTokenService;
+import com.junoyi.framework.security.helper.SessionHelper;
+import com.junoyi.framework.security.helper.JwtTokenHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,8 +26,8 @@ public class SecurityConfiguration {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SecurityConfiguration.class);
     
-    private final JwtTokenService tokenService;
-    private final SessionService sessionService;
+    private final JwtTokenHelper tokenService;
+    private final SessionHelper sessionHelper;
     private final SecurityProperties securityProperties;
 
     /**
@@ -60,7 +60,7 @@ public class SecurityConfiguration {
     @Bean
     public FilterRegistrationBean<TokenAuthenticationTokenFilter> tokenAuthenticationFilter() {
         TokenAuthenticationTokenFilter filter = new TokenAuthenticationTokenFilter(
-                tokenService, sessionService, securityProperties);
+                tokenService, sessionHelper, securityProperties);
         
         FilterRegistrationBean<TokenAuthenticationTokenFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);

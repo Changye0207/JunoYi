@@ -1,17 +1,18 @@
-package com.junoyi.framework.security.session;
+package com.junoyi.framework.security.helper;
 
 import com.junoyi.framework.security.module.LoginUser;
-import com.junoyi.framework.security.token.TokenPair;
+import com.junoyi.framework.security.module.UserSession;
+import com.junoyi.framework.security.module.TokenPair;
 
 import java.util.List;
 
 /**
- * 会话服务接口
+ * 会话服务助手接口
  * 提供用户登录、登出、会话管理等功能
  *
  * @author Fan
  */
-public interface SessionService {
+public interface SessionHelper {
 
     /**
      * 用户登录，创建会话

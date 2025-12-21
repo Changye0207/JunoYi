@@ -1,4 +1,4 @@
-package com.junoyi.framework.security.token;
+package com.junoyi.framework.security.module;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

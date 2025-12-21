@@ -1,4 +1,4 @@
-package com.junoyi.framework.security.session;
+package com.junoyi.framework.security.module;
 
 import com.junoyi.framework.security.enums.PlatformType;
 import lombok.AllArgsConstructor;

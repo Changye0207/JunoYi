@@ -6,9 +6,9 @@ import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.security.context.SecurityContext;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.properties.SecurityProperties;
-import com.junoyi.framework.security.session.SessionService;
-import com.junoyi.framework.security.session.UserSession;
-import com.junoyi.framework.security.token.JwtTokenService;
+import com.junoyi.framework.security.helper.SessionHelper;
+import com.junoyi.framework.security.module.UserSession;
+import com.junoyi.framework.security.helper.JwtTokenHelper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,8 +36,8 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(TokenAuthenticationTokenFilter.class);
 
-    private final JwtTokenService tokenService;
-    private final SessionService sessionService;
+    private final JwtTokenHelper tokenService;
+    private final SessionHelper sessionHelper;
     private final SecurityProperties securityProperties;
     
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
@@ -73,7 +73,7 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
             }
 
             // 从 Redis 获取会话（获取最新的权限信息）
-            UserSession session = sessionService.getSession(token);
+            UserSession session = sessionHelper.getSession(token);
             
             if (session == null) {
                 // 会话不存在（可能被踢出或主动登出）
@@ -100,7 +100,7 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
 
             // 更新最后访问时间
             String tokenId = tokenService.getTokenId(token);
-            sessionService.touch(tokenId);
+            sessionHelper.touch(tokenId);
 
             log.debug("TokenValidated", "User: " + loginUser.getUserName() + " | URI: " + requestURI);
 

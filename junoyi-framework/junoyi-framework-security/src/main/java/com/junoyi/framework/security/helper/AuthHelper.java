@@ -1,19 +1,19 @@
-package com.junoyi.framework.security.service;
+package com.junoyi.framework.security.helper;
 
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
-import com.junoyi.framework.security.session.UserSession;
-import com.junoyi.framework.security.token.TokenPair;
+import com.junoyi.framework.security.module.UserSession;
+import com.junoyi.framework.security.module.TokenPair;
 
 import java.util.List;
 
 /**
- * 认证服务接口
+ * 认证服务助手
  * 提供简化的认证 API，供业务模块使用
  *
  * @author Fan
  */
-public interface AuthService {
+public interface AuthHelper {
 
     /**
      * 用户登录（推荐使用）

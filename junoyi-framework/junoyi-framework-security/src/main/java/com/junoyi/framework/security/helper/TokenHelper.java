@@ -1,14 +1,15 @@
-package com.junoyi.framework.security.token;
+package com.junoyi.framework.security.helper;
 
 import com.junoyi.framework.security.module.LoginUser;
+import com.junoyi.framework.security.module.TokenPair;
 
 /**
- * Token 业务接口类
+ * Token 业务助手接口类
  * AccessToken 和 RefreshToken 逻辑关联，但生成上完全独立
  *
  * @author Fan
  */
-public interface TokenService {
+public interface TokenHelper {
 
     /**
      * 创建 Token 对（AccessToken + RefreshToken）
