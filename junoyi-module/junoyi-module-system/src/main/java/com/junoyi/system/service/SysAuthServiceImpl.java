@@ -38,34 +38,49 @@ public class SysAuthServiceImpl implements ISysAuthService {
         // 解析登录账号类型
         LoginIdentity loginIdentity = parseIdentity(loginRequest);
 
-        // 根据账号类型查询用户
-        SysUser user = findUserByIdentity(loginIdentity);
-
-        // 登录校验（用户状态等）
-        validateUser(user);
-
-        // 校验密码
-        validatePassword(loginRequest.getPassword(), user.getSalt(), user.getPassword());
-
-        // 构建 LoginUser
-        LoginUser loginUser = buildLoginUser(user);
-
         // 获取请求信息
         String loginIp = ServletUtils.getClientIp();
         String userAgent = ServletUtils.getUserAgent();
-
-        // 调用 AuthService 登录（指定平台类型，自动创建会话存入 Redis）
+        
+        // 获取平台类型
         PlatformType platformType = loginRequest.getPlatformType() != null 
                 ? loginRequest.getPlatformType() 
                 : PlatformType.ADMIN_WEB;
-        TokenPair tokenPair = authHelper.login(loginUser, platformType, loginIp, userAgent);
 
-        // 构建返回结果
-        AuthVo authVo = new AuthVo();
-        authVo.setAccessToken(tokenPair.getAccessToken());
-        authVo.setRefreshToken(tokenPair.getRefreshToken());
+        try {
+            // 根据账号类型查询用户
+            SysUser user = findUserByIdentity(loginIdentity);
 
-        return authVo;
+            // 登录校验（用户状态等）
+            validateUser(user);
+
+            // 校验密码
+            validatePassword(loginRequest.getPassword(), user.getSalt(), user.getPassword());
+
+            // 构建 LoginUser
+            LoginUser loginUser = buildLoginUser(user);
+
+            // 调用 AuthHelper 登录（自动创建会话存入 Redis）
+            TokenPair tokenPair = authHelper.login(loginUser, platformType, loginIp, userAgent);
+
+            // 登录成功，清除失败记录
+            authHelper.onLoginSuccess(loginIdentity.getAccount(), platformType, loginIp);
+
+            // 构建返回结果
+            AuthVo authVo = new AuthVo();
+            authVo.setAccessToken(tokenPair.getAccessToken());
+            authVo.setRefreshToken(tokenPair.getRefreshToken());
+
+            return authVo;
+            
+        } catch (Exception e) {
+            // 登录失败，记录失败次数
+            boolean locked = authHelper.onLoginFail(loginIdentity.getAccount(), platformType, loginIp);
+            if (locked) {
+                throw new RuntimeException("登录失败次数过多，账号已被锁定，请稍后再试");
+            }
+            throw e;
+        }
     }
 
     /**
@@ -127,8 +142,9 @@ public class SysAuthServiceImpl implements ISysAuthService {
         if (StringUtils.isBlank(rawPassword))
             throw new RuntimeException("密码不能为空");
 
-        if (!PasswordUtils.matches(rawPassword, salt, encodedPassword))
+        if (!PasswordUtils.matches(rawPassword, salt, encodedPassword)) {
             throw new RuntimeException("密码错误");
+        }
     }
 
     /**

@@ -226,42 +226,39 @@ public class AuthHelperImpl implements AuthHelper {
      * @return 如果返回true账号/IP已经锁定需要等待冷却，返回false就还能尝试登录
      */
     @Override
-    public boolean onLoginFail(String account,PlatformType platformType, String ip){
+    public boolean onLoginFail(String account, PlatformType platformType, String ip) {
         // 获取账号错误次数
-        String accountKey = getAccountKey(account,platformType);
-        Integer accountFailCount = (Integer) RedisUtils.getCacheObject(accountKey);
+        String accountKey = getAccountKey(account, platformType);
+        Integer accountFailCount = RedisUtils.getCacheObject(accountKey);
+        accountFailCount = (accountFailCount == null ? 0 : accountFailCount) + 1;
 
-        accountFailCount = accountFailCount == null ? 1 : accountFailCount ++;
+        // 保存账号失败次数
+        RedisUtils.setCacheObject(accountKey, accountFailCount,
+                Duration.ofMinutes(securityProperties.getLogin().getFailCollDownMinutes()));
 
-        if (accountFailCount >= securityProperties.getLogin().getMaxFailCount()){
-            log.info("", "账号超过登录次数，进入登录冷却");
-
-            RedisUtils.setCacheObject(accountKey, accountFailCount,
-                    Duration.ofMinutes(securityProperties.getLogin().getFailCollDownMinutes()));
-
+        if (accountFailCount >= securityProperties.getLogin().getMaxFailCount()) {
+            log.info("AccountLocked", "账号超过登录次数，进入登录冷却: " + account);
         }
 
         // IP限制模式
-        if (securityProperties.getLogin().isEnableIpLimit()){
+        boolean ipLocked = false;
+        if (securityProperties.getLogin().isEnableIpLimit()) {
             String ipKey = getIpKey(ip);
-            Integer ipFailCount = (Integer) RedisUtils.getCacheObject(ipKey);
+            Integer ipFailCount = RedisUtils.getCacheObject(ipKey);
+            ipFailCount = (ipFailCount == null ? 0 : ipFailCount) + 1;
 
-            ipFailCount = ipFailCount == null ? 1 : ipFailCount ++;
+            // 保存IP失败次数
+            RedisUtils.setCacheObject(ipKey, ipFailCount,
+                    Duration.ofMinutes(securityProperties.getLogin().getIpFailCollDownMinutes()));
 
-            if (ipFailCount >= securityProperties.getLogin().getIpMaxFailCount() ){
-                log.info("", "当前IP超过登录次数，已经锁定等待冷却");
-
-                RedisUtils.setCacheObject(ipKey, ipFailCount,
-                        Duration.ofMinutes(securityProperties.getLogin().getIpFailCollDownMinutes()));
+            if (ipFailCount >= securityProperties.getLogin().getIpMaxFailCount()) {
+                log.info("IpLocked", "当前IP超过登录次数，已经锁定等待冷却: " + ip);
+                ipLocked = true;
             }
-
         }
 
         // 检查是否锁定进入冷却
         boolean accountLocked = accountFailCount >= securityProperties.getLogin().getMaxFailCount();
-        boolean ipLocked = securityProperties.getLogin().isEnableIpLimit() &&
-                (Integer) RedisUtils.getCacheObject(getIpKey(ip)) >= securityProperties.getLogin().getIpMaxFailCount();
-
         return accountLocked || ipLocked;
     }
 
