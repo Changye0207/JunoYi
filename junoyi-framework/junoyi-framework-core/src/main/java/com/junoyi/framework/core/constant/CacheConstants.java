@@ -18,7 +18,7 @@ public interface CacheConstants {
      * 平台登录失败次数
      * 完整 Key: junoyi:login:fail:{platformType}:{username}
      * Value: 失败次数
-     * TTL: 冷却时间（例如5分钟、10分钟）
+     * TTL: 冷却时间
      */
     String LOGIN_FAIL = PREFIX + "login:fail:";
 
