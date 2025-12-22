@@ -1,5 +1,8 @@
 package com.junoyi.framework.web.exception;
 
+import com.junoyi.framework.core.domain.base.BaseException;
+import com.junoyi.framework.core.domain.module.R;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
@@ -14,4 +17,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(BaseException.class)
+    public R<?> handleBaseException(BaseException e) {
+        return R.fail(e.getCode(), e.getMessage());
+    }
 }
