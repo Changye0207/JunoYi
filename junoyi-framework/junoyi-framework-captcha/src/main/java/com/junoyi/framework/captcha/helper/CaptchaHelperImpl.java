@@ -4,6 +4,7 @@ import com.junoyi.framework.captcha.domain.CaptchaResult;
 import com.junoyi.framework.captcha.enums.CaptchaType;
 import com.junoyi.framework.captcha.generator.CaptchaGenerator;
 import com.junoyi.framework.captcha.properties.CaptchaProperties;
+import com.junoyi.framework.core.exception.captcha.CaptchaUnsupportedTypeException;
 
 import java.util.List;
 import java.util.Map;
@@ -74,12 +75,12 @@ public class CaptchaHelperImpl implements CaptchaHelper {
      *
      * @param type 验证码类型
      * @return 验证码生成器
-     * @throws IllegalArgumentException 当不支持该验证码类型时抛出异常
+     * @throws CaptchaUnsupportedTypeException 当不支持该验证码类型时抛出异常
      */
     private CaptchaGenerator getGenerator(CaptchaType type) {
         CaptchaGenerator generator = generatorMap.get(type);
         if (generator == null) {
-            throw new IllegalArgumentException("Unsupported captcha type: " + type);
+            throw new CaptchaUnsupportedTypeException("Unsupported captcha type: " + type);
         }
         return generator;
     }
