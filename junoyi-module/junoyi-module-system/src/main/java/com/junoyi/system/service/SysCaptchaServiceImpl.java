@@ -1,6 +1,7 @@
 package com.junoyi.system.service;
 
 import com.junoyi.framework.captcha.domain.CaptchaResult;
+import com.junoyi.framework.captcha.enums.CaptchaType;
 import com.junoyi.framework.captcha.helper.CaptchaHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,21 @@ public class SysCaptchaServiceImpl implements ISysCaptchaService {
 
     @Override
     public CaptchaResult getImageCaptcha() {
-        return captchaHelper.generate();
+        return captchaHelper.generate(CaptchaType.IMAGE);
+    }
+
+    @Override
+    public CaptchaResult getSliderCaptcha() {
+        return captchaHelper.generate(CaptchaType.SLIDER);
     }
 
     @Override
     public boolean validate(String captchaId, String code) {
         return captchaHelper.validate(captchaId, code);
+    }
+
+    @Override
+    public boolean validateSlider(String captchaId, String pointJson) {
+        return captchaHelper.validateSlider(captchaId, pointJson);
     }
 }

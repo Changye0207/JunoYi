@@ -1,6 +1,9 @@
 package com.junoyi.framework.captcha.config;
 
+import com.anji.captcha.service.CaptchaService;
+import com.anji.captcha.service.impl.CaptchaServiceFactory;
 import com.junoyi.framework.captcha.generator.ImageCaptchaGenerator;
+import com.junoyi.framework.captcha.generator.SliderCaptchaGenerator;
 import com.junoyi.framework.captcha.generator.CaptchaGenerator;
 import com.junoyi.framework.captcha.helper.CaptchaHelper;
 import com.junoyi.framework.captcha.helper.CaptchaHelperImpl;
@@ -17,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * 验证码模块自动配置
@@ -47,6 +51,36 @@ public class CaptchaConfiguration {
     public ImageCaptchaGenerator imageCaptchaGenerator(CaptchaProperties properties, CaptchaStore captchaStore) {
         log.info("[Captcha] Image captcha generator initialized, code type: {}", properties.getImage().getCodeType());
         return new ImageCaptchaGenerator(properties, captchaStore);
+    }
+
+    /**
+     * AJ-Captcha 服务 (用于滑块/点选验证码)
+     * 从 junoyi.captcha.slider 配置读取参数
+     */
+    @Bean
+    @ConditionalOnMissingBean(CaptchaService.class)
+    public CaptchaService captchaService(CaptchaProperties captchaProperties) {
+        CaptchaProperties.SliderCaptcha slider = captchaProperties.getSlider();
+        log.info("[Captcha] AJ-Captcha service initialized, waterMark: {}, tolerance: {}",
+                slider.getWaterMark(), slider.getTolerance());
+
+        Properties props = new Properties();
+        props.setProperty("captcha.type", "blockPuzzle");
+        props.setProperty("captcha.water.mark", slider.getWaterMark());
+        props.setProperty("captcha.slip.offset", String.valueOf(slider.getTolerance()));
+        props.setProperty("captcha.aes.status", String.valueOf(slider.isAesStatus()));
+        props.setProperty("captcha.interference.options", String.valueOf(slider.getInterferenceOptions()));
+
+        return CaptchaServiceFactory.getInstance(props);
+    }
+
+    /**
+     * 滑块验证码生成器
+     */
+    @Bean
+    public SliderCaptchaGenerator sliderCaptchaGenerator(CaptchaProperties properties, CaptchaStore captchaStore, CaptchaService captchaService) {
+        log.info("[Captcha] Slider captcha generator initialized");
+        return new SliderCaptchaGenerator(properties, captchaStore, captchaService);
     }
 
     /**

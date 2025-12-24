@@ -91,6 +91,18 @@ public class CaptchaProperties {
          * 背景图片高度
          */
         private int height = 155;
+        /**
+         * 水印文字
+         */
+        private String waterMark = "JunoYi";
+        /**
+         * 是否启用AES加密
+         */
+        private boolean aesStatus = true;
+        /**
+         * 干扰项数量 (0-2)
+         */
+        private int interferenceOptions = 0;
     }
 
     @Data

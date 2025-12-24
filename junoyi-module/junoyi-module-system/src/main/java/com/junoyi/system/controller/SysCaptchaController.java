@@ -14,39 +14,42 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/captcha")
 @RequiredArgsConstructor
+
 public class SysCaptchaController {
 
     private final ISysCaptchaService captchaService;
 
     /**
      * 获取图形验证码
-     *
-     * @return R<CaptchaResult> 包含图形验证码结果的响应对象
      */
     @GetMapping("/image")
     public R<CaptchaResult> getImageCaptcha() {
-        CaptchaResult result = captchaService.getImageCaptcha();
-        return R.ok(result);
+        return R.ok(captchaService.getImageCaptcha());
     }
 
     /**
      * 获取滑块验证码
-     *
-     * @return R<CaptchaResult> 包含滑块验证码结果的响应对象
      */
     @GetMapping("/slider")
-    public R<CaptchaResult> getSliderCaptcha(){
-
-        return R.ok();
+    public R<CaptchaResult> getSliderCaptcha() {
+        return R.ok(captchaService.getSliderCaptcha());
     }
 
     /**
-     * 获取点击验证码
-     *
-     * @return R<CaptchaResult> 包含点击验证码结果的响应对象
+     * 校验图片验证码
      */
-    @GetMapping("/click")
-    public R<CaptchaResult> getClickCaptcha(){
-        return R.ok();
+    @PostMapping("/validate")
+    public R<Boolean> validate(@RequestParam String captchaId, @RequestParam String code) {
+        return R.ok(captchaService.validate(captchaId, code));
+    }
+
+    /**
+     * 校验滑块验证码
+     * @param captchaId 验证码ID
+     * @param pointJson 滑块坐标JSON，格式: {"x":100,"y":5}
+     */
+    @PostMapping("/validate/slider")
+    public R<Boolean> validateSlider(@RequestParam("captchaId") String captchaId, @RequestParam("pointJson") String pointJson) {
+        return R.ok(captchaService.validateSlider(captchaId, pointJson));
     }
 }

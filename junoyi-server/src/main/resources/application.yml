@@ -127,6 +127,7 @@ junoyi:
       # 允许跨域访问的源（Origin）
       allowed-origins:
         - https://admin.junoyi.com
+        - http://127.0.0.1:5500
       # 允许跨域的方法
       allowed-methods:
         - GET
@@ -210,6 +211,12 @@ junoyi:
     slider:
       # 滑块容差值（像素）
       tolerance: 5
+      # 水印文字
+      water-mark: JunoYi
+      # 是否启用AES加密
+      aes-status: true
+      # 干扰项数量 (0-2)
+      interference-options: 0
     # 点选验证码配置
     click:
       # 需要点击的文字数量
