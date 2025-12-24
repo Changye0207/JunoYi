@@ -13,10 +13,27 @@
     <artifactId>junoyi-framework-captcha</artifactId>
 
     <description>
-        验证码验证核心模块
+        人机验证(验证码)核心模块
     </description>
 
     <dependencies>
+        <!--   SpringBoot 基础     -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
 
+        <!--    Spring Configuration    -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--   Hutool     -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
     </dependencies>
 </project>
