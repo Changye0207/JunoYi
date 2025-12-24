@@ -195,7 +195,7 @@ junoyi:
       # 图片高度
       height: 48
       # 干扰线数量
-      line-count: 5
+      line-count: 10
       # 验证码类型: math(数学运算) / char(字符)
       code-type: char
     # 滑块验证码配置
@@ -226,6 +226,7 @@ junoyi:
       - /auth/login
       - /auth/register
       - /system/info
+      - /captcha/**
       - /demo/**
     # 登录机制
     login:

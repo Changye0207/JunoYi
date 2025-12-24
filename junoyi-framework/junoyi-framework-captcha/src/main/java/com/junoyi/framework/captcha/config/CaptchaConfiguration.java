@@ -10,7 +10,6 @@ import com.junoyi.framework.captcha.store.RedisCaptchaStore;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -36,7 +35,6 @@ public class CaptchaConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(CaptchaStore.class)
-    @ConditionalOnBean(RedissonClient.class)
     public CaptchaStore captchaStore(RedissonClient redissonClient) {
         log.info("[Captcha] Redis captcha store initialized");
         return new RedisCaptchaStore(redissonClient);
@@ -46,7 +44,6 @@ public class CaptchaConfiguration {
      * 图片验证码生成器
      */
     @Bean
-    @ConditionalOnBean(CaptchaStore.class)
     public ImageCaptchaGenerator imageCaptchaGenerator(CaptchaProperties properties, CaptchaStore captchaStore) {
         log.info("[Captcha] Image captcha generator initialized, code type: {}", properties.getImage().getCodeType());
         return new ImageCaptchaGenerator(properties, captchaStore);

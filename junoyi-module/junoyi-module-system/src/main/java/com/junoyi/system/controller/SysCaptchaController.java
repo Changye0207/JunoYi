@@ -1,12 +1,13 @@
 package com.junoyi.system.controller;
 
-import com.junoyi.framework.captcha.enums.CaptchaScene;
-import com.junoyi.framework.captcha.enums.CaptchaType;
+import com.junoyi.framework.captcha.domain.CaptchaResult;
 import com.junoyi.framework.core.domain.module.R;
+import com.junoyi.system.service.ISysCaptchaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * 验证码控制器
  *
  * @author Fan
  */
@@ -15,26 +16,23 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SysCaptchaController {
 
+    private final ISysCaptchaService captchaService;
+
     /**
-     * 获取验证码接口
-     * 本接口根据传入场景，去动态判断是否用什么样的验证码
-     * @param scene 验证场景
-     * @param captchaType 验证类型
-     * @return R<?> 统一响应结果
+     * 获取图形验证码
      */
-    @GetMapping
-    public R<?> getCaptcha(@RequestParam CaptchaScene scene, @RequestParam(required = false) CaptchaType captchaType){
-
-        // 解析场景
-
-
-
-        return R.ok();
+    @GetMapping("/image")
+    public R<CaptchaResult> getImageCaptcha() {
+        CaptchaResult result = captchaService.getImageCaptcha();
+        return R.ok(result);
     }
 
-    @PostMapping("/send")
-    public R<?> sendCaptchaMessage(){
-        return R.ok();
+    /**
+     * 校验验证码
+     */
+    @PostMapping("/validate")
+    public R<Boolean> validate(@RequestParam String captchaId, @RequestParam String code) {
+        boolean valid = captchaService.validate(captchaId, code);
+        return R.ok(valid);
     }
-
 }
