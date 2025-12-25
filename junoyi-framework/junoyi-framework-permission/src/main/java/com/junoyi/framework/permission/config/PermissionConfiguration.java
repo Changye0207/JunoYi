@@ -1,6 +1,6 @@
-package com.juynoyi.framework.permission.config;
+package com.junoyi.framework.permission.config;
 
-import com.juynoyi.framework.permission.properties.PermissionProperties;
+import com.junoyi.framework.permission.properties.PermissionProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 

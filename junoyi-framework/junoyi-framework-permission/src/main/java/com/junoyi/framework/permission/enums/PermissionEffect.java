@@ -1,4 +1,4 @@
-package com.juynoyi.framework.permission.enums;
+package com.junoyi.framework.permission.enums;
 
 
 /**

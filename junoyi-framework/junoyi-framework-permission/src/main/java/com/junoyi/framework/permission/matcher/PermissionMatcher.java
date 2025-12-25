@@ -1,4 +1,4 @@
-package com.juynoyi.framework.permission.matcher;
+package com.junoyi.framework.permission.matcher;
 
 /**
  * 权限匹配器

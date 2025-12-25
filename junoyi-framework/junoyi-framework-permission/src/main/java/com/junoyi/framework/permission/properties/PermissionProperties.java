@@ -1,4 +1,4 @@
-package com.juynoyi.framework.permission.properties;
+package com.junoyi.framework.permission.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
