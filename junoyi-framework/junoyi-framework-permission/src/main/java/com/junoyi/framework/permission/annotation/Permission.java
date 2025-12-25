@@ -55,7 +55,7 @@ public @interface Permission {
     /**
      * 权限类型（默认 API 类型）
      */
-    PermissionType type() default PermissionType.API;
+    PermissionType[] type() default PermissionType.API;
 
     /**
      * 权限校验失败时的提示信息

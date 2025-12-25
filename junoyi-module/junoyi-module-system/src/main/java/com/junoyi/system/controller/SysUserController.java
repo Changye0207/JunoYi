@@ -4,7 +4,10 @@ import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.permission.annotation.Permission;
+import com.junoyi.framework.permission.enums.Logical;
 import com.junoyi.framework.permission.enums.PermissionType;
+import com.junoyi.framework.security.annotation.PlatformScope;
+import com.junoyi.framework.security.enums.PlatformType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +28,14 @@ public class SysUserController {
      */
     @GetMapping
     @Permission(
-            value = "system.user.data.list",
-            type = PermissionType.API
+            // 需要拥有什么权限
+            value = {"system.user.data.list", "system.user.ui.view"},
+            // 权限逻辑计算（OR两者拥有一个，AND两者必须都要有）
+            logical = Logical.OR,
+            // 权限类型 API、后台菜单页面、UI组件
+            type = {PermissionType.API, PermissionType.UI_MENU, PermissionType.UI_COMPONENT}
     )
+    @PlatformScope(PlatformType.ADMIN_WEB)
     public R<?> getUserList(){
 
         return R.ok();
