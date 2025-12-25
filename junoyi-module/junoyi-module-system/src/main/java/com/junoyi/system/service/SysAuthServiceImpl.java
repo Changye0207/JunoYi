@@ -161,14 +161,21 @@ public class SysAuthServiceImpl implements ISysAuthService {
     private LoginUser buildLoginUser(SysUser user) {
         // TODO: 从数据库查询用户权限和角色
         Set<String> permissions = getUserPermissions(user.getUserId());
+        Set<String> groups = getUserGroups(user.getUserId());
         Set<Long> roles = getUserRoles(user.getUserId());
+        
+        // 判断是否为超级管理员（userId=1 或拥有 * 权限）
+        boolean isSuperAdmin = user.getUserId() == 1L || permissions.contains("*");
 
         return LoginUser.builder()
                 .userId(user.getUserId())
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
+                .deptId(user.getDeptId())
+                .superAdmin(isSuperAdmin)
                 // platformType 不在这里设置，由 authService.login() 参数传入
                 .permissions(permissions)
+                .groups(groups)
                 .roles(roles)
                 .build();
     }
@@ -178,8 +185,30 @@ public class SysAuthServiceImpl implements ISysAuthService {
      * TODO: 实现从数据库查询
      */
     private Set<String> getUserPermissions(Long userId) {
-        // 这里应该从数据库查询用户权限
+        // 超级管理员拥有所有权限
+        if (userId == 1L) {
+            Set<String> permissions = new HashSet<>();
+            permissions.add("*");
+            return permissions;
+        }
+        // TODO: 从数据库查询用户权限（合并权限组的 permissions）
         // return sysPermissionMapper.selectPermissionsByUserId(userId);
+        return new HashSet<>();
+    }
+
+    /**
+     * 获取用户权限组列表
+     * TODO: 实现从数据库查询
+     */
+    private Set<String> getUserGroups(Long userId) {
+        // 超级管理员
+        if (userId == 1L) {
+            Set<String> groups = new HashSet<>();
+            groups.add("super_admin");
+            return groups;
+        }
+        // TODO: 从数据库查询用户权限组
+        // return sysPermGroupMapper.selectGroupCodesByUserId(userId);
         return new HashSet<>();
     }
 
