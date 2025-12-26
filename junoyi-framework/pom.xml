@@ -26,6 +26,7 @@
         <module>junoyi-framework-event</module>
         <module>junoyi-framework-permission</module>
         <module>junoyi-framework-captcha</module>
+        <module>junoyi-framework-quartz</module>
     </modules>
 
 </project>
