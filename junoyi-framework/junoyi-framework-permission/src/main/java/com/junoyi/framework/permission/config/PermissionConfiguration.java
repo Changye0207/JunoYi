@@ -4,12 +4,13 @@ import com.junoyi.framework.permission.aspect.PermissionAspect;
 import com.junoyi.framework.permission.field.FieldPermissionModule;
 import com.junoyi.framework.permission.properties.PermissionProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 
 /**
@@ -20,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Fan
  */
 @Slf4j
-@Configuration
+@AutoConfiguration(before = JacksonAutoConfiguration.class)
 @EnableConfigurationProperties(PermissionProperties.class)
 public class PermissionConfiguration {
 

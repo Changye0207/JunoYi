@@ -7,8 +7,8 @@ import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.permission.annotation.FieldPermission;
+import com.junoyi.framework.permission.enums.MaskPattern;
 import com.junoyi.framework.permission.helper.PermissionHelper;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
