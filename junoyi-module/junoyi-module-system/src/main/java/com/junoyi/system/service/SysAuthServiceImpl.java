@@ -19,6 +19,7 @@ import com.junoyi.system.domain.bo.LoginBO;
 import com.junoyi.system.domain.po.LoginIdentity;
 import com.junoyi.system.domain.po.SysUser;
 import com.junoyi.system.domain.vo.AuthVo;
+import com.junoyi.system.domain.vo.UserInfoVo;
 import com.junoyi.system.enums.LoginType;
 import com.junoyi.system.enums.SysUserStatus;
 import com.junoyi.system.mapper.SysUserMapper;
@@ -220,4 +221,5 @@ public class SysAuthServiceImpl implements ISysAuthService {
         // return sysRoleMapper.selectRoleIdsByUserId(userId);
         return new HashSet<>();
     }
+
 }

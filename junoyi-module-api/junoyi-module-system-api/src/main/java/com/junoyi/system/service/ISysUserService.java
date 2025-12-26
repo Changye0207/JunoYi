@@ -1,5 +1,7 @@
 package com.junoyi.system.service;
 
+import com.junoyi.system.domain.po.SysUser;
+
 /**
  * 系统用户业务接口类
  *
@@ -7,4 +9,5 @@ package com.junoyi.system.service;
  */
 public interface ISysUserService {
 
+    SysUser getSysUserById(Long userId);
 }

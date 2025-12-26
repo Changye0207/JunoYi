@@ -1,5 +1,7 @@
 package com.junoyi.system.service;
 
+import com.junoyi.system.domain.po.SysUser;
+import com.junoyi.system.mapper.SysUserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,5 +12,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-public class SysUserServiceImpl implements ISysUserService{
+public class SysUserServiceImpl implements ISysUserService {
+
+    private final SysUserMapper sysUserMapper;
+
+    @Override
+    public SysUser getSysUserById(Long userId) {
+        return null;
+    }
 }
