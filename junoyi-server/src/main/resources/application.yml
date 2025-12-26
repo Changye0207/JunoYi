@@ -273,17 +273,10 @@ junoyi:
 
   # ==================== Permission 配置 ====================
   permission:
+    # 是否启用权限控制功能
     enable: true
-    cache:
-      enable: true
-      expire: 3600
-    super-admin:
-      enable: true
-      user-ids: [1]
-      permission: "*"
-    # 默认权限组(新用户默认权限组)
-    default-groups:
-      - guest
+    # 是否启用字段权限功能
+    field-permission-enable: true
 
 
 # Spring Boot服务器配置
