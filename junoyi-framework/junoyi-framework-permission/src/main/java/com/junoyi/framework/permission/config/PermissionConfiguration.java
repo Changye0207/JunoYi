@@ -1,6 +1,7 @@
 package com.junoyi.framework.permission.config;
 
 import com.junoyi.framework.permission.aspect.PermissionAspect;
+import com.junoyi.framework.permission.field.FieldPermissionModule;
 import com.junoyi.framework.permission.properties.PermissionProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,5 +29,17 @@ public class PermissionConfiguration {
     @ConditionalOnProperty(prefix = "junoyi.permission", name = "enable", havingValue = "true", matchIfMissing = true)
     public PermissionAspect permissionAspect(PermissionProperties properties) {
         return new PermissionAspect(properties);
+    }
+
+    /**
+     * 字段权限 Jackson 模块
+     * <p>
+     * 自动注册到 Spring Boot 的 ObjectMapper，处理 @FieldPermission 注解
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "junoyi.permission", name = "field-permission-enable", havingValue = "true", matchIfMissing = true)
+    public FieldPermissionModule fieldPermissionModule() {
+        return new FieldPermissionModule();
     }
 }
