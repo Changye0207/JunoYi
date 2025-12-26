@@ -1,5 +1,7 @@
 package com.junoyi.framework.permission.aspect;
 
+import com.junoyi.framework.log.core.JunoYiLog;
+import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.permission.annotation.Permission;
 import com.junoyi.framework.permission.enums.Logical;
 import com.junoyi.framework.permission.exception.NoPermissionException;
@@ -23,14 +25,23 @@ import java.lang.reflect.Method;
  *
  * @author Fan
  */
-@Slf4j
 @Aspect
 @Order(100)
 @RequiredArgsConstructor
 public class PermissionAspect {
 
+    private final JunoYiLog log = JunoYiLogFactory.getLogger(PermissionProperties.class);
+
     private final PermissionProperties properties;
 
+    /**
+     * 方法级别权限校验切面
+     * 拦截带有 @Permission 注解的方法，进行权限校验
+     *
+     * @param point 切点信息
+     * @return 方法执行结果
+     * @throws Throwable 方法执行异常
+     */
     @Around("@annotation(com.junoyi.framework.permission.annotation.Permission)")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         // 检查是否启用权限控制
@@ -49,6 +60,14 @@ public class PermissionAspect {
         return point.proceed();
     }
 
+    /**
+     * 类级别权限校验切面
+     * 拦截类上带有 @Permission 注解的方法，进行权限校验
+     *
+     * @param point 切点信息
+     * @return 方法执行结果
+     * @throws Throwable 方法执行异常
+     */
     @Around("@within(com.junoyi.framework.permission.annotation.Permission)")
     public Object aroundClass(ProceedingJoinPoint point) throws Throwable {
         // 检查是否启用权限控制
@@ -75,6 +94,8 @@ public class PermissionAspect {
 
     /**
      * 校验权限
+     *
+     * @param permission 权限注解信息
      */
     private void checkPermission(Permission permission) {
         if (permission == null) {

@@ -1,7 +1,6 @@
 package com.junoyi.framework.permission.annotation;
 
 import com.junoyi.framework.permission.enums.Logical;
-import com.junoyi.framework.permission.enums.PermissionType;
 
 import java.lang.annotation.*;
 
@@ -15,14 +14,11 @@ import java.lang.annotation.*;
  * // 单个权限
  * &#64;Permission("system.user.delete")
  *
+ * // 多个权限（OR 关系，默认）
+ * &#64;Permission({"system.user.delete", "system.admin"})
+ *
  * // 多个权限（AND 关系）
  * &#64;Permission(value = {"system.user.view", "system.user.edit"}, logical = Logical.AND)
- *
- * // 多个权限（OR 关系）
- * &#64;Permission(value = {"system.user.delete", "system.admin"}, logical = Logical.OR)
- *
- * // 指定权限类型
- * &#64;Permission(value = "button.user.export", type = PermissionType.BUTTON)
  * </pre>
  *
  * @author Fan
@@ -48,24 +44,14 @@ public @interface Permission {
      * 多个权限之间的逻辑关系
      * <p>
      * AND: 需要同时拥有所有权限
-     * OR: 拥有任意一个权限即可
+     * OR: 拥有任意一个权限即可（默认）
      */
     Logical logical() default Logical.OR;
 
     /**
-     * 权限类型（默认 API 类型）
-     */
-    PermissionType[] type() default PermissionType.API;
-
-    /**
-     * 权限校验失败时的提示信息
-     */
-    String message() default "没有访问权限";
-
-    /**
-     * 是否要求登录
+     * 是否要求登录（默认 true）
      * <p>
-     * true: 未登录直接拒绝，不进行权限校验
+     * true: 未登录直接拒绝
      * false: 允许匿名访问（但仍需满足权限要求）
      */
     boolean requireLogin() default true;
