@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Fan
  */
 @RestController
-@RequestMapping("/system/router")
+@RequestMapping("/router")
 @RequiredArgsConstructor
 public class SysRouterController extends BaseController {
 
@@ -29,6 +29,9 @@ public class SysRouterController extends BaseController {
     @GetMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
     public R<?> getRouter(){
+
+        // 通过用户来获取不同路由
+
         return R.ok();
     }
 }
