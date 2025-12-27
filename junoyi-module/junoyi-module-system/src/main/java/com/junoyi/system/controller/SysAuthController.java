@@ -93,7 +93,7 @@ public class SysAuthController extends BaseController {
     /**
      * 获取当前登录用户信息
      *
-     * @return R<SysUserVO> 统一响应结果，包含用户信息数据
+     * @return R<UserInfoVo> 统一响应结果，包含用户信息数据
      */
     @GetMapping("/info")
     public R<UserInfoVo> getUserInfo() {

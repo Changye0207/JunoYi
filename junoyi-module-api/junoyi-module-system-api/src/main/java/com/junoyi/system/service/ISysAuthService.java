@@ -12,8 +12,17 @@ import com.junoyi.system.domain.vo.UserInfoVo;
  */
 public interface ISysAuthService {
 
-
+    /**
+     * 登录
+     * @param loginBO 登录业务数据体
+     * @return 返回验证响应数据
+     */
     AuthVo login(LoginBO loginBO);
 
+    /**
+     * 获取用户信息接口
+     * @param loginUser 用户登录信息
+     * @return 返回用户响应接口
+     */
     UserInfoVo getUserInfo(LoginUser loginUser);
 }
