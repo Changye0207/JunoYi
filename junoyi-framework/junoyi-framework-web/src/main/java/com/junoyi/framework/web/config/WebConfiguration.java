@@ -12,6 +12,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 /**
  * Web 模块配置
@@ -23,6 +27,49 @@ import org.springframework.context.annotation.Configuration;
 public class WebConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(WebConfiguration.class);
+
+    /**
+     * CORS 跨域过滤器（最高优先级）
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "junoyi.web.cors", name = "enable", havingValue = "true", matchIfMissing = true)
+    public FilterRegistrationBean<CorsFilter> corsFilterRegistration(CorsProperties corsProperties) {
+        log.info("[CORS] CORS filter enabled, allowed origins: {}", corsProperties.getAllowedOrigins());
+        
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(corsProperties.isAllowCredentials());
+        
+        // 允许的源
+        if (corsProperties.getAllowedOrigins() != null) {
+            corsProperties.getAllowedOrigins().forEach(config::addAllowedOrigin);
+        }
+        
+        // 允许的方法
+        if (corsProperties.getAllowedMethods() != null) {
+            corsProperties.getAllowedMethods().forEach(config::addAllowedMethod);
+        } else {
+            config.addAllowedMethod("*");
+        }
+        
+        // 允许的请求头
+        if (corsProperties.getAllowedHeaders() != null) {
+            corsProperties.getAllowedHeaders().forEach(config::addAllowedHeader);
+        } else {
+            config.addAllowedHeader("*");
+        }
+        
+        // 暴露的响应头
+        config.addExposedHeader("Authorization");
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        
+        FilterRegistrationBean<CorsFilter> registration = new FilterRegistrationBean<>(new CorsFilter(source));
+        registration.setName("corsFilter");
+        // CORS 过滤器必须最先执行
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return registration;
+    }
 
     /**
      * XSS 过滤器

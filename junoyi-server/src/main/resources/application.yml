@@ -126,7 +126,6 @@ junoyi:
       allow-credentials: true
       # 允许跨域访问的源（Origin）
       allowed-origins:
-        - https://admin.junoyi.com
         - http://localhost:3006
       # 允许跨域的方法
       allowed-methods:
@@ -134,6 +133,7 @@ junoyi:
         - POST
         - PUT
         - DELETE
+        - OPTIONS
       # 允许跨域的请求头
       allowed-headers:
         - Authorization
