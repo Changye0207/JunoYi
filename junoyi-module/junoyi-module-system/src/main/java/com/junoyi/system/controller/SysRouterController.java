@@ -43,6 +43,13 @@ public class SysRouterController extends BaseController {
 
         LoginUser loginUser = getLoginUser();
 
+        // 如果用户是超级管理员，就获取所有菜单
+
+        // 按照角色筛选
+
+        // 按照权限筛
+
+
         return R.ok();
     }
 }
