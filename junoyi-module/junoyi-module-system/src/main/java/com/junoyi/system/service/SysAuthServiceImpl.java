@@ -10,6 +10,8 @@ import com.junoyi.framework.core.exception.user.UserStatusIsDisableException;
 import com.junoyi.framework.core.exception.user.UserStatusIsLockedException;
 import com.junoyi.framework.core.utils.ServletUtils;
 import com.junoyi.framework.core.utils.StringUtils;
+import com.junoyi.framework.log.core.JunoYiLog;
+import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.helper.AuthHelper;
@@ -36,10 +38,12 @@ import com.junoyi.system.mapper.SysUserGroupMapper;
 import com.junoyi.system.mapper.SysUserMapper;
 import com.junoyi.system.mapper.SysUserRoleMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,6 +55,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SysAuthServiceImpl implements ISysAuthService {
+
+    private final JunoYiLog log = JunoYiLogFactory.getLogger(SysAuthServiceImpl.class);
 
     private final AuthHelper authHelper;
     private final SysUserMapper sysUserMapper;
@@ -179,7 +185,6 @@ public class SysAuthServiceImpl implements ISysAuthService {
      * 构建 LoginUser（不再设置 platformType，由 login 参数传入）
      */
     private LoginUser buildLoginUser(SysUser user) {
-        // TODO: 从数据库查询用户权限和角色
         Set<String> permissions = getUserPermissions(user.getUserId());
         Set<String> groups = getUserGroups(user.getUserId());
         Set<Long> roles = getUserRoles(user.getUserId());
@@ -234,10 +239,13 @@ public class SysAuthServiceImpl implements ISysAuthService {
      * @return 权限组 code 集合
      */
     private Set<String> getUserGroups(Long userId) {
+        log.debug("[权限组查询] 开始查询用户权限组, userId={}", userId);
+        
         // 超级管理员
         if (userId == 1L) {
             Set<String> groups = new HashSet<>();
             groups.add("super_admin");
+            log.debug("[权限组查询] 超级管理员, 返回 super_admin");
             return groups;
         }
 
@@ -245,44 +253,55 @@ public class SysAuthServiceImpl implements ISysAuthService {
         Date now = new Date();
 
         // 1. 用户直接绑定的权限组
-        sysUserGroupMapper.selectList(
+        List<SysUserGroup> userGroups = sysUserGroupMapper.selectList(
                 new LambdaQueryWrapper<SysUserGroup>()
                         .select(SysUserGroup::getGroupId)
                         .eq(SysUserGroup::getUserId, userId)
                         .and(w -> w.isNull(SysUserGroup::getExpireTime)
                                 .or().gt(SysUserGroup::getExpireTime, now))
-        ).forEach(ug -> groupIds.add(ug.getGroupId()));
+        );
+        userGroups.forEach(ug -> groupIds.add(ug.getGroupId()));
+        log.debug("[权限组查询] 用户直绑权限组: {}", userGroups.stream().map(SysUserGroup::getGroupId).collect(Collectors.toList()));
 
         // 2. 用户角色绑定的权限组
         Set<Long> roleIds = getUserRoles(userId);
+        log.debug("[权限组查询] 用户角色: {}", roleIds);
         if (!roleIds.isEmpty()) {
-            sysRoleGroupMapper.selectList(
+            List<SysRoleGroup> roleGroups = sysRoleGroupMapper.selectList(
                     new LambdaQueryWrapper<SysRoleGroup>()
                             .select(SysRoleGroup::getGroupId)
                             .in(SysRoleGroup::getRoleId, roleIds)
                             .and(w -> w.isNull(SysRoleGroup::getExpireTime)
                                     .or().gt(SysRoleGroup::getExpireTime, now))
-            ).forEach(rg -> groupIds.add(rg.getGroupId()));
+            );
+            roleGroups.forEach(rg -> groupIds.add(rg.getGroupId()));
+            log.debug("[权限组查询] 角色绑定权限组: {}", roleGroups.stream().map(SysRoleGroup::getGroupId).collect(Collectors.toList()));
         }
 
         // 3. 用户部门绑定的权限组
         Set<Long> deptIds = getUserDept(userId);
+        log.debug("[权限组查询] 用户部门: {}", deptIds);
         if (!deptIds.isEmpty()) {
-            sysDeptGroupMapper.selectList(
+            List<SysDeptGroup> deptGroups = sysDeptGroupMapper.selectList(
                     new LambdaQueryWrapper<SysDeptGroup>()
                             .select(SysDeptGroup::getGroupId)
                             .in(SysDeptGroup::getDeptId, deptIds)
                             .and(w -> w.isNull(SysDeptGroup::getExpireTime)
                                     .or().gt(SysDeptGroup::getExpireTime, now))
-            ).forEach(dg -> groupIds.add(dg.getGroupId()));
+            );
+            deptGroups.forEach(dg -> groupIds.add(dg.getGroupId()));
+            log.debug("[权限组查询] 部门绑定权限组: {}", deptGroups.stream().map(SysDeptGroup::getGroupId).collect(Collectors.toList()));
         }
+
+        log.debug("[权限组查询] 合并后权限组ID: {}", groupIds);
 
         // 根据 groupId 查询权限组 code
         if (groupIds.isEmpty()) {
+            log.debug("[权限组查询] 无权限组, 返回空集合");
             return new HashSet<>();
         }
 
-        return sysPermGroupMapper.selectList(
+        Set<String> groupCodes = sysPermGroupMapper.selectList(
                 new LambdaQueryWrapper<SysPermGroup>()
                         .select(SysPermGroup::getCode)
                         .in(SysPermGroup::getId, groupIds)
@@ -290,6 +309,9 @@ public class SysAuthServiceImpl implements ISysAuthService {
         ).stream()
                 .map(SysPermGroup::getCode)
                 .collect(Collectors.toSet());
+        
+        log.debug("[权限组查询] 最终权限组Code: {}", groupCodes);
+        return groupCodes;
     }
 
     /**
