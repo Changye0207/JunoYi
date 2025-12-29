@@ -185,133 +185,156 @@ public class SysAuthServiceImpl implements ISysAuthService {
      * 构建 LoginUser（不再设置 platformType，由 login 参数传入）
      */
     private LoginUser buildLoginUser(SysUser user) {
-        Set<String> permissions = getUserPermissions(user.getUserId());
-        Set<String> groups = getUserGroups(user.getUserId());
-        Set<Long> roles = getUserRoles(user.getUserId());
-        Set<Long> userDept = getUserDept(user.getUserId());
-
+        Long userId = user.getUserId();
+        
+        // 一次性查询所有权限相关数据，避免重复查询
+        UserPermissionContext ctx = loadUserPermissionContext(userId);
+        
         // 判断是否为超级管理员（userId=1 或拥有 * 权限）
-        boolean isSuperAdmin = user.getUserId() == 1L || permissions.contains("*");
+        boolean isSuperAdmin = userId == 1L || ctx.permissions.contains("*");
 
         return LoginUser.builder()
-                .userId(user.getUserId())
+                .userId(userId)
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
-                .depts(userDept)
+                .depts(ctx.deptIds)
                 .superAdmin(isSuperAdmin)
-                // platformType 不在这里设置，由 authService.login() 参数传入
-                .permissions(permissions)
-                .groups(groups)
-                .roles(roles)
+                .permissions(ctx.permissions)
+                .groups(ctx.groupCodes)
+                .roles(ctx.roleIds)
                 .build();
     }
 
     /**
-     * 获取用户权限列表
-     * TODO: 实现从数据库查询
+     * 用户权限上下文（避免重复查询）
+     */
+    private static class UserPermissionContext {
+        // 用户角色列表
+        Set<Long> roleIds = new HashSet<>();
+        // 用户部门列表
+        Set<Long> deptIds = new HashSet<>();
+        // 用户权限组 ID 列表
+        Set<Long> groupIds = new HashSet<>();
+        // 用户权限组 code
+        Set<String> groupCodes = new HashSet<>();
+        // 用户权限集合
+        Set<String> permissions = new HashSet<>();
+    }
+
+    /**
+     * 一次性加载用户权限上下文
+     * 优化：角色、部门、权限组只查询一次，权限从权限组中提取
+     */
+    private UserPermissionContext loadUserPermissionContext(Long userId) {
+        log.debug("[权限加载] 开始加载用户权限上下文, userId={}", userId);
+        long startTime = System.currentTimeMillis();
+        
+        UserPermissionContext ctx = new UserPermissionContext();
+        
+        // 超级管理员特殊处理
+        if (userId == 1L) {
+            ctx.permissions.add("*");
+            ctx.groupCodes.add("super_admin");
+            log.debug("[权限加载] 超级管理员, 直接返回");
+            return ctx;
+        }
+
+        Date now = new Date();
+
+        // 查询用户角色（只查一次）
+        ctx.roleIds = sysUserRoleMapper.selectList(
+                new LambdaQueryWrapper<SysUserRole>()
+                        .select(SysUserRole::getRoleId)
+                        .eq(SysUserRole::getUserId, userId)
+        ).stream().map(SysUserRole::getRoleId).collect(Collectors.toSet());
+        log.debug("[权限加载] 用户角色: {}", ctx.roleIds);
+
+        // 查询用户部门（只查一次）
+        ctx.deptIds = sysUserDeptMapper.selectList(
+                new LambdaQueryWrapper<SysUserDept>()
+                        .select(SysUserDept::getDeptId)
+                        .eq(SysUserDept::getUserId, userId)
+        ).stream().map(SysUserDept::getDeptId).collect(Collectors.toSet());
+        log.debug("[权限加载] 用户部门: {}", ctx.deptIds);
+
+        // 收集所有权限组ID（用户直绑 + 角色绑定 + 部门绑定）
+        // 用户直绑权限组
+        sysUserGroupMapper.selectList(
+                new LambdaQueryWrapper<SysUserGroup>()
+                        .select(SysUserGroup::getGroupId)
+                        .eq(SysUserGroup::getUserId, userId)
+                        .and(w -> w.isNull(SysUserGroup::getExpireTime).or().gt(SysUserGroup::getExpireTime, now))
+        ).forEach(ug -> ctx.groupIds.add(ug.getGroupId()));
+
+        // 角色绑定权限组
+        if (!ctx.roleIds.isEmpty()) {
+            sysRoleGroupMapper.selectList(
+                    new LambdaQueryWrapper<SysRoleGroup>()
+                            .select(SysRoleGroup::getGroupId)
+                            .in(SysRoleGroup::getRoleId, ctx.roleIds)
+                            .and(w -> w.isNull(SysRoleGroup::getExpireTime).or().gt(SysRoleGroup::getExpireTime, now))
+            ).forEach(rg -> ctx.groupIds.add(rg.getGroupId()));
+        }
+
+        // 部门绑定权限组
+        if (!ctx.deptIds.isEmpty()) {
+            sysDeptGroupMapper.selectList(
+                    new LambdaQueryWrapper<SysDeptGroup>()
+                            .select(SysDeptGroup::getGroupId)
+                            .in(SysDeptGroup::getDeptId, ctx.deptIds)
+                            .and(w -> w.isNull(SysDeptGroup::getExpireTime).or().gt(SysDeptGroup::getExpireTime, now))
+            ).forEach(dg -> ctx.groupIds.add(dg.getGroupId()));
+        }
+        log.debug("[权限加载] 合并后权限组ID: {}", ctx.groupIds);
+
+        // 一次性查询权限组（code + permissions）
+        if (!ctx.groupIds.isEmpty()) {
+            List<SysPermGroup> groups = sysPermGroupMapper.selectList(
+                    new LambdaQueryWrapper<SysPermGroup>()
+                            .in(SysPermGroup::getId, ctx.groupIds)
+                            .eq(SysPermGroup::getStatus, 1)
+            );
+            for (SysPermGroup group : groups) {
+                ctx.groupCodes.add(group.getCode());
+                // 权限组的 permissions 字段存储权限列表
+                if (group.getPermissions() != null) {
+                    ctx.permissions.addAll(group.getPermissions());
+                }
+            }
+        }
+
+        // 查询用户独立权限（sys_user_perm）
+        // TODO: 如果有 sys_user_perm 表，在这里查询并合并到 ctx.permissions
+
+        log.debug("[权限加载] 最终权限组Code: {}", ctx.groupCodes);
+        log.debug("[权限加载] 最终权限: {}", ctx.permissions);
+        log.debug("[权限加载] 完成, 耗时: {}ms", System.currentTimeMillis() - startTime);
+        
+        return ctx;
+    }
+
+    /**
+     * 获取用户权限列表（供外部调用，如 getUserInfo）
      */
     private Set<String> getUserPermissions(Long userId) {
-        // 超级管理员拥有所有权限
         if (userId == 1L) {
             Set<String> permissions = new HashSet<>();
             permissions.add("*");
             return permissions;
         }
-        // TODO: 从数据库查询用户权限（合并权限组的 permissions）
-        // 计算用户最终权限合集
-
-        // 权限合并
-        // 1 从sys_user_perm获取所有用户单独的权限
-        // 2 用户sys_user_group直绑的权限组
-        // 3 sys_role_group角色绑定的权限组
-        // 4 sys_dept_group部门绑定的权限组
-        // 通过这些权限组获取所有的权限，
-        // 最后得到一个权限的集合
-        // return sysPermissionMapper.selectPermissionsByUserId(userId);
-        return new HashSet<>();
+        return loadUserPermissionContext(userId).permissions;
     }
 
     /**
-     * 获取用户权限组列表
-     * 合并来源：用户直绑 + 角色绑定 + 部门绑定
-     *
-     * @param userId 用户ID
-     * @return 权限组 code 集合
+     * 获取用户权限组列表（供外部调用）
      */
     private Set<String> getUserGroups(Long userId) {
-        log.debug("[权限组查询] 开始查询用户权限组, userId={}", userId);
-        
-        // 超级管理员
         if (userId == 1L) {
             Set<String> groups = new HashSet<>();
             groups.add("super_admin");
-            log.debug("[权限组查询] 超级管理员, 返回 super_admin");
             return groups;
         }
-
-        Set<Long> groupIds = new HashSet<>();
-        Date now = new Date();
-
-        // 用户直接绑定的权限组
-        List<SysUserGroup> userGroups = sysUserGroupMapper.selectList(
-                new LambdaQueryWrapper<SysUserGroup>()
-                        .select(SysUserGroup::getGroupId)
-                        .eq(SysUserGroup::getUserId, userId)
-                        .and(w -> w.isNull(SysUserGroup::getExpireTime)
-                                .or().gt(SysUserGroup::getExpireTime, now))
-        );
-        userGroups.forEach(ug -> groupIds.add(ug.getGroupId()));
-        log.debug("[权限组查询] 用户直绑权限组: {}", userGroups.stream().map(SysUserGroup::getGroupId).collect(Collectors.toList()));
-
-        // 用户角色绑定的权限组
-        Set<Long> roleIds = getUserRoles(userId);
-        log.debug("[权限组查询] 用户角色: {}", roleIds);
-        if (!roleIds.isEmpty()) {
-            List<SysRoleGroup> roleGroups = sysRoleGroupMapper.selectList(
-                    new LambdaQueryWrapper<SysRoleGroup>()
-                            .select(SysRoleGroup::getGroupId)
-                            .in(SysRoleGroup::getRoleId, roleIds)
-                            .and(w -> w.isNull(SysRoleGroup::getExpireTime)
-                                    .or().gt(SysRoleGroup::getExpireTime, now))
-            );
-            roleGroups.forEach(rg -> groupIds.add(rg.getGroupId()));
-            log.debug("[权限组查询] 角色绑定权限组: {}", roleGroups.stream().map(SysRoleGroup::getGroupId).collect(Collectors.toList()));
-        }
-
-        // 用户部门绑定的权限组
-        Set<Long> deptIds = getUserDept(userId);
-        log.debug("[权限组查询] 用户部门: {}", deptIds);
-        if (!deptIds.isEmpty()) {
-            List<SysDeptGroup> deptGroups = sysDeptGroupMapper.selectList(
-                    new LambdaQueryWrapper<SysDeptGroup>()
-                            .select(SysDeptGroup::getGroupId)
-                            .in(SysDeptGroup::getDeptId, deptIds)
-                            .and(w -> w.isNull(SysDeptGroup::getExpireTime)
-                                    .or().gt(SysDeptGroup::getExpireTime, now))
-            );
-            deptGroups.forEach(dg -> groupIds.add(dg.getGroupId()));
-            log.debug("[权限组查询] 部门绑定权限组: {}", deptGroups.stream().map(SysDeptGroup::getGroupId).collect(Collectors.toList()));
-        }
-
-        log.debug("[权限组查询] 合并后权限组ID: {}", groupIds);
-
-        // 根据 groupId 查询权限组 code
-        if (groupIds.isEmpty()) {
-            log.debug("[权限组查询] 无权限组, 返回空集合");
-            return new HashSet<>();
-        }
-
-        Set<String> groupCodes = sysPermGroupMapper.selectList(
-                new LambdaQueryWrapper<SysPermGroup>()
-                        .select(SysPermGroup::getCode)
-                        .in(SysPermGroup::getId, groupIds)
-                        .eq(SysPermGroup::getStatus, 1)
-        ).stream()
-                .map(SysPermGroup::getCode)
-                .collect(Collectors.toSet());
-        
-        log.debug("[权限组查询] 最终权限组Code: {}", groupCodes);
-        return groupCodes;
+        return loadUserPermissionContext(userId).groupCodes;
     }
 
     /**
