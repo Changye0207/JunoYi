@@ -26,6 +26,7 @@ import com.junoyi.system.domain.po.SysPermGroup;
 import com.junoyi.system.domain.po.SysRoleGroup;
 import com.junoyi.system.domain.po.SysUserGroup;
 import com.junoyi.system.domain.vo.AuthVo;
+import com.junoyi.system.domain.po.SysUserPerm;
 import com.junoyi.system.domain.po.SysUserRole;
 import com.junoyi.system.domain.vo.UserInfoVO;
 import com.junoyi.system.enums.LoginType;
@@ -36,6 +37,7 @@ import com.junoyi.system.mapper.SysRoleGroupMapper;
 import com.junoyi.system.mapper.SysUserDeptMapper;
 import com.junoyi.system.mapper.SysUserGroupMapper;
 import com.junoyi.system.mapper.SysUserMapper;
+import com.junoyi.system.mapper.SysUserPermMapper;
 import com.junoyi.system.mapper.SysUserRoleMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +68,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
     private final SysRoleGroupMapper sysRoleGroupMapper;
     private final SysDeptGroupMapper sysDeptGroupMapper;
     private final SysPermGroupMapper sysPermGroupMapper;
+    private final SysUserPermMapper sysUserPermMapper;
 
     @Override
     public AuthVo login(LoginBO loginBO) {
@@ -304,7 +307,18 @@ public class SysAuthServiceImpl implements ISysAuthService {
         }
 
         // 查询用户独立权限（sys_user_perm）
-        // TODO: 如果有 sys_user_perm 表，在这里查询并合并到 ctx.permissions
+        List<SysUserPerm> userPerms = sysUserPermMapper.selectList(
+                new LambdaQueryWrapper<SysUserPerm>()
+                        .select(SysUserPerm::getPermission)
+                        .eq(SysUserPerm::getUserId, userId)
+                        .and(w -> w.isNull(SysUserPerm::getExpireTime).or().gt(SysUserPerm::getExpireTime, now))
+        );
+        for (SysUserPerm perm : userPerms) {
+            if (perm.getPermission() != null && !perm.getPermission().isBlank()) {
+                ctx.permissions.add(perm.getPermission());
+            }
+        }
+        log.debug("[权限加载] 用户独立权限数量: {}", userPerms.size());
 
         log.debug("[权限加载] 最终权限组Code: {}", ctx.groupCodes);
         log.debug("[权限加载] 最终权限: {}", ctx.permissions);
