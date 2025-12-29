@@ -19,15 +19,18 @@ import com.junoyi.system.domain.bo.LoginBO;
 import com.junoyi.system.domain.po.LoginIdentity;
 import com.junoyi.system.domain.po.SysUser;
 import com.junoyi.system.domain.vo.AuthVo;
+import com.junoyi.system.domain.po.SysUserRole;
 import com.junoyi.system.domain.vo.UserInfoVO;
 import com.junoyi.system.enums.LoginType;
 import com.junoyi.system.enums.SysUserStatus;
 import com.junoyi.system.mapper.SysUserMapper;
+import com.junoyi.system.mapper.SysUserRoleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 系统认证服务实现类
@@ -40,6 +43,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
 
     private final AuthHelper authHelper;
     private final SysUserMapper sysUserMapper;
+    private final SysUserRoleMapper sysUserRoleMapper;
 
     @Override
     public AuthVo login(LoginBO loginBO) {
@@ -224,12 +228,18 @@ public class SysAuthServiceImpl implements ISysAuthService {
 
     /**
      * 获取用户角色ID列表
-     * TODO: 实现从数据库查询
+     *
+     * @param userId 用户ID
+     * @return 角色ID集合
      */
     private Set<Long> getUserRoles(Long userId) {
-        // 这里应该从数据库查询用户角色
-        // return sysRoleMapper.selectRoleIdsByUserId(userId);
-        return new HashSet<>();
+        return sysUserRoleMapper.selectList(
+                new LambdaQueryWrapper<SysUserRole>()
+                        .select(SysUserRole::getRoleId)
+                        .eq(SysUserRole::getUserId, userId)
+        ).stream()
+                .map(SysUserRole::getRoleId)
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -238,7 +248,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
      * @return 返回用户部门 ID 列表
      */
     private Set<Long> getUserDept(Long userId) {
-
+        // TODO
         return new HashSet<>();
     }
 
