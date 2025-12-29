@@ -233,6 +233,7 @@ junoyi:
     whitelist:
       - /auth/login
       - /auth/register
+      - /auth/refresh
       - /system/info
       - /captcha/**
     # 登录机制
