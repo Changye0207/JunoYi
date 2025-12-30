@@ -4,8 +4,15 @@ import com.junoyi.framework.web.domain.BaseController;
 import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
+import com.junoyi.system.convert.SysMenuConverter;
+import com.junoyi.system.domain.dto.SysMenuDTO;
+import com.junoyi.system.domain.po.SysMenu;
+import com.junoyi.system.domain.vo.SysMenuVO;
+import com.junoyi.system.service.ISysMenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 系统菜单控制器
@@ -18,15 +25,23 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SysMenuController extends BaseController {
 
+    private final ISysMenuService sysMenuService;
+
+    private final SysMenuConverter sysMenuConverter;
+
     /**
      * 获取菜单列表
      * 用于查询系统中所有的菜单信息
      *
-     * @return R<?> 通用响应结果，包含菜单列表数据
+     * @param queryDTO 菜单查询数据参数
+     * @return R<List<MenuVO> 菜单列表响应结果，包含菜单列表数据
      */
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    public R<?> getMenuList(){
+    public R<List<SysMenuVO>> getMenuList(@RequestBody SysMenuDTO queryDTO){
+
+        SysMenu sysMenu = sysMenuConverter.toEntity(queryDTO);
+
 
         return R.ok();
     }
