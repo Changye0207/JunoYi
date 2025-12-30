@@ -3,6 +3,7 @@ package com.junoyi.system.domain.po;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 
 import java.util.Date;
@@ -14,7 +15,7 @@ import java.util.Set;
  * @author Fan
  */
 @Data
-@TableName("sys_perm_group")
+@TableName(value = "sys_perm_group", autoResultMap = true)
 public class SysPermGroup {
 
     @TableId
@@ -23,12 +24,12 @@ public class SysPermGroup {
     /**
      * 权限组编码
      */
-    private String code;
+    private String groupCode;
 
     /**
      * 权限组名称
      */
-    private String name;
+    private String groupName;
 
     /**
      * 父级权限组ID，用于构建权限组层级关系
@@ -38,7 +39,7 @@ public class SysPermGroup {
     /**
      * 优先级，用于排序显示
      */
-    private int priority;
+    private Integer priority;
 
     /**
      * 权限组描述信息
@@ -48,12 +49,12 @@ public class SysPermGroup {
     /**
      * 状态标识，用于控制权限组的启用/禁用状态
      */
-    private int status;
+    private Integer status;
 
     /**
-     * 权限集合（非数据库字段，需要单独查询）
+     * 权限集合（JSON字段）
      */
-    @TableField(exist = false)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private Set<String> permissions;
 
     /**

@@ -289,7 +289,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
         }
         log.debug("[权限加载] 合并后权限组ID: {}", ctx.groupIds);
 
-        // 一次性查询权限组（code + permissions）
+        // 一次性查询权限组（groupCode + permissions）
         if (!ctx.groupIds.isEmpty()) {
             List<SysPermGroup> groups = sysPermGroupMapper.selectList(
                     new LambdaQueryWrapper<SysPermGroup>()
@@ -297,7 +297,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
                             .eq(SysPermGroup::getStatus, 1)
             );
             for (SysPermGroup group : groups) {
-                ctx.groupCodes.add(group.getCode());
+                ctx.groupCodes.add(group.getGroupCode());
                 // 权限组的 permissions 字段存储权限列表
                 if (group.getPermissions() != null) {
                     ctx.permissions.addAll(group.getPermissions());
