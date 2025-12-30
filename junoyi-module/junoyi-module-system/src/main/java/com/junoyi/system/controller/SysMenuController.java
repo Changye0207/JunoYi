@@ -54,4 +54,10 @@ public class SysMenuController extends BaseController {
     public R<?> updateMenu(){
         return R.ok();
     }
+
+    @DeleteMapping
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    public R<?> deleteMenu(){
+        return R.ok();
+    }
 }
