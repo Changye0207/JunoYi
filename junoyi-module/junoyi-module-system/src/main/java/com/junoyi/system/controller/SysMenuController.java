@@ -2,6 +2,8 @@ package com.junoyi.system.controller;
 
 import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.framework.permission.annotation.Permission;
+import com.junoyi.framework.permission.enums.Logical;
 import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
@@ -31,6 +33,10 @@ public class SysMenuController extends BaseController {
      */
     @GetMapping("/tree")
     @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"systme.ui.menu.view", "system.api.menu.get"},
+            logical = Logical.OR
+    )
     public R<List<SysMenuVO>> getMenuTree(SysMenuQueryDTO queryDTO) {
         return R.ok(sysMenuService.getMenuTree(queryDTO));
     }
@@ -41,6 +47,10 @@ public class SysMenuController extends BaseController {
      */
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"systme.ui.menu.view", "system.api.menu.get"},
+            logical = Logical.OR
+    )
     public R<PageResult<SysMenuVO>> getMenuList(SysMenuQueryDTO queryDTO) {
         return R.ok(sysMenuService.getMenuPage(queryDTO, buildPage()));
     }
@@ -50,6 +60,10 @@ public class SysMenuController extends BaseController {
      */
     @GetMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"systme.ui.menu.view", "system.api.menu.get"},
+            logical = Logical.OR
+    )
     public R<SysMenuVO> getMenuById(@PathVariable("id") Long id) {
         return R.ok(sysMenuService.getMenuById(id));
     }
@@ -59,6 +73,10 @@ public class SysMenuController extends BaseController {
      */
     @PostMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"systme.ui.menu.view", "system.api.menu.add"},
+            logical = Logical.OR
+    )
     public R<Long> addMenu(@RequestBody SysMenuDTO menuDTO) {
         return R.ok(sysMenuService.addMenu(menuDTO));
     }
@@ -68,6 +86,10 @@ public class SysMenuController extends BaseController {
      */
     @PutMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"systme.ui.menu.view", "system.api.menu.update"},
+            logical = Logical.OR
+    )
     public R<?> updateMenu(@RequestBody SysMenuDTO menuDTO) {
         return sysMenuService.updateMenu(menuDTO) ? R.ok() : R.fail("更新失败");
     }
@@ -77,6 +99,10 @@ public class SysMenuController extends BaseController {
      */
     @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"systme.ui.menu.view", "system.api.menu.delete"},
+            logical = Logical.OR
+    )
     public R<?> deleteMenu(@PathVariable("id") Long id) {
         return sysMenuService.deleteMenu(id) ? R.ok() : R.fail("删除失败");
     }
