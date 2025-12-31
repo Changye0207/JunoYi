@@ -6,6 +6,7 @@ import com.junoyi.framework.permission.annotation.Permission;
 import com.junoyi.framework.permission.enums.Logical;
 import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
+import com.junoyi.system.service.ISysRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 public class SysRoleController {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SysUserController.class);
+
+    private final ISysRoleService sysRoleService;
 
     /**
      * 获取角色列表（分页）
