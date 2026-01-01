@@ -2,7 +2,7 @@ package com.junoyi.system.convert;
 
 import com.junoyi.framework.core.convert.MapStructConfig;
 import com.junoyi.system.domain.po.SysRole;
-import com.junoyi.system.domain.vo.SysRoleVo;
+import com.junoyi.system.domain.vo.SysRoleVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -18,7 +18,7 @@ public interface SysRoleConverter {
 
     SysRoleConverter INSTANCE = Mappers.getMapper(SysRoleConverter.class);
 
-    SysRoleVo toVo(SysRole sysRole);
+    SysRoleVO toVo(SysRole sysRole);
 
-    List<SysRoleVo> toVoList(List<SysRole> sysRoleList);
+    List<SysRoleVO> toVoList(List<SysRole> sysRoleList);
 }

@@ -13,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class CaptchaVo {
+public class CaptchaVO {
     /**
      * 验证码唯一标识符
      */

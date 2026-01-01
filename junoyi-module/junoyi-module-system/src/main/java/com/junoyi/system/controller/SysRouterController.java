@@ -5,7 +5,7 @@ import com.junoyi.framework.web.domain.BaseController;
 import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
-import com.junoyi.system.domain.vo.RouterItemVo;
+import com.junoyi.system.domain.vo.RouterItemVO;
 import com.junoyi.system.service.ISysRouterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +35,7 @@ public class SysRouterController extends BaseController {
      */
     @GetMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
-    public R<List<RouterItemVo>> getRouter(){
+    public R<List<RouterItemVO>> getRouter(){
         // 通过用户来获取不同路由
         LoginUser loginUser = getLoginUser();
         return R.ok(sysRouterService.getUserRouter(loginUser));

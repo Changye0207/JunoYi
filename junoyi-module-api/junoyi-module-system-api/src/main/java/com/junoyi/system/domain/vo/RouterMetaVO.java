@@ -8,7 +8,7 @@ import lombok.Data;
  * @author Fan
  */
 @Data
-public class RouterMetaVo {
+public class RouterMetaVO {
 
     /**
      * 菜单标题（支持 i18n key）

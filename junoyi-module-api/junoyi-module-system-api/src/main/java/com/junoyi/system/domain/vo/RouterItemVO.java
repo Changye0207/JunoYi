@@ -10,7 +10,7 @@ import java.util.List;
  * @author Fan
  */
 @Data
-public class RouterItemVo {
+public class RouterItemVO {
 
     /**
      * 菜单ID
@@ -35,10 +35,10 @@ public class RouterItemVo {
     /**
      * 路由元信息
      */
-    private RouterMetaVo meta;
+    private RouterMetaVO meta;
 
     /**
      * 子路由
      */
-    private List<RouterItemVo> children;
+    private List<RouterItemVO> children;
 }

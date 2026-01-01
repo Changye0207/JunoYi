@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.system.domain.dto.SysRoleQueryDTO;
 import com.junoyi.system.domain.po.SysRole;
-import com.junoyi.system.domain.vo.SysRoleVo;
+import com.junoyi.system.domain.vo.SysRoleVO;
+
+import java.util.List;
 
 
 /**
@@ -19,5 +21,11 @@ public interface ISysRoleService {
      * @param queryDTO 查询参数
      * @return 角色
      */
-    PageResult<SysRoleVo> getRoleList(SysRoleQueryDTO queryDTO, Page<SysRole> page);
+    PageResult<SysRoleVO> getRoleList(SysRoleQueryDTO queryDTO, Page<SysRole> page);
+
+    /**
+     * 获取角色列表
+     * @return 角色列表
+     */
+    List<SysRoleVO> getRoleList();
 }

@@ -2,7 +2,7 @@ package com.junoyi.system.service;
 
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.system.domain.bo.LoginBO;
-import com.junoyi.system.domain.vo.AuthVo;
+import com.junoyi.system.domain.vo.AuthVO;
 import com.junoyi.system.domain.vo.UserInfoVO;
 
 /**
@@ -17,7 +17,7 @@ public interface ISysAuthService {
      * @param loginBO 登录业务数据体
      * @return 返回验证响应数据
      */
-    AuthVo login(LoginBO loginBO);
+    AuthVO login(LoginBO loginBO);
 
     /**
      * 获取用户信息接口

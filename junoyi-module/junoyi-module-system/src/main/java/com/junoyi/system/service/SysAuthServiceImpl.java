@@ -25,7 +25,7 @@ import com.junoyi.system.domain.po.SysDeptGroup;
 import com.junoyi.system.domain.po.SysPermGroup;
 import com.junoyi.system.domain.po.SysRoleGroup;
 import com.junoyi.system.domain.po.SysUserGroup;
-import com.junoyi.system.domain.vo.AuthVo;
+import com.junoyi.system.domain.vo.AuthVO;
 import com.junoyi.system.domain.po.SysUserPerm;
 import com.junoyi.system.domain.po.SysUserRole;
 import com.junoyi.system.domain.vo.UserInfoVO;
@@ -70,7 +70,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
     private final SysUserPermMapper sysUserPermMapper;
 
     @Override
-    public AuthVo login(LoginBO loginBO) {
+    public AuthVO login(LoginBO loginBO) {
         // 解析登录账号类型
         LoginIdentity loginIdentity = parseIdentity(loginBO);
 
@@ -103,7 +103,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
             authHelper.onLoginSuccess(loginIdentity.getAccount(), platformType, loginIp);
 
             // 构建返回结果
-            AuthVo authVo = new AuthVo();
+            AuthVO authVo = new AuthVO();
             authVo.setAccessToken(tokenPair.getAccessToken());
             authVo.setRefreshToken(tokenPair.getRefreshToken());
 

@@ -6,11 +6,13 @@ import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.system.convert.SysRoleConverter;
 import com.junoyi.system.domain.dto.SysRoleQueryDTO;
 import com.junoyi.system.domain.po.SysRole;
-import com.junoyi.system.domain.vo.SysRoleVo;
+import com.junoyi.system.domain.vo.SysRoleVO;
 import com.junoyi.system.mapper.SysRoleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 
 /**
@@ -31,7 +33,7 @@ public class SysRoleServiceImpl implements ISysRoleService{
      * @return 角色
      */
     @Override
-    public PageResult<SysRoleVo> getRoleList(SysRoleQueryDTO queryDTO, Page<SysRole> page) {
+    public PageResult<SysRoleVO> getRoleList(SysRoleQueryDTO queryDTO, Page<SysRole> page) {
         LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtils.hasText(queryDTO.getRoleName()), SysRole::getRoleName, queryDTO.getRoleName())
                .like(StringUtils.hasText(queryDTO.getRoleKey()), SysRole::getRoleKey, queryDTO.getRoleKey())
@@ -44,5 +46,18 @@ public class SysRoleServiceImpl implements ISysRoleService{
                 resultPage.getTotal(), 
                 (int) resultPage.getCurrent(), 
                 (int) resultPage.getSize());
+    }
+
+    /**
+     * 获取角色列表
+     * @return 角色列表
+     */
+    @Override
+    public List<SysRoleVO> getRoleList() {
+        LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysRole::isDelFlag, false)
+                .eq(SysRole::getStatus, 1);
+        List<SysRole> sysRoles = sysRoleMapper.selectList(wrapper);
+        return sysRoleConverter.toVoList(sysRoles);
     }
 }

@@ -10,7 +10,7 @@ import java.util.Date;
  * @author Fan
  */
 @Data
-public class SysRoleVo {
+public class SysRoleVO {
 
     /**
      * 角色 ID

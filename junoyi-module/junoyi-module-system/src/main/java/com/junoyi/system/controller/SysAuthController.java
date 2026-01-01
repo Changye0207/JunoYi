@@ -14,7 +14,7 @@ import com.junoyi.framework.security.module.TokenPair;
 import com.junoyi.system.convert.LoginConverter;
 import com.junoyi.system.domain.dto.LoginDTO;
 import com.junoyi.system.domain.bo.LoginBO;
-import com.junoyi.system.domain.vo.AuthVo;
+import com.junoyi.system.domain.vo.AuthVO;
 import com.junoyi.system.domain.vo.UserInfoVO;
 import com.junoyi.system.service.ISysAuthService;
 import jakarta.validation.Valid;
@@ -47,7 +47,7 @@ public class SysAuthController extends BaseController {
      * @return R<AuthVo> 统一响应结果，包含 accessToken 和 refreshToken
      */
     @PostMapping("/login")
-    public R<AuthVo> login(@Valid @RequestBody LoginDTO loginDTO) {
+    public R<AuthVO> login(@Valid @RequestBody LoginDTO loginDTO) {
         // 验证码校验
         if (!StringUtils.isBlank(loginDTO.getCaptchaId())) {
             if (StringUtils.isBlank(loginDTO.getCode()))
@@ -59,7 +59,7 @@ public class SysAuthController extends BaseController {
 
         // 转换为 LoginBO 并调用登录服务
         LoginBO loginBO = loginConverter.toLoginBO(loginDTO);
-        AuthVo authVo = sysAuthService.login(loginBO);
+        AuthVO authVo = sysAuthService.login(loginBO);
 
         return R.ok(authVo);
     }
@@ -73,9 +73,9 @@ public class SysAuthController extends BaseController {
      * @return R<AuthVo> 统一响应结果，包含新的 accessToken
      */
     @PostMapping("/refresh")
-    public R<AuthVo> refresh(@RequestParam("refreshToken") String refreshToken) {
+    public R<AuthVO> refresh(@RequestParam("refreshToken") String refreshToken) {
         TokenPair tokenPair = authHelper.refresh(refreshToken);
-        AuthVo authVo = new AuthVo();
+        AuthVO authVo = new AuthVO();
         authVo.setAccessToken(tokenPair.getAccessToken());
         authVo.setRefreshToken(tokenPair.getRefreshToken());
         return R.ok(authVo);

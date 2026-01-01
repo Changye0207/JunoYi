@@ -5,8 +5,8 @@ import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.system.domain.po.SysMenu;
-import com.junoyi.system.domain.vo.RouterItemVo;
-import com.junoyi.system.domain.vo.RouterMetaVo;
+import com.junoyi.system.domain.vo.RouterItemVO;
+import com.junoyi.system.domain.vo.RouterMetaVO;
 import com.junoyi.system.mapper.SysMenuMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class SysRouterServiceImpl implements ISysRouterService {
     private final SysMenuMapper sysMenuMapper;
 
     @Override
-    public List<RouterItemVo> getUserRouter(LoginUser loginUser) {
+    public List<RouterItemVO> getUserRouter(LoginUser loginUser) {
         log.debug("[路由加载] 开始加载用户路由, userId={}", loginUser.getUserId());
         
         // 查询所有启用的菜单（目录+菜单）
@@ -73,7 +73,7 @@ public class SysRouterServiceImpl implements ISysRouterService {
         }
         
         // 构建树形结构
-        List<RouterItemVo> routes = buildRouterTree(userMenus, 0L);
+        List<RouterItemVO> routes = buildRouterTree(userMenus, 0L);
 
         log.debug("[路由加载] 完成, 顶级路由数量: {}", routes.size());
         return routes;
@@ -85,11 +85,11 @@ public class SysRouterServiceImpl implements ISysRouterService {
      * @param parentId 父级ID
      * @return 路由列表
      */
-    private List<RouterItemVo> buildRouterTree(List<SysMenu> menus, Long parentId) {
+    private List<RouterItemVO> buildRouterTree(List<SysMenu> menus, Long parentId) {
         return menus.stream()
                 .filter(menu -> Objects.equals(menu.getParentId(), parentId))
                 .map(menu -> {
-                    RouterItemVo item = new RouterItemVo();
+                    RouterItemVO item = new RouterItemVO();
                     item.setId(menu.getId());
                     item.setName(menu.getName());
                     item.setPath(menu.getPath());
@@ -97,7 +97,7 @@ public class SysRouterServiceImpl implements ISysRouterService {
                     item.setMeta(buildMeta(menu));
                     
                     // 递归构建子路由
-                    List<RouterItemVo> children = buildRouterTree(menus, menu.getId());
+                    List<RouterItemVO> children = buildRouterTree(menus, menu.getId());
                     if (!children.isEmpty()) {
                         item.setChildren(children);
                     }
@@ -127,8 +127,8 @@ public class SysRouterServiceImpl implements ISysRouterService {
     /**
      * 构建路由元信息
      */
-    private RouterMetaVo buildMeta(SysMenu menu) {
-        RouterMetaVo meta = new RouterMetaVo();
+    private RouterMetaVO buildMeta(SysMenu menu) {
+        RouterMetaVO meta = new RouterMetaVO();
         meta.setTitle(menu.getTitle());
         meta.setIcon(menu.getIcon());
         meta.setShowBadge(menu.getShowBadge() != null && menu.getShowBadge() == 1);

@@ -9,7 +9,7 @@ import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
 import com.junoyi.system.domain.dto.SysRoleQueryDTO;
-import com.junoyi.system.domain.vo.SysRoleVo;
+import com.junoyi.system.domain.vo.SysRoleVO;
 import com.junoyi.system.service.ISysRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +38,7 @@ public class SysRoleController extends BaseController {
     @Permission(
             value = {"system.ui.role.view", "system.api.role.get"}
     )
-    public R<PageResult<SysRoleVo>> getRoleList(SysRoleQueryDTO queryDTO){
+    public R<PageResult<SysRoleVO>> getRoleList(SysRoleQueryDTO queryDTO){
         return R.ok(sysRoleService.getRoleList(queryDTO, buildPage()));
     }
 
@@ -49,8 +49,8 @@ public class SysRoleController extends BaseController {
     @Permission(
             value = {"system.ui.role.view", "system.api.role.get"}
     )
-    public R<List<SysRoleVo>> getRoleOptions(){
-        return R.ok();
+    public R<List<SysRoleVO>> getRoleOptions(){
+        return R.ok(sysRoleService.getRoleList());
     }
 
     /**
@@ -61,7 +61,7 @@ public class SysRoleController extends BaseController {
     @Permission(
             value = {"system.ui.role.view", "system.api.role.get"}
     )
-    public R<SysRoleVo> getRoleById(@PathVariable("id") Long id){
+    public R<SysRoleVO> getRoleById(@PathVariable("id") Long id){
         return R.ok();
     }
 

@@ -6,7 +6,7 @@ import lombok.Data;
  * 登录验证返回密钥对
  */
 @Data
-public class AuthVo {
+public class AuthVO {
 
     /**
      * 访问令牌
