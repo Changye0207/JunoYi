@@ -11,10 +11,7 @@ import com.junoyi.system.domain.dto.SysDeptQueryDTO;
 import com.junoyi.system.domain.vo.SysDeptVO;
 import com.junoyi.system.service.ISysDeptService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -54,5 +51,18 @@ public class SysDeptController extends BaseController {
     )
     public R<SysDeptVO> getDeptById(@PathVariable("id") Long id){
         return R.ok(sysDeptService.getDeptById(id));
+    }
+
+    /**
+     * 添加部门
+     */
+    @PostMapping()
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.dept.view", "system.api.dept.add"}
+    )
+    public R<Void> addDept(){
+
+        return R.ok();
     }
 }
