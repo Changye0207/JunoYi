@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.framework.core.utils.DateUtils;
+import com.junoyi.framework.security.utils.SecurityUtils;
 import com.junoyi.system.convert.SysRoleConverter;
 import com.junoyi.system.domain.dto.SysRoleDTO;
 import com.junoyi.system.domain.dto.SysRoleQueryDTO;
@@ -77,11 +79,10 @@ public class SysRoleServiceImpl implements ISysRoleService{
      */
     @Override
     public SysRoleVO getRoleById(Long id) {
-        // 构建查询条件：根据ID查询未删除的角色
-        LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(SysRole::getId, id)
-                .eq(SysRole::isDelFlag, false);
-        SysRole sysRole = sysRoleMapper.selectOne(wrapper);
+        SysRole sysRole = sysRoleMapper.selectById(id);
+        if (sysRole == null || sysRole.isDelFlag()) {
+            return null;
+        }
         return sysRoleConverter.toVo(sysRole);
     }
 
@@ -93,7 +94,10 @@ public class SysRoleServiceImpl implements ISysRoleService{
     @Override
     public void addRole(SysRoleDTO roleDTO) {
         SysRole sysRole = sysRoleConverter.toPo(roleDTO);
+        sysRole.setStatus(1);
         sysRole.setDelFlag(false);
+        sysRole.setCreateBy(SecurityUtils.getUserName());
+        sysRole.setCreateTime(DateUtils.getNowDate());
         sysRoleMapper.insert(sysRole);
     }
 
@@ -105,6 +109,8 @@ public class SysRoleServiceImpl implements ISysRoleService{
     @Override
     public void updateRole(SysRoleDTO roleDTO) {
         SysRole sysRole = sysRoleConverter.toPo(roleDTO);
+        sysRole.setUpdateBy(SecurityUtils.getUserName());
+        sysRole.setUpdateTime(DateUtils.getNowDate());
         sysRoleMapper.updateById(sysRole);
     }
 

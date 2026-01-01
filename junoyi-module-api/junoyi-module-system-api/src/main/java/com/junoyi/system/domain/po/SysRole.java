@@ -1,6 +1,9 @@
 package com.junoyi.system.domain.po;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
@@ -9,11 +12,13 @@ import java.util.Date;
  * 用于封装系统角色相关的信息，包括角色名称、权限标识、状态等属性
  */
 @Data
+@TableName("sys_role")
 public class SysRole {
 
     /**
      * 角色主键ID
      */
+    @TableId
     private Long id;
 
     /**
