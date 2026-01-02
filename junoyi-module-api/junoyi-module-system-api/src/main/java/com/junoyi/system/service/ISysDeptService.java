@@ -32,4 +32,10 @@ public interface ISysDeptService {
      * @param deptDTO 部门信息
      */
     void addDept(SysDeptDTO deptDTO);
+
+    /**
+     * 更新部门
+     * @param deptDTO 部门信息
+     */
+    void updateDept(SysDeptDTO deptDTO);
 }

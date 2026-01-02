@@ -89,6 +89,19 @@ public class SysDeptServiceImpl implements ISysDeptService {
     }
 
     /**
+     * 更新部门
+     *
+     * @param deptDTO 部门信息
+     */
+    @Override
+    public void updateDept(SysDeptDTO deptDTO) {
+        SysDept sysDept = sysDeptConverter.toPo(deptDTO);
+        sysDept.setUpdateTime(DateUtils.getNowDate());
+        sysDept.setUpdateBy(SecurityUtils.getUserName());
+        sysDeptMapper.updateById(sysDept);
+    }
+
+    /**
      * 构建部门树
      */
     private List<SysDeptVO> buildTree(List<SysDeptVO> deptList) {

@@ -66,4 +66,17 @@ public class SysDeptController extends BaseController {
         sysDeptService.addDept(sysDeptDTO);
         return R.ok();
     }
+
+    /**
+     * 更新部门
+     */
+    @PutMapping
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.dept.view", "system.api.dept.update"}
+    )
+    public R<Void> updateDept(@RequestBody SysDeptDTO sysDeptDTO){
+        sysDeptService.updateDept(sysDeptDTO);
+        return R.ok();
+    }
 }
