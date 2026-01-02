@@ -4,6 +4,7 @@ import com.junoyi.framework.core.constant.HttpStatus;
 import com.junoyi.framework.core.domain.base.BaseException;
 import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.core.exception.captcha.CaptchaException;
+import com.junoyi.framework.core.exception.dept.DeptException;
 import com.junoyi.framework.core.exception.menu.MenuException;
 import com.junoyi.framework.permission.exception.NoPermissionException;
 import com.junoyi.framework.permission.exception.NotLoginException;
@@ -90,6 +91,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MenuException.class)
     public R<?> handleMenuException(MenuException e, HttpServletRequest request){
         log.warn("[菜单异常] 请求地址: {}, 领域: {}, 异常信息: {}", request.getRequestURI(), e.getFullDomain(), e.getMessage());
+        return R.fail(e.getCode(), e.getMessage());
+    }
+
+    /**
+     * 部门异常
+     */
+    @ExceptionHandler(DeptException.class)
+    public R<?> handleDeptException(DeptException e, HttpServletRequest request){
+        log.warn("[部门异常] 请求地址: {}, 领域: {}, 异常信息: {}", request.getRequestURI(), e.getFullDomain(), e.getMessage());
         return R.fail(e.getCode(), e.getMessage());
     }
 
