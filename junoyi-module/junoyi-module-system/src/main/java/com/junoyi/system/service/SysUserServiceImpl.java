@@ -117,4 +117,47 @@ public class SysUserServiceImpl implements ISysUserService {
             }
         }
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUser(SysUserDTO userDTO) {
+        Long userId = userDTO.getId();
+        
+        // 更新用户基本信息（不更新密码）
+        SysUser sysUser = sysUserConverter.toEntity(userDTO);
+        sysUser.setUserId(userId);
+        sysUser.setPassword(null);  // 不更新密码
+        sysUser.setSalt(null);      // 不更新盐值
+        sysUser.setUpdateTime(DateUtils.getNowDate());
+        sysUser.setUpdateBy(SecurityUtils.getUserName());
+        sysUserMapper.updateById(sysUser);
+        
+        // 更新角色关联（先删后增）
+        if (userDTO.getRoleIds() != null) {
+            LambdaQueryWrapper<SysUserRole> roleWrapper = new LambdaQueryWrapper<>();
+            roleWrapper.eq(SysUserRole::getUserId, userId);
+            sysUserRoleMapper.delete(roleWrapper);
+            
+            for (Long roleId : userDTO.getRoleIds()) {
+                SysUserRole userRole = new SysUserRole();
+                userRole.setUserId(userId);
+                userRole.setRoleId(roleId);
+                sysUserRoleMapper.insert(userRole);
+            }
+        }
+        
+        // 更新部门关联（先删后增）
+        if (userDTO.getDeptIds() != null) {
+            LambdaQueryWrapper<SysUserDept> deptWrapper = new LambdaQueryWrapper<>();
+            deptWrapper.eq(SysUserDept::getUserId, userId);
+            sysUserDeptMapper.delete(deptWrapper);
+            
+            for (Long deptId : userDTO.getDeptIds()) {
+                SysUserDept userDept = new SysUserDept();
+                userDept.setUserId(userId);
+                userDept.setDeptId(deptId);
+                sysUserDeptMapper.insert(userDept);
+            }
+        }
+    }
 }

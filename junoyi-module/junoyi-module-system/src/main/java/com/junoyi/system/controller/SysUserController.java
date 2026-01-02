@@ -74,7 +74,12 @@ public class SysUserController extends BaseController {
      */
     @PutMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
-    public void updateUser(){
+    @Permission(
+            value = {"system.ui.user.view", "system.api.user.update"}
+    )
+    public R<Void> updateUser(@RequestBody SysUserDTO sysUserDTO){
+        sysUserService.updateUser(sysUserDTO);
+        return R.ok();
     }
 
     /**

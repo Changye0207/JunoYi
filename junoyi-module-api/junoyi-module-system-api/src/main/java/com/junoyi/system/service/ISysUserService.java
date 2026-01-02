@@ -27,4 +27,10 @@ public interface ISysUserService {
      * @param userDTO 用户信息
      */
     void addUser(SysUserDTO userDTO);
+
+    /**
+     * 更新用户（不更新密码）
+     * @param userDTO 用户信息
+     */
+    void updateUser(SysUserDTO userDTO);
 }
