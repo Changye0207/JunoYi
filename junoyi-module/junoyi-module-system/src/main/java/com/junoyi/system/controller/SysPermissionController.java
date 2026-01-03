@@ -18,4 +18,7 @@ public class SysPermissionController {
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SysPermissionController.class);
 
 
+
+
+
 }

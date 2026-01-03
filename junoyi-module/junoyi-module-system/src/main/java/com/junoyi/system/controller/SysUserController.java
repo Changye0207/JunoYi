@@ -37,7 +37,7 @@ public class SysUserController extends BaseController {
      * 获取用户列表（分页）
      * @return 响应结果
      */
-    @GetMapping
+    @GetMapping("/list")
     @Permission(
             value = {"system.ui.user.view", "system.api.user.get"}
     )
