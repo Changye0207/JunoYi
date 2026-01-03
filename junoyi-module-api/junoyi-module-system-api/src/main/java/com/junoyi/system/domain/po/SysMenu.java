@@ -123,8 +123,4 @@ public class SysMenu extends BaseEntity {
      */
     private Integer status;
 
-    /**
-     * 备注
-     */
-    private String remark;
 }

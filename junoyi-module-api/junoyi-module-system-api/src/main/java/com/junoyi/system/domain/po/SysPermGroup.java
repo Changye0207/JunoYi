@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.junoyi.framework.core.domain.base.BaseEntity;
 import lombok.Data;
 
 import java.util.Date;
@@ -16,7 +17,7 @@ import java.util.Set;
  */
 @Data
 @TableName(value = "sys_perm_group", autoResultMap = true)
-public class SysPermGroup {
+public class SysPermGroup extends BaseEntity {
 
     @TableId
     private Long id;
@@ -57,28 +58,4 @@ public class SysPermGroup {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Set<String> permissions;
 
-    /**
-     * 创建人标识
-     */
-    private String createBy;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新人标识
-     */
-    private String updateBy;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 备注信息
-     */
-    private String remark;
 }
