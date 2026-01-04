@@ -1,6 +1,7 @@
 package com.junoyi.system.convert;
 
 import com.junoyi.framework.core.convert.MapStructConfig;
+import com.junoyi.system.domain.dto.SysPermGroupDTO;
 import com.junoyi.system.domain.po.SysPermGroup;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
 import org.mapstruct.Mapper;
@@ -21,4 +22,6 @@ public interface SysPermGroupConverter {
     SysPermGroupVO toVo(SysPermGroup permGroup);
 
     List<SysPermGroupVO> toVoList(List<SysPermGroup> permGroupList);
+
+    SysPermGroup toPo(SysPermGroupDTO dto);
 }

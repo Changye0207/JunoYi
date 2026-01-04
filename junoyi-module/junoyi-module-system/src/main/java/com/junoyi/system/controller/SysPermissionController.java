@@ -8,11 +8,14 @@ import com.junoyi.framework.permission.annotation.Permission;
 import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
+import com.junoyi.system.domain.dto.SysPermGroupDTO;
 import com.junoyi.system.domain.dto.SysPermGroupQueryDTO;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
 import com.junoyi.system.service.ISysPermGroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 系统权限管理控制器
@@ -41,6 +44,14 @@ public class SysPermissionController extends BaseController {
     }
 
     /**
+     * 获取权限组下拉列表
+     */
+    @GetMapping("/options")
+    public R<List<SysPermGroupVO>> getPermissionGroupOptions(){
+        return R.ok();
+    }
+
+    /**
      * 添加权限组
      */
     @PostMapping
@@ -48,7 +59,8 @@ public class SysPermissionController extends BaseController {
     @Permission(
             value = {"system.ui.permission.view", "system.api.permission.add"}
     )
-    public R<Void> addPermission(){
+    public R<Void> addPermission(@RequestBody SysPermGroupDTO dto){
+        sysPermGroupService.addPermGroup(dto);
         return R.ok();
     }
 

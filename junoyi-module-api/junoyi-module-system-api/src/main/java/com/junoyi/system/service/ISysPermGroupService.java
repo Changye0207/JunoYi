@@ -2,11 +2,10 @@ package com.junoyi.system.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.system.domain.dto.SysPermGroupDTO;
 import com.junoyi.system.domain.dto.SysPermGroupQueryDTO;
 import com.junoyi.system.domain.po.SysPermGroup;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
-
-import java.util.List;
 
 /**
  * 权限组服务接口
@@ -23,4 +22,11 @@ public interface ISysPermGroupService {
      * @return 分页结果
      */
     PageResult<SysPermGroupVO> getPermGroupList(SysPermGroupQueryDTO queryDTO, Page<SysPermGroup> page);
+
+    /**
+     * 添加权限组
+     *
+     * @param dto 权限组数据
+     */
+    void addPermGroup(SysPermGroupDTO dto);
 }

@@ -3,7 +3,10 @@ package com.junoyi.system.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.framework.core.utils.DateUtils;
+import com.junoyi.framework.security.utils.SecurityUtils;
 import com.junoyi.system.convert.SysPermGroupConverter;
+import com.junoyi.system.domain.dto.SysPermGroupDTO;
 import com.junoyi.system.domain.dto.SysPermGroupQueryDTO;
 import com.junoyi.system.domain.po.SysPermGroup;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
@@ -39,5 +42,13 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
                 resultPage.getTotal(),
                 (int) resultPage.getCurrent(),
                 (int) resultPage.getSize());
+    }
+
+    @Override
+    public void addPermGroup(SysPermGroupDTO dto) {
+        SysPermGroup permGroup = sysPermGroupConverter.toPo(dto);
+        permGroup.setCreateBy(SecurityUtils.getUserName());
+        permGroup.setCreateTime(DateUtils.getNowDate());
+        sysPermGroupMapper.insert(permGroup);
     }
 }
