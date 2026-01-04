@@ -48,7 +48,7 @@ public class SysPermissionController extends BaseController {
      */
     @GetMapping("/options")
     public R<List<SysPermGroupVO>> getPermissionGroupOptions(){
-        return R.ok();
+        return R.ok(sysPermGroupService.getPermGroupOptions());
     }
 
     /**

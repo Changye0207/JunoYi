@@ -7,6 +7,8 @@ import com.junoyi.system.domain.dto.SysPermGroupQueryDTO;
 import com.junoyi.system.domain.po.SysPermGroup;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
 
+import java.util.List;
+
 /**
  * 权限组服务接口
  *
@@ -29,4 +31,12 @@ public interface ISysPermGroupService {
      * @param dto 权限组数据
      */
     void addPermGroup(SysPermGroupDTO dto);
+
+    /**
+     * 获取权限组下拉列表（启用状态）
+     *
+     * @return 权限组VO列表
+     */
+    List<SysPermGroupVO> getPermGroupOptions();
+
 }

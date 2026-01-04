@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 /**
  * 权限组服务实现
  *
@@ -65,6 +67,19 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
         permGroup.setCreateBy(SecurityUtils.getUserName());
         permGroup.setCreateTime(DateUtils.getNowDate());
         sysPermGroupMapper.insert(permGroup);
+    }
+
+    /**
+     * 获取权限组下拉列表（启用状态）
+     * @return 权限组VO列表
+     */
+    @Override
+    public List<SysPermGroupVO> getPermGroupOptions() {
+        LambdaQueryWrapper<SysPermGroup> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysPermGroup::getStatus, 1)
+                .orderByAsc(SysPermGroup::getPriority);
+        List<SysPermGroup> permGroups = sysPermGroupMapper.selectList(wrapper);
+        return sysPermGroupConverter.toVoList(permGroups);
     }
 
 }
