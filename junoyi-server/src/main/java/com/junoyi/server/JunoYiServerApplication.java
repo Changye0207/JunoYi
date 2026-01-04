@@ -24,5 +24,6 @@ public class JunoYiServerApplication {
     public static void main(String[] args) {
         JunoYiApplication.run(JunoYiServerApplication.class,args);
         log.info("JunoYi Server", "Startup completed. System is now operational.");
+        System.out.println("\n  _ _/|\n \\'o.0'\n =(___)=\n    U\n");
     }
 }
