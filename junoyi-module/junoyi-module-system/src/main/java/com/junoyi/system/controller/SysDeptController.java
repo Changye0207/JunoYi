@@ -11,6 +11,7 @@ import com.junoyi.system.domain.dto.SysDeptDTO;
 import com.junoyi.system.domain.dto.SysDeptQueryDTO;
 import com.junoyi.system.domain.dto.SysDeptSortDTO;
 import com.junoyi.system.domain.vo.SysDeptVO;
+import com.junoyi.system.domain.vo.SysPermGroupVO;
 import com.junoyi.system.service.ISysDeptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -104,6 +105,31 @@ public class SysDeptController extends BaseController {
     )
     public R<Void> deleteDept(@PathVariable("id") Long id) {
         sysDeptService.deleteDept(id);
+        return R.ok();
+    }
+
+    /**
+     * 获取部门已经绑定的权限组
+     */
+    @GetMapping("/{id}/permission-groups")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.dept.view","system.api.dept.get"}
+    )
+    public R<List<SysPermGroupVO>> getDeptPermissionGroup(@PathVariable("id") Long id){
+        return R.ok(sysDeptService.getDeptPermGroups(id));
+    }
+
+    /**
+     * 更新部门绑定权限组
+     */
+    @PutMapping("/{id}/permission-groups")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.dept.view","system.api.dept.update"}
+    )
+    public R<Void> updateDeptGroup(@PathVariable("id") Long id, @RequestBody List<Long> groupIds){
+        sysDeptService.updateDeptPermGroups(id, groupIds);
         return R.ok();
     }
 }

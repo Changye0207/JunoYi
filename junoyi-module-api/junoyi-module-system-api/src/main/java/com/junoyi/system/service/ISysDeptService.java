@@ -4,6 +4,7 @@ import com.junoyi.system.domain.bo.SysDeptSortItem;
 import com.junoyi.system.domain.dto.SysDeptDTO;
 import com.junoyi.system.domain.dto.SysDeptQueryDTO;
 import com.junoyi.system.domain.vo.SysDeptVO;
+import com.junoyi.system.domain.vo.SysPermGroupVO;
 
 import java.util.List;
 
@@ -52,4 +53,18 @@ public interface ISysDeptService {
      * @param id 部门ID
      */
     void deleteDept(Long id);
+
+    /**
+     * 获取部门绑定的权限组列表
+     * @param deptId 部门ID
+     * @return 权限组列表
+     */
+    List<SysPermGroupVO> getDeptPermGroups(Long deptId);
+
+    /**
+     * 更新部门权限组绑定
+     * @param deptId 部门ID
+     * @param groupIds 权限组ID列表
+     */
+    void updateDeptPermGroups(Long deptId, List<Long> groupIds);
 }

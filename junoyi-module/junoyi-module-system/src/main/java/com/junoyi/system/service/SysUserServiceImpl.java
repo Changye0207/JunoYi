@@ -20,10 +20,12 @@ import com.junoyi.system.domain.po.SysRole;
 import com.junoyi.system.domain.po.SysUser;
 import com.junoyi.system.domain.po.SysUserDept;
 import com.junoyi.system.domain.po.SysUserGroup;
+import com.junoyi.system.domain.po.SysUserPerm;
 import com.junoyi.system.domain.po.SysUserRole;
 import com.junoyi.system.domain.vo.SysDeptVO;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
 import com.junoyi.system.domain.vo.SysRoleVO;
+import com.junoyi.system.domain.vo.SysUserPermVO;
 import com.junoyi.system.domain.vo.SysUserVO;
 import com.junoyi.system.enums.SysUserStatus;
 import com.junoyi.system.event.PermissionChangedEvent;
@@ -33,12 +35,14 @@ import com.junoyi.system.mapper.SysRoleMapper;
 import com.junoyi.system.mapper.SysUserDeptMapper;
 import com.junoyi.system.mapper.SysUserGroupMapper;
 import com.junoyi.system.mapper.SysUserMapper;
+import com.junoyi.system.mapper.SysUserPermMapper;
 import com.junoyi.system.mapper.SysUserRoleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,6 +59,7 @@ public class SysUserServiceImpl implements ISysUserService {
     private final SysUserDeptMapper sysUserDeptMapper;
     private final SysUserRoleMapper sysUserRoleMapper;
     private final SysUserGroupMapper sysUserGroupMapper;
+    private final SysUserPermMapper sysUserPermMapper;
     private final SysRoleMapper sysRoleMapper;
     private final SysDeptMapper sysDeptMapper;
     private final SysPermGroupMapper sysPermGroupMapper;
@@ -406,6 +411,89 @@ public class SysUserServiceImpl implements ISysUserService {
         // 发布权限变更事件，同步用户会话
         EventBus.get().callEvent(new PermissionChangedEvent(
                 PermissionChangedEvent.ChangeType.USER_GROUP_CHANGE,
+                userId
+        ));
+    }
+
+    /**
+     * 获取用户独立权限列表
+     *
+     * @param userId 用户ID
+     * @return 独立权限列表
+     */
+    @Override
+    public List<SysUserPermVO> getUserPerms(Long userId) {
+        // 查询用户独立权限（只查未过期的）
+        List<SysUserPerm> userPerms = sysUserPermMapper.selectList(
+                new LambdaQueryWrapper<SysUserPerm>()
+                        .eq(SysUserPerm::getUserId, userId)
+                        .and(w -> w.isNull(SysUserPerm::getExpireTime)
+                                .or().gt(SysUserPerm::getExpireTime, DateUtils.getNowDate()))
+                        .orderByDesc(SysUserPerm::getCreateTime));
+
+        return userPerms.stream().map(perm -> {
+            SysUserPermVO vo = new SysUserPermVO();
+            vo.setId(perm.getId());
+            vo.setPermission(perm.getPermission());
+            vo.setExpireTime(perm.getExpireTime());
+            vo.setCreateTime(perm.getCreateTime());
+            return vo;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 更新用户独立权限
+     *
+     * @param userId 用户ID
+     * @param permissions 权限字符串列表
+     * @param expireTime 过期时间（可选）
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserPerms(Long userId, List<String> permissions, Date expireTime) {
+        // 先删除原有的用户独立权限
+        sysUserPermMapper.delete(new LambdaQueryWrapper<SysUserPerm>()
+                .eq(SysUserPerm::getUserId, userId));
+
+        // 批量插入新的用户独立权限
+        if (permissions != null && !permissions.isEmpty()) {
+            Date now = DateUtils.getNowDate();
+            for (String permission : permissions) {
+                if (permission == null || permission.trim().isEmpty()) {
+                    continue;
+                }
+                SysUserPerm userPerm = new SysUserPerm();
+                userPerm.setUserId(userId);
+                userPerm.setPermission(permission.trim());
+                userPerm.setExpireTime(expireTime);
+                userPerm.setCreateTime(now);
+                sysUserPermMapper.insert(userPerm);
+            }
+        }
+
+        // 发布用户独立权限变更事件，同步用户会话
+        EventBus.get().callEvent(new PermissionChangedEvent(
+                PermissionChangedEvent.ChangeType.USER_PERM_CHANGE,
+                userId
+        ));
+    }
+
+    /**
+     * 删除用户独立权限
+     *
+     * @param userId 用户ID
+     * @param permId 权限ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUserPerm(Long userId, Long permId) {
+        sysUserPermMapper.delete(new LambdaQueryWrapper<SysUserPerm>()
+                .eq(SysUserPerm::getId, permId)
+                .eq(SysUserPerm::getUserId, userId));
+
+        // 发布用户独立权限变更事件，同步用户会话
+        EventBus.get().callEvent(new PermissionChangedEvent(
+                PermissionChangedEvent.ChangeType.USER_PERM_CHANGE,
                 userId
         ));
     }

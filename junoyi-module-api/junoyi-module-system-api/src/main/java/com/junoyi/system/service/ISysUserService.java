@@ -8,8 +8,10 @@ import com.junoyi.system.domain.po.SysUser;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
 import com.junoyi.system.domain.vo.SysDeptVO;
 import com.junoyi.system.domain.vo.SysRoleVO;
+import com.junoyi.system.domain.vo.SysUserPermVO;
 import com.junoyi.system.domain.vo.SysUserVO;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -99,4 +101,26 @@ public interface ISysUserService {
      * @param groupIds 权限组ID列表
      */
     void updateUserPermGroups(Long userId, List<Long> groupIds);
+
+    /**
+     * 获取用户独立权限列表
+     * @param userId 用户ID
+     * @return 独立权限列表
+     */
+    List<SysUserPermVO> getUserPerms(Long userId);
+
+    /**
+     * 更新用户独立权限
+     * @param userId 用户ID
+     * @param permissions 权限字符串列表
+     * @param expireTime 过期时间（可选）
+     */
+    void updateUserPerms(Long userId, List<String> permissions, Date expireTime);
+
+    /**
+     * 删除用户独立权限
+     * @param userId 用户ID
+     * @param permId 权限ID
+     */
+    void deleteUserPerm(Long userId, Long permId);
 }

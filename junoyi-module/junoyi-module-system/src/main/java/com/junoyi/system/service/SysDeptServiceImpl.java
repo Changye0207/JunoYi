@@ -4,16 +4,24 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.junoyi.framework.core.exception.dept.DeptHasChildrenException;
 import com.junoyi.framework.core.utils.DateUtils;
+import com.junoyi.framework.event.core.EventBus;
 import com.junoyi.framework.security.utils.SecurityUtils;
 import com.junoyi.system.convert.SysDeptConverter;
+import com.junoyi.system.convert.SysPermGroupConverter;
 import com.junoyi.system.domain.bo.SysDeptSortItem;
 import com.junoyi.system.domain.dto.SysDeptDTO;
 import com.junoyi.system.domain.dto.SysDeptQueryDTO;
 import com.junoyi.system.domain.dto.SysDeptSortDTO;
 import com.junoyi.system.domain.po.SysDept;
+import com.junoyi.system.domain.po.SysDeptGroup;
+import com.junoyi.system.domain.po.SysPermGroup;
 import com.junoyi.system.domain.vo.SysDeptVO;
+import com.junoyi.system.domain.vo.SysPermGroupVO;
 import com.junoyi.system.enums.SysDeptStatus;
+import com.junoyi.system.event.PermissionChangedEvent;
+import com.junoyi.system.mapper.SysDeptGroupMapper;
 import com.junoyi.system.mapper.SysDeptMapper;
+import com.junoyi.system.mapper.SysPermGroupMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,7 +44,10 @@ import java.util.stream.Collectors;
 public class SysDeptServiceImpl implements ISysDeptService {
 
     private final SysDeptMapper sysDeptMapper;
+    private final SysDeptGroupMapper sysDeptGroupMapper;
+    private final SysPermGroupMapper sysPermGroupMapper;
     private final SysDeptConverter sysDeptConverter;
+    private final SysPermGroupConverter sysPermGroupConverter;
 
     /**
      * 获取部门树形结构数据
@@ -189,5 +200,68 @@ public class SysDeptServiceImpl implements ISysDeptService {
         }
 
         return true;
+    }
+
+    /**
+     * 获取部门绑定的权限组列表
+     *
+     * @param deptId 部门ID
+     * @return 权限组列表
+     */
+    @Override
+    public List<SysPermGroupVO> getDeptPermGroups(Long deptId) {
+        // 查询部门权限组关联（只查未过期的）
+        List<SysDeptGroup> deptGroups = sysDeptGroupMapper.selectList(
+                new LambdaQueryWrapper<SysDeptGroup>()
+                        .eq(SysDeptGroup::getDeptId, deptId)
+                        .and(w -> w.isNull(SysDeptGroup::getExpireTime)
+                                .or().gt(SysDeptGroup::getExpireTime, DateUtils.getNowDate())));
+
+        if (deptGroups.isEmpty()) {
+            return List.of();
+        }
+
+        // 获取权限组ID列表
+        List<Long> groupIds = deptGroups.stream()
+                .map(SysDeptGroup::getGroupId)
+                .collect(Collectors.toList());
+
+        // 查询权限组信息
+        List<SysPermGroup> groups = sysPermGroupMapper.selectList(
+                new LambdaQueryWrapper<SysPermGroup>()
+                        .in(SysPermGroup::getId, groupIds));
+
+        return sysPermGroupConverter.toVoList(groups);
+    }
+
+    /**
+     * 更新部门权限组绑定
+     *
+     * @param deptId 部门ID
+     * @param groupIds 权限组ID列表
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDeptPermGroups(Long deptId, List<Long> groupIds) {
+        // 先删除原有的部门权限组关联
+        sysDeptGroupMapper.delete(new LambdaQueryWrapper<SysDeptGroup>()
+                .eq(SysDeptGroup::getDeptId, deptId));
+
+        // 批量插入新的部门权限组关联
+        if (groupIds != null && !groupIds.isEmpty()) {
+            for (Long groupId : groupIds) {
+                SysDeptGroup deptGroup = new SysDeptGroup();
+                deptGroup.setDeptId(deptId);
+                deptGroup.setGroupId(groupId);
+                deptGroup.setCreateTime(DateUtils.getNowDate());
+                sysDeptGroupMapper.insert(deptGroup);
+            }
+        }
+
+        // 发布部门权限组变更事件，同步该部门下用户的会话
+        EventBus.get().callEvent(new PermissionChangedEvent(
+                PermissionChangedEvent.ChangeType.DEPT_GROUP_CHANGE,
+                deptId
+        ));
     }
 }

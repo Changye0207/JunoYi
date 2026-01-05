@@ -10,10 +10,12 @@ import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
 import com.junoyi.system.domain.dto.ResetPasswordDTO;
 import com.junoyi.system.domain.dto.SysUserDTO;
+import com.junoyi.system.domain.dto.SysUserPermDTO;
 import com.junoyi.system.domain.dto.SysUserQueryDTO;
 import com.junoyi.system.domain.vo.SysDeptVO;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
 import com.junoyi.system.domain.vo.SysRoleVO;
+import com.junoyi.system.domain.vo.SysUserPermVO;
 import com.junoyi.system.domain.vo.SysUserVO;
 import com.junoyi.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
@@ -200,6 +202,44 @@ public class SysUserController extends BaseController {
     )
     public R<Void> updateUserGroup(@PathVariable("id") Long id, @RequestBody List<Long> groupIds){
         sysUserService.updateUserPermGroups(id, groupIds);
+        return R.ok();
+    }
+
+    /**
+     * 获取用户独立权限列表
+     */
+    @GetMapping("/{id}/permissions")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.user.view", "system.api.user.get"}
+    )
+    public R<List<SysUserPermVO>> getUserPermissions(@PathVariable("id") Long id) {
+        return R.ok(sysUserService.getUserPerms(id));
+    }
+
+    /**
+     * 更新用户独立权限
+     */
+    @PutMapping("/{id}/permissions")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.user.view", "system.api.user.update"}
+    )
+    public R<Void> updateUserPermissions(@PathVariable("id") Long id, @RequestBody SysUserPermDTO permDTO) {
+        sysUserService.updateUserPerms(id, permDTO.getPermissions(), permDTO.getExpireTime());
+        return R.ok();
+    }
+
+    /**
+     * 删除用户独立权限
+     */
+    @DeleteMapping("/{id}/permissions/{permId}")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.user.view", "system.api.user.update"}
+    )
+    public R<Void> deleteUserPermission(@PathVariable("id") Long id, @PathVariable("permId") Long permId) {
+        sysUserService.deleteUserPerm(id, permId);
         return R.ok();
     }
 }
