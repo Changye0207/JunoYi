@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.framework.core.utils.DateUtils;
+import com.junoyi.framework.event.core.EventBus;
 import com.junoyi.framework.security.utils.SecurityUtils;
 import com.junoyi.system.convert.SysRoleConverter;
 import com.junoyi.system.domain.dto.SysRoleDTO;
@@ -12,6 +13,7 @@ import com.junoyi.system.domain.dto.SysRoleQueryDTO;
 import com.junoyi.system.domain.po.SysRole;
 import com.junoyi.system.domain.vo.SysRoleVO;
 import com.junoyi.system.enums.SysRoleStatus;
+import com.junoyi.system.event.PermissionChangedEvent;
 import com.junoyi.system.mapper.SysRoleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -114,6 +116,12 @@ public class SysRoleServiceImpl implements ISysRoleService{
         sysRole.setUpdateBy(SecurityUtils.getUserName());
         sysRole.setUpdateTime(DateUtils.getNowDate());
         sysRoleMapper.updateById(sysRole);
+        
+        // 发布角色权限变更事件
+        EventBus.get().callEvent(new PermissionChangedEvent(
+                PermissionChangedEvent.ChangeType.ROLE_PERM_UPDATE,
+                roleDTO.getId()
+        ));
     }
 
     /**
@@ -128,6 +136,12 @@ public class SysRoleServiceImpl implements ISysRoleService{
         wrapper.eq(SysRole::getId, id)
                 .set(SysRole::isDelFlag, true);
         sysRoleMapper.update(null, wrapper);
+        
+        // 发布角色删除事件
+        EventBus.get().callEvent(new PermissionChangedEvent(
+                PermissionChangedEvent.ChangeType.ROLE_DELETE,
+                id
+        ));
     }
 
     /**
@@ -142,5 +156,13 @@ public class SysRoleServiceImpl implements ISysRoleService{
         wrapper.in(SysRole::getId, ids)
                 .set(SysRole::isDelFlag, true);
         sysRoleMapper.update(null, wrapper);
+        
+        // 发布角色删除事件
+        for (Long id : ids) {
+            EventBus.get().callEvent(new PermissionChangedEvent(
+                    PermissionChangedEvent.ChangeType.ROLE_DELETE,
+                    id
+            ));
+        }
     }
 }

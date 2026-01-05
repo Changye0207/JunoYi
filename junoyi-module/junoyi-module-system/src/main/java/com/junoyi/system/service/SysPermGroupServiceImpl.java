@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.framework.core.exception.permission.PermGroupHasChildrenException;
 import com.junoyi.framework.core.utils.DateUtils;
+import com.junoyi.framework.event.core.EventBus;
 import com.junoyi.framework.security.utils.SecurityUtils;
 import com.junoyi.system.convert.SysPermGroupConverter;
 import com.junoyi.system.domain.dto.SysPermGroupDTO;
 import com.junoyi.system.domain.dto.SysPermGroupQueryDTO;
 import com.junoyi.system.domain.po.SysPermGroup;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
+import com.junoyi.system.event.PermissionChangedEvent;
 import com.junoyi.system.mapper.SysPermGroupMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -136,6 +138,12 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
         permGroup.setUpdateBy(SecurityUtils.getUserName());
         permGroup.setUpdateTime(DateUtils.getNowDate());
         sysPermGroupMapper.updateById(permGroup);
+        
+        // 发布权限变更事件，异步同步受影响用户的会话
+        EventBus.get().callEvent(new PermissionChangedEvent(
+                PermissionChangedEvent.ChangeType.PERM_GROUP_UPDATE, 
+                dto.getId()
+        ));
     }
 
     /**
@@ -154,6 +162,12 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
         }
         // 物理删除
         sysPermGroupMapper.deleteById(id);
+        
+        // 发布权限变更事件
+        EventBus.get().callEvent(new PermissionChangedEvent(
+                PermissionChangedEvent.ChangeType.PERM_GROUP_DELETE, 
+                id
+        ));
     }
 
     /**
@@ -175,6 +189,14 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
         }
         // 批量物理删除
         sysPermGroupMapper.deleteBatchIds(ids);
+        
+        // 发布权限变更事件
+        for (Long id : ids) {
+            EventBus.get().callEvent(new PermissionChangedEvent(
+                    PermissionChangedEvent.ChangeType.PERM_GROUP_DELETE, 
+                    id
+            ));
+        }
     }
 
 }
