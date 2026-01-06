@@ -161,7 +161,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
      */
     private void validateUser(SysUser user) {
         if (user.isDelFlag())
-            throw new UserNotExistException("用户已被删除");
+            throw new UserNotExistException("用户账号或密码错误");
 
         if (user.getStatus() == SysUserStatus.DISABLED.getCode())
             throw new UserStatusIsDisableException("用户已被禁用");
@@ -179,7 +179,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
             throw new LoginPasswordIsNullException("密码不能为空");
 
         if (!PasswordUtils.matches(rawPassword, salt, encodedPassword)) {
-            throw new LoginPasswordWrongException("密码错误");
+            throw new LoginPasswordWrongException("用户账号或密码错误");
         }
     }
 
