@@ -43,16 +43,12 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        log.debug("[SQL注入防护] 处理请求: {} {}, ContentType: {}", request.getMethod(), request.getRequestURI(), request.getContentType());
 
         // 判断是否需要过滤
         if (shouldSkip(request)) {
-            log.debug("[SQL注入防护] 跳过过滤: {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
-
-        log.debug("[SQL注入防护] 执行过滤: {}, 模式: {}", request.getRequestURI(), properties.getMode());
 
         // DETECT 模式：先检测是否包含 SQL 注入
         if (properties.getMode() == SQLInjectionProperties.SQLInjectionMode.DETECT) {
@@ -78,12 +74,10 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
 
             // 检测请求体（需要包装请求）
             if (properties.isFilterBody() && hasRequestBody(request)) {
-                log.debug("[SQL注入防护] 检测请求体, ContentType: {}", request.getContentType());
                 // 读取请求体
                 byte[] body = request.getInputStream().readAllBytes();
                 if (body != null && body.length > 0) {
                     String bodyStr = new String(body, StandardCharsets.UTF_8);
-                    log.debug("[SQL注入防护] 检测请求体: {}", bodyStr);
                     if (SqlInjectionUtils.containsSqlInjection(bodyStr)) {
                         log.warn("[SQL注入拦截] 请求地址: {}, 请求体包含 SQL 注入", request.getRequestURI());
                         rejectRequest(response);
@@ -92,7 +86,6 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
                 }
                 // 创建包装器以便后续读取，保留原始 request 的 ContentType
                 SqlInjectionHttpServletRequestWrapper wrappedRequest = new SqlInjectionHttpServletRequestWrapper(request, properties, body);
-                log.debug("[SQL注入防护] 创建包装器, 包装后 ContentType: {}", wrappedRequest.getContentType());
                 filterChain.doFilter(wrappedRequest, response);
                 return;
             }

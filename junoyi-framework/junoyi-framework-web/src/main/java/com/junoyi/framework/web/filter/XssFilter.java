@@ -38,21 +38,16 @@ public class XssFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        log.debug("[XSS] 处理请求: {} {}, ContentType: {}", request.getMethod(), request.getRequestURI(), request.getContentType());
         
         // 判断是否需要过滤
         if (shouldSkip(request)) {
-            log.debug("[XSS] 跳过过滤: {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
 
-        log.debug("[XSS] 执行过滤: {}, 模式: {}", request.getRequestURI(), xssProperties.getMode());
-
         // REJECT 模式：先创建 wrapper 缓存请求体，检测后继续传递
         if (xssProperties.getMode() == XssProperties.XSSMode.REJECT) {
             XssHttpServletRequestWrapper xssRequest = new XssHttpServletRequestWrapper(request, xssProperties);
-            log.debug("[XSS] REJECT模式, 包装后 ContentType: {}", xssRequest.getContentType());
             if (containsXssInWrapper(xssRequest)) {
                 log.warn("[XSS拦截] 请求地址: {}, 检测到 XSS 攻击内容", request.getRequestURI());
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
