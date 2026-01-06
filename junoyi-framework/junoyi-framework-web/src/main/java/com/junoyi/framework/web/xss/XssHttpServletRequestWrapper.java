@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -101,16 +102,39 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     }
 
     /**
-     * 获取经过 XSS 过滤的请求头值
+     * 获取请求头值，Content-Type 不进行 XSS 过滤
      *
      * @param name 请求头名称
-     * @return 过滤后的请求头值
+     * @return 请求头值
      */
     @Override
     public String getHeader(String name) {
+        // Content-Type 不进行 XSS 过滤，保留上层 wrapper 的设置
+        if ("Content-Type".equalsIgnoreCase(name)) {
+            return super.getHeader(name);
+        }
         if (!xssProperties.isFilterHeader()) return super.getHeader(name);
         String value = super.getHeader(name);
         return filterValue(value);
+    }
+
+    /**
+     * 重写 getHeaders，对 Content-Type 委托给上层 wrapper
+     * Spring MVC 通过此方法获取 Content-Type
+     */
+    @Override
+    public Enumeration<String> getHeaders(String name) {
+        // Content-Type 直接委托给上层 wrapper
+        return super.getHeaders(name);
+    }
+
+    /**
+     * 重写 getContentType，委托给上层 wrapper（如 DecryptedRequestWrapper）
+     * 这确保 API 加密解密后的 Content-Type 能正确传递
+     */
+    @Override
+    public String getContentType() {
+        return super.getContentType();
     }
 
     /**

@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,9 +88,32 @@ public class SqlInjectionHttpServletRequestWrapper extends HttpServletRequestWra
 
     @Override
     public String getHeader(String name) {
+        // Content-Type 不进行过滤，保留上层 wrapper 的设置
+        if ("Content-Type".equalsIgnoreCase(name)) {
+            return super.getHeader(name);
+        }
         if (!properties.isFilterHeader()) return super.getHeader(name);
         String value = super.getHeader(name);
         return filterValue(value);
+    }
+
+    /**
+     * 重写 getHeaders，对 Content-Type 委托给上层 wrapper
+     * Spring MVC 通过此方法获取 Content-Type
+     */
+    @Override
+    public Enumeration<String> getHeaders(String name) {
+        // Content-Type 直接委托给上层 wrapper
+        return super.getHeaders(name);
+    }
+
+    /**
+     * 重写 getContentType，委托给上层 wrapper（如 DecryptedRequestWrapper）
+     * 这确保 API 加密解密后的 Content-Type 能正确传递
+     */
+    @Override
+    public String getContentType() {
+        return super.getContentType();
     }
 
     @Override

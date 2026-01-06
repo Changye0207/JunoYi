@@ -43,7 +43,7 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        log.debug("[SQL注入防护] 处理请求: {} {}", request.getMethod(), request.getRequestURI());
+        log.debug("[SQL注入防护] 处理请求: {} {}, ContentType: {}", request.getMethod(), request.getRequestURI(), request.getContentType());
 
         // 判断是否需要过滤
         if (shouldSkip(request)) {
@@ -78,6 +78,7 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
 
             // 检测请求体（需要包装请求）
             if (properties.isFilterBody() && hasRequestBody(request)) {
+                log.debug("[SQL注入防护] 检测请求体, ContentType: {}", request.getContentType());
                 // 读取请求体
                 byte[] body = request.getInputStream().readAllBytes();
                 if (body != null && body.length > 0) {
@@ -89,8 +90,9 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
                         return;
                     }
                 }
-                // 创建包装器以便后续读取
+                // 创建包装器以便后续读取，保留原始 request 的 ContentType
                 SqlInjectionHttpServletRequestWrapper wrappedRequest = new SqlInjectionHttpServletRequestWrapper(request, properties, body);
+                log.debug("[SQL注入防护] 创建包装器, 包装后 ContentType: {}", wrappedRequest.getContentType());
                 filterChain.doFilter(wrappedRequest, response);
                 return;
             }

@@ -57,9 +57,13 @@ public class WebConfiguration {
         } else {
             config.addAllowedHeader("*");
         }
+        // 确保加密相关的请求头被允许
+        config.addAllowedHeader("X-Encrypted");
+        config.addAllowedHeader("X-No-Encrypt");
         
         // 暴露的响应头
         config.addExposedHeader("Authorization");
+        config.addExposedHeader("X-Encrypted");
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

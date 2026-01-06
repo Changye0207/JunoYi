@@ -61,11 +61,24 @@ public class ApiEncryptFilter extends OncePerRequestFilter {
         HttpServletResponse wrappedResponse = response;
         boolean needEncryptResponse = false;
 
+        // 始终打印 INFO 级别日志以便调试
+        String xEncrypted = request.getHeader("X-Encrypted");
+        String contentType = request.getContentType();
+        String method = request.getMethod();
+        log.info("ApiEncryptFilter", "URI: " + requestURI + 
+                ", Method: " + method +
+                ", ContentType: " + contentType + 
+                ", X-Encrypted: " + xEncrypted +
+                ", apiEncrypt.request: " + securityProperties.getApiEncrypt().isRequest());
+
         try {
             // 处理请求体解密
-            if (securityProperties.getApiEncrypt().isRequest() && needDecryptRequest(request)) {
+            boolean needDecrypt = securityProperties.getApiEncrypt().isRequest() && needDecryptRequest(request);
+            log.info("ApiEncryptCheck", "needDecrypt: " + needDecrypt);
+            
+            if (needDecrypt) {
                 wrappedRequest = decryptRequest(request);
-                log.debug("RequestDecrypted", "Request body decrypted: " + requestURI);
+                log.info("RequestDecrypted", "Request body decrypted, URI: " + requestURI + ", New ContentType: " + wrappedRequest.getContentType());
             }
 
             // 判断是否需要加密响应
@@ -96,14 +109,22 @@ public class ApiEncryptFilter extends OncePerRequestFilter {
     private boolean needDecryptRequest(HttpServletRequest request) {
         // 检查请求头中是否有加密标识
         String encrypted = request.getHeader("X-Encrypted");
-        if (!"true".equalsIgnoreCase(encrypted))
+        String method = request.getMethod();
+        
+        log.info("NeedDecryptCheck", "X-Encrypted header: '" + encrypted + "', Method: " + method);
+        
+        if (!"true".equalsIgnoreCase(encrypted)) {
+            log.info("NeedDecryptCheck", "X-Encrypted is not 'true', skipping decryption");
             return false;
+        }
 
         // 只对 POST/PUT/PATCH 请求进行解密
-        String method = request.getMethod();
-        return "POST".equalsIgnoreCase(method) 
+        boolean shouldDecrypt = "POST".equalsIgnoreCase(method) 
             || "PUT".equalsIgnoreCase(method) 
             || "PATCH".equalsIgnoreCase(method);
+        
+        log.info("NeedDecryptCheck", "Should decrypt: " + shouldDecrypt);
+        return shouldDecrypt;
     }
 
     /**
@@ -133,12 +154,24 @@ public class ApiEncryptFilter extends OncePerRequestFilter {
         }
 
         String encryptedBody = sb.toString().trim();
-        if (encryptedBody.isEmpty())
+        log.debug("DecryptRequest", "Encrypted body length: " + encryptedBody.length());
+        
+        if (encryptedBody.isEmpty()) {
+            log.warn("DecryptRequest", "Empty request body, skipping decryption");
             return request;
+        }
 
         // 解密请求体
-        String decryptedBody = rsaCryptoHelper.decrypt(encryptedBody);
-        return new DecryptedRequestWrapper(request, decryptedBody);
+        try {
+            String decryptedBody = rsaCryptoHelper.decrypt(encryptedBody);
+            log.debug("DecryptRequest", "Decrypted body: " + decryptedBody);
+            DecryptedRequestWrapper wrapper = new DecryptedRequestWrapper(request, decryptedBody);
+            log.debug("DecryptRequest", "Wrapper ContentType: " + wrapper.getContentType());
+            return wrapper;
+        } catch (Exception e) {
+            log.error("DecryptRequest", "Failed to decrypt request body", e);
+            throw new IOException("Failed to decrypt request body: " + e.getMessage(), e);
+        }
     }
 
     /**

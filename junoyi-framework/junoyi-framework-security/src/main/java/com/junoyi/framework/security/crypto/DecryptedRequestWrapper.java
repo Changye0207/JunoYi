@@ -10,6 +10,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Enumeration;
 
 /**
  * 解密请求包装器
@@ -19,6 +21,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class DecryptedRequestWrapper extends HttpServletRequestWrapper {
 
+    private static final String APPLICATION_JSON = "application/json;charset=UTF-8";
     private final byte[] body;
 
     /**
@@ -29,6 +32,37 @@ public class DecryptedRequestWrapper extends HttpServletRequestWrapper {
     public DecryptedRequestWrapper(HttpServletRequest request, String decryptedBody) {
         super(request);
         this.body = decryptedBody != null ? decryptedBody.getBytes(StandardCharsets.UTF_8) : new byte[0];
+    }
+
+    /**
+     * 重写getContentType方法，返回JSON类型（解密后的内容是JSON格式）
+     */
+    @Override
+    public String getContentType() {
+        return APPLICATION_JSON;
+    }
+
+    /**
+     * 重写getHeader方法，对Content-Type返回JSON类型
+     */
+    @Override
+    public String getHeader(String name) {
+        if ("Content-Type".equalsIgnoreCase(name)) {
+            return APPLICATION_JSON;
+        }
+        return super.getHeader(name);
+    }
+
+    /**
+     * 重写getHeaders方法，对Content-Type返回JSON类型
+     * Spring MVC 通过此方法获取 Content-Type
+     */
+    @Override
+    public Enumeration<String> getHeaders(String name) {
+        if ("Content-Type".equalsIgnoreCase(name)) {
+            return Collections.enumeration(Collections.singletonList(APPLICATION_JSON));
+        }
+        return super.getHeaders(name);
     }
 
     /**

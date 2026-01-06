@@ -47,7 +47,7 @@ public class SysAuthController extends BaseController {
      * @return R<AuthVo> 统一响应结果，包含 accessToken 和 refreshToken
      */
     @PostMapping("/login")
-    public R<AuthVO> login(@Valid @RequestBody LoginDTO loginDTO) {
+    public R<AuthVO> login(@RequestBody LoginDTO loginDTO) {
         // 验证码校验
         if (!StringUtils.isBlank(loginDTO.getCaptchaId())) {
             if (StringUtils.isBlank(loginDTO.getCode()))

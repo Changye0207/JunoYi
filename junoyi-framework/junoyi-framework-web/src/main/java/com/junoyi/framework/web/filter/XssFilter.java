@@ -38,7 +38,7 @@ public class XssFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        log.debug("[XSS] 处理请求: {} {}", request.getMethod(), request.getRequestURI());
+        log.debug("[XSS] 处理请求: {} {}, ContentType: {}", request.getMethod(), request.getRequestURI(), request.getContentType());
         
         // 判断是否需要过滤
         if (shouldSkip(request)) {
@@ -49,9 +49,11 @@ public class XssFilter extends OncePerRequestFilter {
 
         log.debug("[XSS] 执行过滤: {}, 模式: {}", request.getRequestURI(), xssProperties.getMode());
 
-        // REJECT 模式：先检测是否包含 XSS
+        // REJECT 模式：先创建 wrapper 缓存请求体，检测后继续传递
         if (xssProperties.getMode() == XssProperties.XSSMode.REJECT) {
-            if (containsXssInRequest(request)) {
+            XssHttpServletRequestWrapper xssRequest = new XssHttpServletRequestWrapper(request, xssProperties);
+            log.debug("[XSS] REJECT模式, 包装后 ContentType: {}", xssRequest.getContentType());
+            if (containsXssInWrapper(xssRequest)) {
                 log.warn("[XSS拦截] 请求地址: {}, 检测到 XSS 攻击内容", request.getRequestURI());
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -59,7 +61,7 @@ public class XssFilter extends OncePerRequestFilter {
                 response.getWriter().write("{\"code\":400,\"msg\":\"请求包含非法字符\"}");
                 return;
             }
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(xssRequest, response);
             return;
         }
 
@@ -108,15 +110,15 @@ public class XssFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 检测请求中是否包含 XSS 内容（用于 REJECT 模式）
+     * 检测 wrapper 中是否包含 XSS 内容（用于 REJECT 模式）
      */
-    private boolean containsXssInRequest(HttpServletRequest request) throws IOException {
+    private boolean containsXssInWrapper(XssHttpServletRequestWrapper wrapper) {
         // 检测参数
         if (xssProperties.isFilterParameter()) {
-            Enumeration<String> paramNames = request.getParameterNames();
+            Enumeration<String> paramNames = wrapper.getParameterNames();
             while (paramNames.hasMoreElements()) {
                 String name = paramNames.nextElement();
-                String[] values = request.getParameterValues(name);
+                String[] values = wrapper.getParameterValues(name);
                 if (values != null) {
                     for (String value : values) {
                         if (XssUtils.containsXss(value)) {
@@ -130,12 +132,11 @@ public class XssFilter extends OncePerRequestFilter {
 
         // 检测请求头
         if (xssProperties.isFilterHeader()) {
-            Enumeration<String> headerNames = request.getHeaderNames();
+            Enumeration<String> headerNames = wrapper.getHeaderNames();
             while (headerNames.hasMoreElements()) {
                 String name = headerNames.nextElement();
-                // 跳过一些标准请求头
                 if (isStandardHeader(name)) continue;
-                String value = request.getHeader(name);
+                String value = wrapper.getHeader(name);
                 if (XssUtils.containsXss(value)) {
                     log.debug("[XSS检测] 请求头 {} 包含 XSS 内容: {}", name, value);
                     return true;
@@ -143,12 +144,15 @@ public class XssFilter extends OncePerRequestFilter {
             }
         }
 
-        // 检测请求体
+        // 检测请求体（使用已缓存的 body）
         if (xssProperties.isFilterBody()) {
-            String body = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            if (XssUtils.containsXss(body)) {
-                log.debug("[XSS检测] 请求体包含 XSS 内容");
-                return true;
+            byte[] body = wrapper.getOriginalBody();
+            if (body != null && body.length > 0) {
+                String bodyStr = new String(body, StandardCharsets.UTF_8);
+                if (XssUtils.containsXss(bodyStr)) {
+                    log.debug("[XSS检测] 请求体包含 XSS 内容");
+                    return true;
+                }
             }
         }
 

@@ -94,6 +94,12 @@ public class SecurityConfiguration {
     /**
      * 注册 Token 认证过滤器
      * 验证 Token 并从 Redis 获取会话信息
+     * 
+     * 过滤器执行顺序：
+     * - ApiEncryptFilter (order=0) - 解密请求
+     * - SqlInjectionFilter (order=1) - SQL注入检测
+     * - XssFilter (order=2) - XSS防护
+     * - TokenAuthenticationFilter (order=10) - Token认证
      *
      * @return FilterRegistrationBean 过滤器注册对象
      */
@@ -105,7 +111,7 @@ public class SecurityConfiguration {
         FilterRegistrationBean<TokenAuthenticationTokenFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.addUrlPatterns("/*");
-        registrationBean.setOrder(1);
+        registrationBean.setOrder(10);  // 在 XSS/SQL注入过滤器之后执行
         registrationBean.setName("tokenAuthenticationFilter");
         
         log.info("FilterRegistered", "Token authentication filter registered.");
