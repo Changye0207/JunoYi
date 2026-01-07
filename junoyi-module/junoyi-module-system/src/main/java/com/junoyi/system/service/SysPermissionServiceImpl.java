@@ -59,7 +59,7 @@ public class SysPermissionServiceImpl implements ISysPermissionService {
 
     @Override
     public void addPermission(SysPermissionDTO dto) {
-        SysPermission permission = sysPermissionConverter.toPo(dto);
+        SysPermission permission = sysPermissionConverter.toEntity(dto);
         permission.setCreateBy(SecurityUtils.getUserName());
         permission.setCreateTime(DateUtils.getNowDate());
         sysPermissionMapper.insert(permission);
@@ -67,7 +67,7 @@ public class SysPermissionServiceImpl implements ISysPermissionService {
 
     @Override
     public void updatePermission(SysPermissionDTO dto) {
-        SysPermission permission = sysPermissionConverter.toPo(dto);
+        SysPermission permission = sysPermissionConverter.toEntity(dto);
         permission.setUpdateBy(SecurityUtils.getUserName());
         permission.setUpdateTime(DateUtils.getNowDate());
         sysPermissionMapper.updateById(permission);

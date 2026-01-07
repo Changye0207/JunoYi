@@ -12,5 +12,5 @@ import org.mapstruct.Mapper;
  * @author Fan
  */
 @Mapper(componentModel = "spring")
-public interface SysPermissionConverter extends BaseConverter<SysPermission, SysPermissionVO, SysPermissionDTO> {
+public interface SysPermissionConverter extends BaseConverter<SysPermissionDTO, SysPermission, SysPermissionVO> {
 }
