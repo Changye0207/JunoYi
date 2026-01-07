@@ -66,19 +66,6 @@ public class SysPermissionPoolController extends BaseController {
     }
 
     /**
-     * 更新权限
-     */
-    @PutMapping
-    @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(
-            value = {"system.ui.permission-pool.view", "system.api.permission-pool.update"}
-    )
-    public R<Void> updatePermission(@RequestBody SysPermissionDTO dto) {
-        sysPermissionService.updatePermission(dto);
-        return R.ok();
-    }
-
-    /**
      * 删除权限
      */
     @DeleteMapping("/{id}")

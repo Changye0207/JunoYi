@@ -32,11 +32,6 @@ public interface ISysPermissionService {
     void addPermission(SysPermissionDTO dto);
 
     /**
-     * 更新权限
-     */
-    void updatePermission(SysPermissionDTO dto);
-
-    /**
      * 删除权限
      */
     void deletePermission(Long id);

@@ -66,14 +66,6 @@ public class SysPermissionServiceImpl implements ISysPermissionService {
     }
 
     @Override
-    public void updatePermission(SysPermissionDTO dto) {
-        SysPermission permission = sysPermissionConverter.toEntity(dto);
-        permission.setUpdateBy(SecurityUtils.getUserName());
-        permission.setUpdateTime(DateUtils.getNowDate());
-        sysPermissionMapper.updateById(permission);
-    }
-
-    @Override
     public void deletePermission(Long id) {
         sysPermissionMapper.deleteById(id);
     }
