@@ -1,6 +1,7 @@
 package com.junoyi.system.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.framework.core.utils.DateUtils;
@@ -102,6 +103,21 @@ public class SysPermissionServiceImpl implements ISysPermissionService {
             return;
         }
         sysPermissionMapper.deleteBatchIds(ids);
+    }
+
+    /**
+     * 更新权限状态
+     * @param id 权限ID
+     * @param status 状态值
+     */
+    @Override
+    public void updatePermissionStatus(Long id, Integer status) {
+        LambdaUpdateWrapper<SysPermission> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(SysPermission::getId, id)
+                .set(SysPermission::getStatus, status)
+                .set(SysPermission::getUpdateBy, SecurityUtils.getUserName())
+                .set(SysPermission::getUpdateTime, DateUtils.getNowDate());
+        sysPermissionMapper.update(null, wrapper);
     }
 
 }

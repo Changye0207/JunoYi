@@ -40,4 +40,9 @@ public interface ISysPermissionService {
      * 批量删除权限
      */
     void deletePermissionBatch(List<Long> ids);
+
+    /**
+     * 更新权限状态
+     */
+    void updatePermissionStatus(Long id, Integer status);
 }

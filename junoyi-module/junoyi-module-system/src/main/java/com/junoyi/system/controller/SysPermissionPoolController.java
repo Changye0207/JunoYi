@@ -90,4 +90,17 @@ public class SysPermissionPoolController extends BaseController {
         sysPermissionService.deletePermissionBatch(ids);
         return R.ok();
     }
+
+    /**
+     * 更新权限状态
+     */
+    @PutMapping("/{id}/status")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.permission.pool.view", "system.api.permission.pool.update"}
+    )
+    public R<Void> updatePermissionStatus(@PathVariable("id") Long id, @RequestBody SysPermissionDTO sysPermissionDTO) {
+        sysPermissionService.updatePermissionStatus(id, sysPermissionDTO.getStatus());
+        return R.ok();
+    }
 }
