@@ -268,8 +268,8 @@ junoyi:
         desktop: 7d         # 桌面应用
       # Refresh Token 有效期
       refresh-expire:
-        admin-web: 7d       # 后台管理 Web
-        front-web: 14d      # 前台用户 Web
+        admin-web: 3d       # 后台管理 Web
+        front-web: 7d      # 前台用户 Web
         miniprogram: 30d    # 小程序
         app: 30d            # App
         desktop: 90d        # 桌面应用
