@@ -46,7 +46,7 @@ public class SysSessionServiceImpl implements ISysSessionService {
                 ? filteredList.subList(fromIndex, toIndex) 
                 : List.of();
         
-        return PageResult.of(pageList, total, pageNum, pageSize);
+        return PageResult.of(pageList, (long) total, pageNum, pageSize);
     }
 
     /**
