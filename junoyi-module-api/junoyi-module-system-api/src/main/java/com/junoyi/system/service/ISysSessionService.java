@@ -5,6 +5,8 @@ import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.system.domain.dto.SysSessionQueryDTO;
 import com.junoyi.system.domain.po.SysSession;
 
+import java.util.List;
+
 /**
  * 系统会话服务接口
  *
@@ -21,4 +23,9 @@ public interface ISysSessionService {
      * 踢出指定会话
      */
     boolean kickOut(String sessionId);
+
+    /**
+     * 批量踢出会话
+     */
+    int kickOutBatch(List<String> sessionIds);
 }

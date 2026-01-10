@@ -14,6 +14,8 @@ import com.junoyi.system.service.ISysSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 系统会话控制器
  *
@@ -50,6 +52,19 @@ public class SysSessionController extends BaseController {
     )
     public R<Void> kickOut(@PathVariable("sessionId") String sessionId) {
         sysSessionService.kickOut(sessionId);
+        return R.ok();
+    }
+
+    /**
+     * 批量踢出会话
+     */
+    @DeleteMapping("/batch")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.session.view", "system.api.session.kickout"}
+    )
+    public R<Void> kickOutBatch(@RequestBody List<String> sessionIds) {
+        sysSessionService.kickOutBatch(sessionIds);
         return R.ok();
     }
 }

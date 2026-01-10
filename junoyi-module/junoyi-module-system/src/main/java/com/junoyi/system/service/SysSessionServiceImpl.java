@@ -24,30 +24,38 @@ public class SysSessionServiceImpl implements ISysSessionService {
 
     private final SessionHelper sessionHelper;
 
+    /**
+     * 获取系统会话列表，支持查询条件过滤和分页
+     *
+     * @param queryDTO 查询条件对象，用于过滤会话数据
+     * @param pageQuery 分页查询对象，包含页码和每页大小信息
+     * @return PageResult<SysSession> 包含分页结果的会话列表，包括当前页数据、总数、页码和页面大小
+     */
     @Override
     public PageResult<SysSession> getSessionList(SysSessionQueryDTO queryDTO, PageQuery pageQuery) {
         // 获取所有会话
         List<UserSession> allSessions = sessionHelper.getAllSessions();
-        
-        // 过滤
+
+        // 根据查询条件过滤并转换会话数据
         List<SysSession> filteredList = allSessions.stream()
                 .filter(session -> matchQuery(session, queryDTO))
                 .map(this::convertToSysSession)
                 .collect(Collectors.toList());
-        
+
         // 手动分页
         int total = filteredList.size();
         int pageNum = pageQuery.getPageNum();
         int pageSize = pageQuery.getPageSize();
         int fromIndex = (pageNum - 1) * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, total);
-        
-        List<SysSession> pageList = fromIndex < total 
-                ? filteredList.subList(fromIndex, toIndex) 
+
+        List<SysSession> pageList = fromIndex < total
+                ? filteredList.subList(fromIndex, toIndex)
                 : List.of();
-        
+
         return PageResult.of(pageList, (long) total, pageNum, pageSize);
     }
+
 
     /**
      * 匹配查询条件
@@ -78,10 +86,38 @@ public class SysSessionServiceImpl implements ISysSessionService {
         return true;
     }
 
+    /**
+     * 踢出指定会话
+     *
+     * @param sessionId 会话ID
+     * @return 操作是否成功，true表示踢出会话成功，false表示踢出会话失败
+     */
     @Override
     public boolean kickOut(String sessionId) {
         return sessionHelper.kickOut(sessionId);
     }
+
+    /**
+     * 批量踢出多个会话
+     *
+     * @param sessionIds 会话ID列表
+     * @return 成功踢出的会话数量
+     */
+    @Override
+    public int kickOutBatch(List<String> sessionIds) {
+        // 检查输入参数是否为空或空列表
+        if (sessionIds == null || sessionIds.isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        for (String sessionId : sessionIds) {
+            if (sessionHelper.kickOut(sessionId)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 
     /**
      * 将 UserSession 转换为 SysSession
