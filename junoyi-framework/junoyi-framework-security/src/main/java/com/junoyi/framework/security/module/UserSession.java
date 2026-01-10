@@ -83,6 +83,11 @@ public class UserSession implements Serializable {
     private String loginIp;
 
     /**
+     * IP所在地区
+     */
+    private String ipRegion;
+
+    /**
      * 登录时间
      */
     private Date loginTime;

@@ -1,5 +1,6 @@
 package com.junoyi.framework.security.helper;
 
+import com.junoyi.framework.core.utils.IPUtils;
 import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
@@ -58,6 +59,7 @@ public class SessionHelperImpl implements SessionHelper {
 
         // 构建会话信息
         Date now = new Date();
+        String ipRegion = IPUtils.getIpRegion(loginIp);
         UserSession session = UserSession.builder()
                 .sessionId(tokenId)
                 .userId(loginUser.getUserId())
@@ -70,6 +72,7 @@ public class SessionHelperImpl implements SessionHelper {
                 .superAdmin(loginUser.isSuperAdmin())
                 .roles(loginUser.getRoles())
                 .loginIp(loginIp)
+                .ipRegion(ipRegion)
                 .loginTime(now)
                 .lastAccessTime(now)
                 .userAgent(userAgent)

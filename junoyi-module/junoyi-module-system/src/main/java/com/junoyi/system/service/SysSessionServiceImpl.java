@@ -134,6 +134,7 @@ public class SysSessionServiceImpl implements ISysSessionService {
         sysSession.setGroups(userSession.getGroups());
         sysSession.setDepts(userSession.getDepts());
         sysSession.setLoginIp(userSession.getLoginIp());
+        sysSession.setIpRegion(userSession.getIpRegion());
         sysSession.setLoginTime(userSession.getLoginTime());
         sysSession.setLastAccessTime(userSession.getLastAccessTime());
         sysSession.setAccessExpireTime(userSession.getAccessExpireTime());
