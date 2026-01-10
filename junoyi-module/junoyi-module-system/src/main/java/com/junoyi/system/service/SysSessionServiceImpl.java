@@ -129,14 +129,12 @@ public class SysSessionServiceImpl implements ISysSessionService {
         sysSession.setUserName(userSession.getUserName());
         sysSession.setNickName(userSession.getNickName());
         sysSession.setPlatformType(userSession.getPlatformType());
-        sysSession.setRoles(userSession.getRoles());
-        sysSession.setPermissions(userSession.getPermissions());
-        sysSession.setGroups(userSession.getGroups());
-        sysSession.setDepts(userSession.getDepts());
         sysSession.setLoginIp(userSession.getLoginIp());
         sysSession.setIpRegion(userSession.getIpRegion());
         sysSession.setLoginTime(userSession.getLoginTime());
         sysSession.setLastAccessTime(userSession.getLastAccessTime());
+        sysSession.setUserAgent(userSession.getUserAgent());
+        sysSession.setDeviceType(userSession.getDeviceType());
         sysSession.setAccessExpireTime(userSession.getAccessExpireTime());
         sysSession.setRefreshExpireTime(userSession.getRefreshExpireTime());
         return sysSession;

@@ -4,11 +4,10 @@ import com.junoyi.framework.security.enums.PlatformType;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.Set;
 
 /**
  * 系统会话数据实体
- * 用于存储和管理系统用户的会话信息，包括用户基本信息、权限角色、登录信息等
+ * 用于会话管理接口返回的会话信息
  *
  * @author Fan
  */
@@ -41,26 +40,6 @@ public class SysSession {
     private PlatformType platformType;
 
     /**
-     * 用户角色集合，存储用户拥有的角色ID
-     */
-    private Set<Long> roles;
-
-    /**
-     * 权限集合，存储用户拥有的权限标识
-     */
-    private Set<String> permissions;
-
-    /**
-     * 用户组集合，存储用户所属的用户组
-     */
-    private Set<String> groups;
-
-    /**
-     * 部门集合，存储用户所属的部门ID
-     */
-    private Set<Long> depts;
-
-    /**
      * 登录IP地址，记录用户登录时的IP
      */
     private String loginIp;
@@ -76,9 +55,19 @@ public class SysSession {
     private Date loginTime;
 
     /**
-     * 最后访问时间，记录用户最后一次访问的时间，用于会话超时管理
+     * 最后访问时间，记录用户最后一次访问的时间
      */
     private Date lastAccessTime;
+
+    /**
+     * 用户代理（浏览器信息）
+     */
+    private String userAgent;
+
+    /**
+     * 设备类型（Mobile/Tablet/Desktop/Unknown）
+     */
+    private String deviceType;
 
     /**
      * AccessToken 过期时间
