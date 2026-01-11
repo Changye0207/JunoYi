@@ -590,4 +590,24 @@ public class RedisUtils {
             case MAP -> (long) CLIENT.getMap(key).size();
         };
     }
+
+    /**
+     * 获取键的值（根据类型返回不同结构）。
+     *
+     * @param key 键名
+     * @return 值对象，null 表示键不存在
+     */
+    public static Object getValue(String key) {
+        RType type = CLIENT.getKeys().getType(key);
+        if (type == null) {
+            return null;
+        }
+        return switch (type) {
+            case OBJECT -> CLIENT.getBucket(key).get();
+            case LIST -> CLIENT.getList(key).readAll();
+            case SET -> CLIENT.getSet(key).readAll();
+            case ZSET -> CLIENT.getScoredSortedSet(key).readAll();
+            case MAP -> CLIENT.getMap(key).readAllMap();
+        };
+    }
 }
