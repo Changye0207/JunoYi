@@ -4,6 +4,8 @@ import com.junoyi.framework.core.utils.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.redisson.api.*;
+import org.redisson.api.redisnode.RedisNode;
+import org.redisson.api.redisnode.RedisNodes;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -487,5 +489,33 @@ public class RedisUtils {
     public static Boolean hasKey(String key) {
         RKeys rKeys = CLIENT.getKeys();
         return rKeys.countExists(key) > 0;
+    }
+
+    /**
+     * 获取 Redis 服务器信息。
+     *
+     * @param section 信息分类（如 server、memory、stats 等）
+     * @return 服务器信息 Map
+     */
+    public static Map<String, String> getServerInfo(String section) {
+        return CLIENT.getRedisNodes(RedisNodes.SINGLE).getInstance().info(RedisNode.InfoSection.valueOf(section.toUpperCase()));
+    }
+
+    /**
+     * 获取 Redis 所有服务器信息。
+     *
+     * @return 服务器信息 Map
+     */
+    public static Map<String, String> getServerInfo() {
+        return CLIENT.getRedisNodes(RedisNodes.SINGLE).getInstance().info(RedisNode.InfoSection.ALL);
+    }
+
+    /**
+     * 获取 Redis 数据库大小（键数量）。
+     *
+     * @return 键数量
+     */
+    public static long getDbSize() {
+        return CLIENT.getKeys().count();
     }
 }
