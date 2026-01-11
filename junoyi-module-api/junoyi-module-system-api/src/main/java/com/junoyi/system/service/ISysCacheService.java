@@ -3,6 +3,7 @@ package com.junoyi.system.service;
 import com.junoyi.framework.core.domain.page.PageQuery;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.system.domain.dto.CacheKeyQueryDTO;
+import com.junoyi.system.domain.vo.CacheKeyDetailVO;
 import com.junoyi.system.domain.vo.CacheKeyVO;
 import com.junoyi.system.domain.vo.RedisInfoVO;
 
@@ -28,4 +29,12 @@ public interface ISysCacheService {
      * @return 分页结果
      */
     PageResult<CacheKeyVO> getCacheKeyList(CacheKeyQueryDTO query, PageQuery pageQuery);
+
+    /**
+     * 获取缓存键详情（包含值）
+     *
+     * @param key 键名
+     * @return 缓存详情
+     */
+    CacheKeyDetailVO getCacheKeyDetail(String key);
 }

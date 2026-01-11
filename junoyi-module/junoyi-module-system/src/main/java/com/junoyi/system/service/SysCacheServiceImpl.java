@@ -4,6 +4,7 @@ import com.junoyi.framework.core.domain.page.PageQuery;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.framework.redis.utils.RedisUtils;
 import com.junoyi.system.domain.dto.CacheKeyQueryDTO;
+import com.junoyi.system.domain.vo.CacheKeyDetailVO;
 import com.junoyi.system.domain.vo.CacheKeyVO;
 import com.junoyi.system.domain.vo.RedisInfoVO;
 import org.springframework.stereotype.Service;
@@ -108,6 +109,21 @@ public class SysCacheServiceImpl implements ISysCacheService {
         vo.setTtl(RedisUtils.getTtl(key));
         vo.setMemoryUsage(RedisUtils.getMemoryUsage(key));
         vo.setSize(RedisUtils.getSize(key));
+        return vo;
+    }
+
+    @Override
+    public CacheKeyDetailVO getCacheKeyDetail(String key) {
+        if (!RedisUtils.hasKey(key)) {
+            return null;
+        }
+        CacheKeyDetailVO vo = new CacheKeyDetailVO();
+        vo.setKey(key);
+        vo.setType(RedisUtils.getType(key));
+        vo.setTtl(RedisUtils.getTtl(key));
+        vo.setMemoryUsage(RedisUtils.getMemoryUsage(key));
+        vo.setSize(RedisUtils.getSize(key));
+        vo.setValue(RedisUtils.getValue(key));
         return vo;
     }
 

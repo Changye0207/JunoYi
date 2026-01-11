@@ -7,12 +7,14 @@ import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
 import com.junoyi.system.domain.dto.CacheKeyQueryDTO;
+import com.junoyi.system.domain.vo.CacheKeyDetailVO;
 import com.junoyi.system.domain.vo.CacheKeyVO;
 import com.junoyi.system.domain.vo.RedisInfoVO;
 import com.junoyi.system.service.ISysCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -49,6 +51,18 @@ public class SysCacheController extends BaseController {
     )
     public R<PageResult<CacheKeyVO>> getCacheKeyList(CacheKeyQueryDTO query) {
         return R.ok(sysCacheService.getCacheKeyList(query, getPageQuery()));
+    }
+
+    /**
+     * 查询缓存详情
+     */
+    @GetMapping("/key")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.cache.view", "system.api.cache.get"}
+    )
+    public R<CacheKeyDetailVO> getCacheKeyDetail(@RequestParam("key") String key) {
+        return R.ok(sysCacheService.getCacheKeyDetail(key));
     }
 
 }
