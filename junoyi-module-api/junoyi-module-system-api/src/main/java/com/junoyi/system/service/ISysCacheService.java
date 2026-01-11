@@ -1,5 +1,9 @@
 package com.junoyi.system.service;
 
+import com.junoyi.framework.core.domain.page.PageQuery;
+import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.system.domain.dto.CacheKeyQueryDTO;
+import com.junoyi.system.domain.vo.CacheKeyVO;
 import com.junoyi.system.domain.vo.RedisInfoVO;
 
 /**
@@ -15,4 +19,13 @@ public interface ISysCacheService {
      * @return Redis 信息
      */
     RedisInfoVO getRedisInfo();
+
+    /**
+     * 查询缓存键列表（分页）
+     *
+     * @param query 查询条件
+     * @param pageQuery 分页参数
+     * @return 分页结果
+     */
+    PageResult<CacheKeyVO> getCacheKeyList(CacheKeyQueryDTO query, PageQuery pageQuery);
 }

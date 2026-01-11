@@ -1,10 +1,18 @@
 package com.junoyi.system.service;
 
+import com.junoyi.framework.core.domain.page.PageQuery;
+import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.framework.redis.utils.RedisUtils;
+import com.junoyi.system.domain.dto.CacheKeyQueryDTO;
+import com.junoyi.system.domain.vo.CacheKeyVO;
 import com.junoyi.system.domain.vo.RedisInfoVO;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 系统缓存服务实现类
@@ -53,6 +61,53 @@ public class SysCacheServiceImpl implements ISysCacheService {
             vo.setHitRate("0.00%");
         }
 
+        return vo;
+    }
+
+    @Override
+    public PageResult<CacheKeyVO> getCacheKeyList(CacheKeyQueryDTO query, PageQuery pageQuery) {
+        // 构建查询模式
+        String pattern = StringUtils.hasText(query.getPattern()) ? query.getPattern() : "*";
+
+        // 获取所有匹配的键
+        Collection<String> allKeys = RedisUtils.keys(pattern);
+
+        // 按类型过滤
+        List<String> filteredKeys = allKeys.stream()
+                .filter(key -> {
+                    if (!StringUtils.hasText(query.getType())) {
+                        return true;
+                    }
+                    return query.getType().equalsIgnoreCase(RedisUtils.getType(key));
+                })
+                .collect(Collectors.toList());
+
+        // 总数
+        long total = filteredKeys.size();
+
+        // 分页
+        int offset = pageQuery.getOffset();
+        int pageSize = pageQuery.getPageSize();
+        List<String> pagedKeys = filteredKeys.stream()
+                .skip(offset)
+                .limit(pageSize)
+                .collect(Collectors.toList());
+
+        // 转换为 VO
+        List<CacheKeyVO> records = pagedKeys.stream()
+                .map(this::buildCacheKeyVO)
+                .collect(Collectors.toList());
+
+        return PageResult.of(records, total, pageQuery);
+    }
+
+    private CacheKeyVO buildCacheKeyVO(String key) {
+        CacheKeyVO vo = new CacheKeyVO();
+        vo.setKey(key);
+        vo.setType(RedisUtils.getType(key));
+        vo.setTtl(RedisUtils.getTtl(key));
+        vo.setMemoryUsage(RedisUtils.getMemoryUsage(key));
+        vo.setSize(RedisUtils.getSize(key));
         return vo;
     }
 

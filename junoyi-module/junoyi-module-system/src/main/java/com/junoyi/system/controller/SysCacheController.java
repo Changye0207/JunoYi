@@ -12,7 +12,6 @@ import com.junoyi.system.domain.vo.RedisInfoVO;
 import com.junoyi.system.service.ISysCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,9 +47,8 @@ public class SysCacheController extends BaseController {
     @Permission(
             value = {"system.ui.cache.view", "system.api.cache.get"}
     )
-    public R<PageResult<CacheKeyVO>> getCacheKeyList(@RequestBody CacheKeyQueryDTO cacheKeyQuery){
-
-        return R.ok();
+    public R<PageResult<CacheKeyVO>> getCacheKeyList(CacheKeyQueryDTO query) {
+        return R.ok(sysCacheService.getCacheKeyList(query, getPageQuery()));
     }
 
 }
