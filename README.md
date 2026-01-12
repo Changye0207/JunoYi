@@ -40,6 +40,20 @@
 
 ---
 
+## �️ 版本绍规划
+
+项目持续更新中，后续版本规划：
+
+| 版本 | 说明 | 状态 |
+|------|------|------|
+| 单体版 | 当前版本，适合中小型项目 | 🚧 开发中 |
+| 多租户版 | 支持 SaaS 多租户架构 | 📋 规划中 |
+| 微服务版 | 基于 Spring Cloud 的分布式架构 | 📋 规划中 |
+
+📝 更新日志请查看文档站：https://doc.framework.junoyi.com
+
+---
+
 ## 📖 项目介绍
 
 JunoYi（钧逸）是一个基于 **Spring Boot 3.5.0** 和 **Java 21** 打造的现代化企业级应用开发框架。提供更全面、更成熟、更可扩展的基础设施能力，专为现代企业级业务研发而生。
@@ -191,7 +205,6 @@ JunoYi
 ---
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Juno-Yi/JunoYi&type=date&legend=top-left)](https://www.star-history.com/#Juno-Yi/JunoYi&type=date&legend=top-left)
-
 ---
 
 <div align="center">
