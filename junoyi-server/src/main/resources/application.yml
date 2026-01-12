@@ -127,6 +127,7 @@ junoyi:
       # 允许跨域访问的源（Origin）
       allowed-origins:
         - http://localhost:3006
+        - https://demo.junoyi.com
       # 允许跨域的方法
       allowed-methods:
         - GET

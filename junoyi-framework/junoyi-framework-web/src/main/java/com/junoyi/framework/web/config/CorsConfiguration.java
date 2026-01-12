@@ -33,7 +33,7 @@ public class CorsConfiguration implements WebMvcConfigurer {
                 .allowCredentials(corsProperties.isAllowCredentials())
                 .allowedHeaders(corsProperties.getAllowedHeaders().toArray(new String[0]))
                 .allowedMethods(corsProperties.getAllowedMethods().toArray(new String[0]))
-                .allowedOrigins(corsProperties.getAllowedOrigins().toArray(new String[0]))
+                .allowedOriginPatterns(corsProperties.getAllowedOrigins().toArray(new String[0]))
                 .maxAge(3600);
     }
 }
