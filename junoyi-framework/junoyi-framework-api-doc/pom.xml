@@ -13,7 +13,7 @@
     <artifactId>junoyi-framework-api-doc</artifactId>
 
     <description>
-        API 文档集成核心模块（基于 Knife4j + SpringDoc OpenAPI 3）
+        API 文档集成核心模块（基于 SpringDoc OpenAPI 3）
     </description>
 
     <dependencies>
@@ -30,10 +30,10 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Knife4j OpenAPI 3 (Spring Boot 3.x) -->
+        <!-- SpringDoc OpenAPI 3 (Spring Boot 3.x) -->
         <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
         <!-- Lombok -->

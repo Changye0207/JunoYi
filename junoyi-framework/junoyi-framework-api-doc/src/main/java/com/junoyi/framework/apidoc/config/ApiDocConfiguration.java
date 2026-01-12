@@ -14,12 +14,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * API 文档自动配置类
- * 基于 Knife4j + SpringDoc OpenAPI 3
+ * 基于 SpringDoc OpenAPI 3
  *
  * @author Fan
  */
@@ -30,14 +29,20 @@ public class ApiDocConfiguration {
 
     private static final String SECURITY_SCHEME_NAME = "Authorization";
 
+    private final ApiDocProperties properties;
+
+    public ApiDocConfiguration(ApiDocProperties properties) {
+        this.properties = properties;
+    }
+
     /**
      * 创建 OpenAPI 配置
      */
     @Bean
-    public OpenAPI openAPI(ApiDocProperties properties) {
+    public OpenAPI openAPI() {
         return new OpenAPI()
-                .info(buildInfo(properties))
-                .externalDocs(buildExternalDocs(properties))
+                .info(buildInfo())
+                .externalDocs(buildExternalDocs())
                 // 添加全局安全认证
                 .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
                 .schemaRequirement(SECURITY_SCHEME_NAME, new SecurityScheme()
@@ -52,7 +57,7 @@ public class ApiDocConfiguration {
     /**
      * 构建文档基本信息
      */
-    private Info buildInfo(ApiDocProperties properties) {
+    private Info buildInfo() {
         Info info = new Info()
                 .title(properties.getTitle())
                 .description(properties.getDescription())
@@ -88,7 +93,7 @@ public class ApiDocConfiguration {
     /**
      * 构建外部文档
      */
-    private ExternalDocumentation buildExternalDocs(ApiDocProperties properties) {
+    private ExternalDocumentation buildExternalDocs() {
         ApiDocProperties.ExternalDocs externalDocsProps = properties.getExternalDocs();
         if (externalDocsProps == null || externalDocsProps.getUrl() == null) {
             return null;
@@ -111,32 +116,54 @@ public class ApiDocConfiguration {
     }
 
     /**
-     * 根据配置创建自定义分组
+     * 系统管理分组
      */
     @Bean
-    public List<GroupedOpenApi> customGroups(ApiDocProperties properties) {
-        List<GroupedOpenApi> groups = new ArrayList<>();
+    public GroupedOpenApi systemGroup() {
+        List<ApiDocProperties.Group> groups = properties.getGroups();
+        ApiDocProperties.Group systemGroup = groups.stream()
+                .filter(g -> "system".equals(g.getName()))
+                .findFirst()
+                .orElse(null);
         
-        for (ApiDocProperties.Group groupConfig : properties.getGroups()) {
-            GroupedOpenApi.Builder builder = GroupedOpenApi.builder()
-                    .group(groupConfig.getName())
-                    .displayName(groupConfig.getDisplayName() != null 
-                            ? groupConfig.getDisplayName() 
-                            : groupConfig.getName());
-
-            // 设置路径匹配
-            if (!groupConfig.getPathsToMatch().isEmpty()) {
-                builder.pathsToMatch(groupConfig.getPathsToMatch().toArray(new String[0]));
-            }
-
-            // 设置包扫描
-            if (!groupConfig.getPackagesToScan().isEmpty()) {
-                builder.packagesToScan(groupConfig.getPackagesToScan().toArray(new String[0]));
-            }
-
-            groups.add(builder.build());
+        if (systemGroup != null && systemGroup.getPathsToMatch() != null && !systemGroup.getPathsToMatch().isEmpty()) {
+            return GroupedOpenApi.builder()
+                    .group(systemGroup.getName())
+                    .displayName(systemGroup.getDisplayName() != null ? systemGroup.getDisplayName() : "系统管理")
+                    .pathsToMatch(systemGroup.getPathsToMatch().toArray(new String[0]))
+                    .build();
         }
         
-        return groups;
+        return GroupedOpenApi.builder()
+                .group("system")
+                .displayName("系统管理")
+                .pathsToMatch("/system/**", "/auth/**", "/captcha/**")
+                .build();
+    }
+
+    /**
+     * 示例模块分组
+     */
+    @Bean
+    public GroupedOpenApi demoGroup() {
+        List<ApiDocProperties.Group> groups = properties.getGroups();
+        ApiDocProperties.Group demoGroup = groups.stream()
+                .filter(g -> "demo".equals(g.getName()))
+                .findFirst()
+                .orElse(null);
+        
+        if (demoGroup != null && demoGroup.getPathsToMatch() != null && !demoGroup.getPathsToMatch().isEmpty()) {
+            return GroupedOpenApi.builder()
+                    .group(demoGroup.getName())
+                    .displayName(demoGroup.getDisplayName() != null ? demoGroup.getDisplayName() : "示例模块")
+                    .pathsToMatch(demoGroup.getPathsToMatch().toArray(new String[0]))
+                    .build();
+        }
+        
+        return GroupedOpenApi.builder()
+                .group("demo")
+                .displayName("示例模块")
+                .pathsToMatch("/demo/**")
+                .build();
     }
 }
