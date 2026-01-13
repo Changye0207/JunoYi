@@ -112,6 +112,18 @@ junoyi:
     slow-sql-threshold: 3000
     # 启用 SQL 日志
     sql-log-enabled: false
+    # 数据范围
+    data-scope:
+      # 是否启用数据范围（默认 true）
+      enabled: true
+      # 是否启用全局模式（默认 false）
+      # false: 仅对标注 @DataScope 的方法生效
+      # true: 对所有查询生效，包括 MyBatis-Plus 内置方法
+      global-enabled: true
+      # 默认部门字段名（默认 dept_id）
+      default-dept-field: dept_id
+      # 默认用户字段名（默认 create_by）
+      default-user-field: create_by
 
   # ==================== 事件配置 ====================
   event:
@@ -288,6 +300,8 @@ junoyi:
     enable: true
     # 是否启用字段权限功能
     field-permission-enable: true
+
+
 
   # ==================== API 文档配置 ====================
   api-doc:

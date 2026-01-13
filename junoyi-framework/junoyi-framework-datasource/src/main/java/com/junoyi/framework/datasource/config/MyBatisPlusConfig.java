@@ -3,9 +3,10 @@ package com.junoyi.framework.datasource.config;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.junoyi.framework.datasource.datascope.interceptor.DataScopeInterceptor;
+import com.junoyi.framework.datasource.datascope.handler.DataScopeHandler;
 import com.junoyi.framework.datasource.interceptor.SqlBeautifyInterceptor;
 import com.junoyi.framework.datasource.interceptor.SlowSqlInterceptor;
 import com.junoyi.framework.datasource.properties.DataSourceProperties;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * - 防止全表更新删除插件
  * - SQL 美化输出
  * - 慢 SQL 监控
+ * - 数据范围权限控制
  *
  * @author Fan
  */
@@ -43,18 +45,34 @@ public class MyBatisPlusConfig {
      * <p>
      * 包含以下功能插件：
      * <ul>
+     *   <li>数据权限插件：自动添加数据范围过滤条件</li>
      *   <li>分页插件：支持数据库分页查询</li>
      *   <li>乐观锁插件：用于处理并发更新场景下的版本控制</li>
      *   <li>防全表更新/删除插件：防止误操作导致的数据批量变更</li>
      * </ul>
      *
+     * @param properties 数据源配置属性
      * @return 初始化完成的 MybatisPlusInterceptor 实例
      */
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(DataSourceProperties properties) {
         log.info("Start initializing MyBatis-Plus interceptor.");
 
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+
+        // 添加数据权限插件（必须在分页插件之前）
+        if (properties.getDataScope().isEnabled()) {
+            log.info("Initializing DataScope plugin (mode: {}).",
+                    properties.getDataScope().isGlobalEnabled() ? "global" : "annotation");
+            DataPermissionInterceptor dataPermissionInterceptor = new DataPermissionInterceptor(
+                    new DataScopeHandler(
+                            properties.getDataScope().isGlobalEnabled(),
+                            properties.getDataScope().getDefaultDeptField(),
+                            properties.getDataScope().getDefaultUserField()
+                    )
+            );
+            interceptor.addInnerInterceptor(dataPermissionInterceptor);
+        }
 
         // 添加分页插件，并设置相关参数
         PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor(DbType.MYSQL);
@@ -96,20 +114,5 @@ public class MyBatisPlusConfig {
     @Bean
     public SlowSqlInterceptor slowSqlInterceptor(DataSourceProperties properties) {
         return new SlowSqlInterceptor(properties);
-    }
-
-    /**
-     * 创建数据范围拦截器 Bean。
-     * <p>
-     * 用于自动添加数据范围过滤条件，实现行级数据权限控制。
-     * 通过配置 junoyi.datasource.data-scope.enabled=false 可禁用。
-     *
-     * @return DataScopeInterceptor 实例
-     */
-    @Bean
-    @ConditionalOnProperty(prefix = "junoyi.datasource.data-scope", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public DataScopeInterceptor dataScopeInterceptor() {
-        log.info("Initializing DataScope interceptor.");
-        return new DataScopeInterceptor();
     }
 }

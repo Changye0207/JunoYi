@@ -2,7 +2,7 @@
 
 ## 一、概述
 
-数据范围（DataScope）是一种**行级数据权限控制**机制，用于控制用户能够查看哪些数据记录。它基于 MyBatis 拦截器实现，在 SQL 执行前自动添加过滤条件，对业务代码**完全透明**。
+数据范围（DataScope）是一种**行级数据权限控制**机制，用于控制用户能够查看哪些数据记录。它基于 MyBatis-Plus `DataPermissionHandler` 实现，在 SQL 执行前自动添加过滤条件，对业务代码**完全透明**。
 
 ### 1.1 应用场景
 
@@ -21,6 +21,13 @@
 | 4 | SELF | 仅本人创建的数据 | 最低 |
 
 > **多角色取并集**：当用户拥有多个角色时，取权限最大的数据范围。例如用户同时拥有"部门经理"(DEPT_AND_CHILD) 和"普通员工"(SELF) 两个角色，最终数据范围为 DEPT_AND_CHILD。
+
+### 1.3 两种使用模式
+
+| 模式 | 配置 | 说明 |
+|------|------|------|
+| 注解模式（默认） | `global-enabled: false` | 仅对标注 `@DataScope` 的 Mapper 方法生效 |
+| 全局模式 | `global-enabled: true` | 对所有查询生效，包括 MyBatis-Plus 内置方法（selectPage、selectList 等） |
 
 ---
 
@@ -51,10 +58,12 @@
 │       │                                                          │
 │       ▼                                                          │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │  DataScopeInterceptor (MyBatis 拦截器)                   │    │
-│  │  - 检查方法是否有 @DataScope 注解                         │    │
+│  │  DataPermissionInterceptor + DataScopeHandler            │    │
+│  │  (MyBatis-Plus 数据权限插件)                              │    │
+│  │  - 注解模式: 检查 @DataScope 注解                         │    │
+│  │  - 全局模式: 对所有查询生效                               │    │
 │  │  - 从 ThreadLocal 获取数据范围上下文                      │    │
-│  │  - 自动修改 SQL 添加过滤条件                              │    │
+│  │  - 使用 JSqlParser 修改 SQL 添加过滤条件                  │    │
 │  └─────────────────────────────────────────────────────────┘    │
 │       │                                                          │
 │       ▼                                                          │
@@ -97,9 +106,9 @@
                - superAdmin (是否超级管理员)
 
 SQL执行时:
-  DataScopeInterceptor
+  DataScopeHandler
        │
-       ├─→ 检查 @DataScope 注解
+       ├─→ 检查 @DataScope 注解（注解模式）或直接处理（全局模式）
        │
        ├─→ 获取 DataScopeContextHolder 上下文
        │
@@ -109,7 +118,7 @@ SQL执行时:
        │       - DEPT_AND_CHILD: dept_id IN (可访问部门)
        │       - SELF: create_by = userId
        │
-       └─→ 修改原始 SQL，添加 WHERE 条件
+       └─→ 使用 JSqlParser 修改 SQL，添加 WHERE 条件
 ```
 
 ---
@@ -123,8 +132,9 @@ SQL执行时:
 | `datascope/DataScopeType.java` | 数据范围类型枚举，定义 ALL/DEPT/DEPT_AND_CHILD/SELF |
 | `datascope/DataScopeContextHolder.java` | ThreadLocal 上下文持有者，存储当前请求的数据范围信息 |
 | `datascope/annotation/DataScope.java` | @DataScope 注解，标记需要数据范围过滤的 Mapper 方法 |
-| `datascope/interceptor/DataScopeInterceptor.java` | MyBatis 拦截器，自动修改 SQL 添加过滤条件 |
-| `config/MyBatisPlusConfig.java` | 配置类，注册 DataScopeInterceptor |
+| `datascope/handler/DataScopeHandler.java` | MyBatis-Plus DataPermissionHandler 实现，自动修改 SQL |
+| `config/MyBatisPlusConfig.java` | 配置类，注册 DataPermissionInterceptor |
+| `properties/DataSourceProperties.java` | 配置属性，包含数据范围开关和模式设置 |
 
 ### 3.2 安全层 (junoyi-framework-security)
 
@@ -152,9 +162,35 @@ SQL执行时:
 
 ---
 
-## 四、基础使用
+## 四、配置说明
 
-### 4.1 配置角色数据范围
+### 4.1 YAML 配置
+
+```yaml
+junoyi:
+  datasource:
+    data-scope:
+      # 是否启用数据范围（默认 true）
+      enabled: true
+      # 是否启用全局模式（默认 false）
+      # false: 仅对标注 @DataScope 的方法生效
+      # true: 对所有查询生效，包括 MyBatis-Plus 内置方法
+      global-enabled: false
+      # 默认部门字段名（默认 dept_id）
+      default-dept-field: dept_id
+      # 默认用户字段名（默认 create_by）
+      default-user-field: create_by
+```
+
+### 4.2 模式选择建议
+
+| 场景 | 推荐模式 | 说明 |
+|------|----------|------|
+| 新项目 | 全局模式 | 所有查询自动过滤，安全性高 |
+| 老项目迁移 | 注解模式 | 逐步添加注解，风险可控 |
+| 混合场景 | 注解模式 | 精确控制哪些查询需要过滤 |
+
+### 4.3 配置角色数据范围
 
 在数据库中设置角色的 `data_scope` 字段：
 
@@ -169,7 +205,11 @@ UPDATE sys_role SET data_scope = '3' WHERE role_key = 'dept_manager';
 UPDATE sys_role SET data_scope = '4' WHERE role_key = 'employee';
 ```
 
-### 4.2 业务表设计
+---
+
+## 五、基础使用
+
+### 5.1 业务表设计
 
 确保业务表包含以下字段（字段名可自定义）：
 
@@ -191,7 +231,7 @@ CREATE INDEX idx_order_dept ON biz_order(dept_id);
 CREATE INDEX idx_order_creator ON biz_order(create_by);
 ```
 
-### 4.3 Mapper 添加注解
+### 5.2 注解模式使用
 
 在需要数据范围过滤的 Mapper 方法上添加 `@DataScope` 注解：
 
@@ -213,7 +253,39 @@ public interface BizOrderMapper extends BaseMapper<BizOrder> {
 }
 ```
 
-### 4.4 XML 中的 SQL
+### 5.3 全局模式使用
+
+启用全局模式后，MyBatis-Plus 内置方法也会自动应用数据范围：
+
+```yaml
+junoyi:
+  datasource:
+    data-scope:
+      global-enabled: true
+```
+
+```java
+@Service
+public class BizOrderServiceImpl {
+
+    @Autowired
+    private BizOrderMapper orderMapper;
+
+    public IPage<BizOrder> getOrderPage(Page<BizOrder> page, BizOrderQuery query) {
+        // 直接使用 MyBatis-Plus 内置方法，自动应用数据范围
+        LambdaQueryWrapper<BizOrder> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(query.getStatus() != null, BizOrder::getStatus, query.getStatus());
+        return orderMapper.selectPage(page, wrapper);
+    }
+
+    public List<BizOrder> getOrderList() {
+        // selectList 也会自动过滤
+        return orderMapper.selectList(null);
+    }
+}
+```
+
+### 5.4 XML 中的 SQL
 
 ```xml
 <select id="selectOrderList" resultType="BizOrder">
@@ -239,9 +311,9 @@ ORDER BY create_time DESC
 
 ---
 
-## 五、高级用法
+## 六、高级用法
 
-### 5.1 自定义字段名
+### 6.1 自定义字段名
 
 当业务表的字段名与默认值不同时：
 
@@ -250,7 +322,7 @@ ORDER BY create_time DESC
 List<BizOrder> selectOrderList(BizOrderQuery query);
 ```
 
-### 5.2 多表关联查询
+### 6.2 多表关联查询
 
 使用 `tableAlias` 指定表别名：
 
@@ -279,40 +351,7 @@ LEFT JOIN sys_user u ON o.create_by = u.user_id
 WHERE (o.dept_id IN (1, 2, 3)) AND o.del_flag = 0
 ```
 
-### 5.3 复杂查询场景
-
-对于子查询或复杂 SQL，建议在 XML 中手动处理：
-
-```xml
-<select id="selectComplexOrder" resultType="BizOrderVO">
-    SELECT * FROM (
-        SELECT o.*, 
-               (SELECT COUNT(*) FROM biz_order_item WHERE order_id = o.id) as item_count
-        FROM biz_order o
-        WHERE o.del_flag = 0
-        <if test="@com.junoyi.framework.datasource.datascope.DataScopeContextHolder@get() != null">
-            <choose>
-                <when test="@com.junoyi.framework.datasource.datascope.DataScopeContextHolder@get().superAdmin">
-                    <!-- 超级管理员不过滤 -->
-                </when>
-                <when test="@com.junoyi.framework.datasource.datascope.DataScopeContextHolder@get().scopeType.name() == 'SELF'">
-                    AND o.create_by = #{@com.junoyi.framework.datasource.datascope.DataScopeContextHolder@get().userId}
-                </when>
-                <otherwise>
-                    AND o.dept_id IN
-                    <foreach collection="@com.junoyi.framework.datasource.datascope.DataScopeContextHolder@get().accessibleDeptIds" 
-                             item="deptId" open="(" separator="," close=")">
-                        #{deptId}
-                    </foreach>
-                </otherwise>
-            </choose>
-        </if>
-    ) t
-    ORDER BY t.create_time DESC
-</select>
-```
-
-### 5.4 临时跳过数据范围
+### 6.3 临时跳过数据范围
 
 某些场景需要临时跳过数据范围过滤（如统计报表）：
 
@@ -340,7 +379,7 @@ public class ReportServiceImpl {
 }
 ```
 
-### 5.5 手动设置数据范围
+### 6.4 手动设置数据范围
 
 在非 HTTP 请求场景（如定时任务、消息消费）中手动设置：
 
@@ -366,7 +405,7 @@ public class OrderSyncTask {
 }
 ```
 
-### 5.6 动态数据范围
+### 6.5 动态数据范围
 
 某些场景需要根据业务动态调整数据范围：
 
@@ -409,9 +448,9 @@ public class OrderServiceImpl {
 
 ---
 
-## 六、SQL 生成规则
+## 七、SQL 生成规则
 
-### 6.1 不同数据范围的 SQL 示例
+### 7.1 不同数据范围的 SQL 示例
 
 原始 SQL：
 ```sql
@@ -442,7 +481,7 @@ SELECT * FROM biz_order WHERE (dept_id IN (5, 10, 11, 12)) AND status = 1 ORDER 
 SELECT * FROM biz_order WHERE (create_by = 100) AND status = 1 ORDER BY create_time DESC
 ```
 
-### 6.2 无数据时的处理
+### 7.2 无数据时的处理
 
 当用户没有任何部门时，生成 `1 = 0` 条件确保查不到数据：
 
@@ -453,9 +492,9 @@ SELECT * FROM biz_order WHERE (1 = 0) AND status = 1 ORDER BY create_time DESC
 
 ---
 
-## 七、调试与排查
+## 八、调试与排查
 
-### 7.1 开启 DEBUG 日志
+### 8.1 开启 DEBUG 日志
 
 ```yaml
 logging:
@@ -464,7 +503,7 @@ logging:
     com.junoyi.framework.security.filter: DEBUG
 ```
 
-### 7.2 查看登录时的数据范围计算
+### 8.2 查看登录时的数据范围计算
 
 登录时会输出：
 ```
@@ -474,7 +513,7 @@ logging:
 [权限加载] 可访问部门: [5, 10, 11, 12]
 ```
 
-### 7.3 查看 Redis 中的会话数据
+### 8.3 查看 Redis 中的会话数据
 
 ```bash
 # 查看会话
@@ -487,11 +526,11 @@ redis-cli GET "junoyi:session:{tokenId}"
 - `depts`: 用户所属部门
 - `superAdmin`: 是否超级管理员
 
-### 7.4 常见问题排查
+### 8.4 常见问题排查
 
 | 问题 | 可能原因 | 解决方案 |
 |------|----------|----------|
-| 数据范围不生效 | Mapper 方法没有 @DataScope 注解 | 添加注解 |
+| 数据范围不生效 | 注解模式下 Mapper 方法没有 @DataScope 注解 | 添加注解或启用全局模式 |
 | 查不到任何数据 | 用户没有部门或角色 | 检查用户关联数据 |
 | 超级管理员也被过滤 | superAdmin 字段为 false | 检查 userId=1 或 permissions 包含 * |
 | 修改角色后不生效 | 会话缓存未更新 | 用户重新登录 |
@@ -499,9 +538,9 @@ redis-cli GET "junoyi:session:{tokenId}"
 
 ---
 
-## 八、性能优化
+## 九、性能优化
 
-### 8.1 索引优化
+### 9.1 索引优化
 
 ```sql
 -- 必须索引
@@ -512,13 +551,13 @@ CREATE INDEX idx_table_creator ON your_table(create_by);
 CREATE INDEX idx_table_status_dept ON your_table(status, dept_id);
 ```
 
-### 8.2 减少部门层级
+### 9.2 减少部门层级
 
 部门层级过深会导致 `accessibleDeptIds` 集合过大，建议：
 - 控制部门层级在 5 层以内
 - 定期清理无效部门
 
-### 8.3 缓存部门树
+### 9.3 缓存部门树
 
 如果部门数据变化不频繁，可以缓存部门树结构：
 
@@ -531,67 +570,10 @@ public Set<Long> getChildDeptIds(Long parentId) {
 
 ---
 
-## 九、扩展开发
-
-### 9.1 添加新的数据范围类型
-
-1. 在 `DataScopeType` 枚举中添加新类型：
-
-```java
-public enum DataScopeType {
-    // ... 现有类型
-    
-    /**
-     * 自定义部门（指定部门列表）
-     */
-    CUSTOM_DEPT("5", "自定义部门", 5);
-}
-```
-
-2. 在 `DataScopeInterceptor.buildScopeCondition()` 中添加处理逻辑：
-
-```java
-case CUSTOM_DEPT:
-    Set<Long> customDeptIds = context.getCustomDeptIds();
-    if (customDeptIds == null || customDeptIds.isEmpty()) {
-        return "1 = 0";
-    }
-    return deptField + " IN (" + joinIds(customDeptIds) + ")";
-```
-
-3. 在 `SysAuthServiceImpl.calculateDataScope()` 中添加计算逻辑。
-
-### 9.2 支持多租户
-
-结合多租户场景，可以在 `DataScopeContext` 中添加 `tenantId`：
-
-```java
-@Data
-@Builder
-public static class DataScopeContext {
-    // ... 现有字段
-    
-    /**
-     * 租户ID
-     */
-    private Long tenantId;
-}
-```
-
-在拦截器中添加租户过滤：
-
-```java
-if (context.getTenantId() != null) {
-    conditions.add("tenant_id = " + context.getTenantId());
-}
-```
-
----
-
 ## 十、最佳实践
 
 1. **统一字段命名**：所有业务表使用相同的 `dept_id` 和 `create_by` 字段名
-2. **默认添加注解**：所有列表查询方法默认添加 `@DataScope` 注解
+2. **默认添加注解**：所有列表查询方法默认添加 `@DataScope` 注解（注解模式）
 3. **详情查询不过滤**：单条记录查询（如 getById）通常不需要数据范围过滤
 4. **导出功能注意**：数据导出功能必须添加数据范围过滤
 5. **定时任务特殊处理**：定时任务需要手动设置上下文或以管理员身份执行
