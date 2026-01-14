@@ -79,7 +79,9 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
                 if (body != null && body.length > 0) {
                     String bodyStr = new String(body, StandardCharsets.UTF_8);
                     if (SqlInjectionUtils.containsSqlInjection(bodyStr)) {
-                        log.warn("[SQL注入拦截] 请求地址: {}, 请求体包含 SQL 注入", request.getRequestURI());
+                        String pattern = SqlInjectionUtils.getDetectedPattern(bodyStr);
+                        log.warn("[SQL注入拦截] 请求地址: {}, 请求体包含 SQL 注入, 触发规则: {}, 内容: {}", 
+                                request.getRequestURI(), pattern, truncateForLog(bodyStr));
                         rejectRequest(response);
                         return;
                     }
@@ -204,5 +206,17 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
                 lowerName.equals("authorization") || lowerName.equals("cookie") ||
                 lowerName.equals("origin") || lowerName.equals("referer") ||
                 lowerName.equals("cache-control") || lowerName.equals("pragma");
+    }
+
+    /**
+     * 截断日志内容，避免日志过长
+     */
+    private String truncateForLog(String content) {
+        if (content == null) return null;
+        int maxLength = 500;
+        if (content.length() <= maxLength) {
+            return content;
+        }
+        return content.substring(0, maxLength) + "...(truncated)";
     }
 }

@@ -128,20 +128,32 @@ public class SqlInjectionUtils {
     }
 
     /**
+     * 安全的标识符模式 - 这些格式的关键词不应触发检测
+     * 如：system.api.user.delete、permission.update 等
+     */
+    private static final Pattern SAFE_IDENTIFIER_PATTERN = Pattern.compile(
+            "\\w+\\.\\w+\\.(\\w+\\.)*(select|insert|update|delete|drop|truncate|alter|create|exec|execute|union|declare|grant|revoke)(\\.[\\w-]+)*",
+            Pattern.CASE_INSENSITIVE
+    );
+
+    /**
      * 检测是否包含危险的 SQL 关键词组合
      * <p>
      * 优化策略：
      * - 需要 2 个以上 SQL 关键词同时出现
      * - 或者 1 个关键词 + 明确的注入语法（如 ' OR、; DROP 等）
-     * - 单独的关键词（如 system.api.user.delete）不触发
+     * - 点分隔的标识符格式（如 system.api.user.delete）不触发
      */
     private static boolean containsDangerousKeywordCombination(String value) {
-        // 统计出现的 SQL 关键词
+        // 先移除安全的标识符格式，避免误报
+        String cleanedValue = removeSafeIdentifiers(value);
+        
+        // 统计出现的 SQL 关键词（在清理后的内容中）
         int keywordCount = 0;
         Set<String> foundKeywords = new HashSet<>();
         
         for (String keyword : SQL_KEYWORDS) {
-            if (Pattern.compile("\\b" + keyword + "\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            if (Pattern.compile("\\b" + keyword + "\\b", Pattern.CASE_INSENSITIVE).matcher(cleanedValue).find()) {
                 keywordCount++;
                 foundKeywords.add(keyword);
             }
@@ -153,21 +165,41 @@ public class SqlInjectionUtils {
         // 多个关键词 + 任意危险字符
         if (keywordCount >= 2) {
             // 检查是否有危险语法结构
-            if (hasDangerousSyntax(value)) {
+            if (hasDangerousSyntax(cleanedValue)) {
                 return true;
             }
             // 特殊组合：select + from / insert + into / delete + from 等
-            if (hasDangerousKeywordPair(foundKeywords, value)) {
+            if (hasDangerousKeywordPair(foundKeywords, cleanedValue)) {
                 return true;
             }
         }
 
         // 单个关键词需要配合明确的注入语法
         if (keywordCount == 1) {
-            return hasClearInjectionSyntax(value, foundKeywords.iterator().next());
+            return hasClearInjectionSyntax(cleanedValue, foundKeywords.iterator().next());
         }
 
         return false;
+    }
+
+    /**
+     * 移除安全的标识符格式
+     * 将 system.api.user.delete 这类格式替换为占位符，避免误报
+     */
+    private static String removeSafeIdentifiers(String value) {
+        // 移除点分隔的标识符（如 system.api.user.delete、permission.update）
+        String result = SAFE_IDENTIFIER_PATTERN.matcher(value).replaceAll("__SAFE_ID__");
+        
+        // 移除 JSON 字段名中的关键词（如 "delete": true, "updateTime": "xxx"）
+        // 匹配 "keyword" 或 keyword: 格式
+        for (String keyword : SQL_KEYWORDS) {
+            // "delete": 或 "delete" : 格式
+            result = result.replaceAll("\"" + keyword + "\"\\s*:", "__SAFE_FIELD__:");
+            // deleteTime、updateBy 等驼峰命名
+            result = result.replaceAll("(?i)\"\\w*" + keyword + "\\w*\"\\s*:", "__SAFE_FIELD__:");
+        }
+        
+        return result;
     }
 
     /**
@@ -278,27 +310,30 @@ public class SqlInjectionUtils {
             }
         }
 
+        // 移除安全标识符后再检测
+        String cleanedValue = removeSafeIdentifiers(value);
+
         // 检测关键词组合
         int keywordCount = 0;
         Set<String> foundKeywords = new HashSet<>();
         for (String keyword : SQL_KEYWORDS) {
-            if (Pattern.compile("\\b" + keyword + "\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            if (Pattern.compile("\\b" + keyword + "\\b", Pattern.CASE_INSENSITIVE).matcher(cleanedValue).find()) {
                 keywordCount++;
                 foundKeywords.add(keyword);
             }
         }
 
-        if (keywordCount >= 2 && hasDangerousSyntax(value)) {
+        if (keywordCount >= 2 && hasDangerousSyntax(cleanedValue)) {
             return "多关键词组合: " + foundKeywords + " + 危险语法";
         }
 
-        if (keywordCount >= 2 && hasDangerousKeywordPair(foundKeywords, value)) {
+        if (keywordCount >= 2 && hasDangerousKeywordPair(foundKeywords, cleanedValue)) {
             return "危险关键词配对: " + foundKeywords;
         }
 
         if (keywordCount == 1) {
             String keyword = foundKeywords.iterator().next();
-            if (hasClearInjectionSyntax(value, keyword)) {
+            if (hasClearInjectionSyntax(cleanedValue, keyword)) {
                 return "关键词 + 注入语法: " + keyword;
             }
         }
