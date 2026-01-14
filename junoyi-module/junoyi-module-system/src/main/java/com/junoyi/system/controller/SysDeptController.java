@@ -38,7 +38,7 @@ public class SysDeptController extends BaseController {
     @GetMapping("/tree")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.dept.view", "system.api.dept.get"}
+            value = {"system.ui.dept.view", "system.api.dept.get.tree"}
     )
     public R<List<SysDeptVO>> getDeptTree(SysDeptQueryDTO queryDTO){
         return R.ok(sysDeptService.getDeptTree(queryDTO));
@@ -50,7 +50,7 @@ public class SysDeptController extends BaseController {
     @GetMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.dept.view","system.api.dept.get"}
+            value = {"system.ui.dept.view","system.api.dept.get.id"}
     )
     public R<SysDeptVO> getDeptById(@PathVariable("id") Long id){
         return R.ok(sysDeptService.getDeptById(id));
@@ -88,7 +88,7 @@ public class SysDeptController extends BaseController {
     @PutMapping("/sort")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.dept.view", "system.api.dept.update"}
+            value = {"system.ui.dept.view", "system.api.dept.update.sort"}
     )
     public R<Void> updateDeptSort(@RequestBody SysDeptSortDTO sortDTO){
         sysDeptService.updateDeptSort(sortDTO.getItems());
@@ -114,7 +114,7 @@ public class SysDeptController extends BaseController {
     @GetMapping("/{id}/permission-groups")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.dept.view","system.api.dept.get"}
+            value = {"system.ui.dept.view","system.api.dept.get.permission-group"}
     )
     public R<List<SysPermGroupVO>> getDeptPermissionGroup(@PathVariable("id") Long id){
         return R.ok(sysDeptService.getDeptPermGroups(id));
@@ -126,7 +126,7 @@ public class SysDeptController extends BaseController {
     @PutMapping("/{id}/permission-groups")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.dept.view","system.api.dept.update"}
+            value = {"system.ui.dept.view","system.api.dept.update.permission-group"}
     )
     public R<Void> updateDeptGroup(@PathVariable("id") Long id, @RequestBody List<Long> groupIds){
         sysDeptService.updateDeptPermGroups(id, groupIds);
