@@ -96,7 +96,7 @@ public class SysMenuController extends BaseController {
     @PutMapping("/sort")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.menu.view", "system.api.menu.update"}
+            value = {"system.ui.menu.view", "system.api.menu.update.sort"}
     )
     public R<Void> updateMenuSort(@RequestBody SysMenuSortDTO sortDTO){
         return sysMenuService.updateMenuSort(sortDTO.getItems()) ? R.ok() : R.fail("排序更新失败");
