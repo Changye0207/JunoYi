@@ -37,7 +37,7 @@ public class SysPermissionPoolController extends BaseController {
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission.pool.view", "system.api.permission.pool.get"}
+            value = {"system.ui.permission.pool.view", "system.api.permission.pool.get.list"}
     )
     public R<PageResult<SysPermissionVO>> getPermissionPoolList(SysPermissionQueryDTO queryDTO) {
         return R.ok(sysPermissionService.getPermissionList(queryDTO, buildPage()));
@@ -48,6 +48,9 @@ public class SysPermissionPoolController extends BaseController {
      */
     @GetMapping("/options")
     @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.permission.pool.view", "system.api.permission.pool.get.options"}
+    )
     public R<List<SysPermissionVO>> getPermissionPoolOptions() {
         return R.ok(sysPermissionService.getPermissionOptions());
     }
@@ -71,7 +74,7 @@ public class SysPermissionPoolController extends BaseController {
     @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission.pool.view", "system.api.permission.pool.delete"}
+            value = {"system.ui.permission.pool.view", "system.api.permission.pool.delete.id"}
     )
     public R<Void> deletePermission(@PathVariable("id") Long id) {
         sysPermissionService.deletePermission(id);
@@ -84,7 +87,7 @@ public class SysPermissionPoolController extends BaseController {
     @DeleteMapping("/batch")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission.pool.view", "system.api.permission.pool.delete"}
+            value = {"system.ui.permission.pool.view", "system.api.permission.pool.delete.batch"}
     )
     public R<Void> deletePermissionBatch(@RequestBody List<Long> ids) {
         sysPermissionService.deletePermissionBatch(ids);
@@ -97,7 +100,7 @@ public class SysPermissionPoolController extends BaseController {
     @PutMapping("/{id}/status")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission.pool.view", "system.api.permission.pool.update"}
+            value = {"system.ui.permission.pool.view", "system.api.permission.pool.update.status"}
     )
     public R<Void> updatePermissionStatus(@PathVariable("id") Long id, @RequestBody SysPermissionDTO sysPermissionDTO) {
         sysPermissionService.updatePermissionStatus(id, sysPermissionDTO.getStatus());
