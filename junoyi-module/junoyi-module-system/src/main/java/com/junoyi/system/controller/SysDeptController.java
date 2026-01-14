@@ -101,7 +101,7 @@ public class SysDeptController extends BaseController {
     @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.dept.view","system.api.dept.delete"}
+            value = {"system.ui.dept.view","system.api.dept.delete.id"}
     )
     public R<Void> deleteDept(@PathVariable("id") Long id) {
         sysDeptService.deleteDept(id);

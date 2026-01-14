@@ -37,7 +37,7 @@ public class SysPermissionController extends BaseController {
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission.view", "system.api.permission.get"}
+            value = {"system.ui.permission.view", "system.api.permission.get.list"}
     )
     public R<PageResult<SysPermGroupVO>> getPermissionGroupList(SysPermGroupQueryDTO queryDTO){
         return R.ok(sysPermGroupService.getPermGroupList(queryDTO, buildPage()));
@@ -48,6 +48,9 @@ public class SysPermissionController extends BaseController {
      */
     @GetMapping("/options")
     @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.permission.view","sytem.api.permission.get.options"}
+    )
     public R<List<SysPermGroupVO>> getPermissionGroupOptions(){
         return R.ok(sysPermGroupService.getPermGroupOptions());
     }
@@ -84,7 +87,7 @@ public class SysPermissionController extends BaseController {
     @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission.view", "system.api.permission.delete"}
+            value = {"system.ui.permission.view", "system.api.permission.delete.id"}
     )
     public R<Void> deletePermission(@PathVariable("id") Long id){
         sysPermGroupService.deletePermGroup(id);
@@ -97,7 +100,7 @@ public class SysPermissionController extends BaseController {
     @DeleteMapping("/batch")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission.view", "system.api.permission.delete"}
+            value = {"system.ui.permission.view", "system.api.permission.delete.batch"}
     )
     public R<Void> deletePermissionBatch(@RequestBody List<Long> ids){
         sysPermGroupService.deletePermGroupBatch(ids);
