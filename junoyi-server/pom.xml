@@ -26,7 +26,6 @@
             <artifactId>junoyi-module-demo</artifactId>
         </dependency>
 
-
         <!-- ==================== 开发工具依赖 ==================== -->
         <!-- 
             Spring Boot DevTools - 开发热部署工具
