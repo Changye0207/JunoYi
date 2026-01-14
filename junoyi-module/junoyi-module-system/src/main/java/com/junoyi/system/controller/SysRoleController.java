@@ -38,7 +38,7 @@ public class SysRoleController extends BaseController {
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.role.view", "system.api.role.get"}
+            value = {"system.ui.role.view", "system.api.role.get.list"}
     )
     public R<PageResult<SysRoleVO>> getRoleList(SysRoleQueryDTO queryDTO){
         return R.ok(sysRoleService.getRoleList(queryDTO, buildPage()));
@@ -49,7 +49,7 @@ public class SysRoleController extends BaseController {
      */
     @GetMapping("/options")
     @Permission(
-            value = {"system.ui.role.view", "system.api.role.get"}
+            value = {"system.ui.role.view", "system.api.role.get.options"}
     )
     public R<List<SysRoleVO>> getRoleOptions(){
         return R.ok(sysRoleService.getRoleList());
@@ -61,7 +61,7 @@ public class SysRoleController extends BaseController {
     @GetMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.role.view", "system.api.role.get"}
+            value = {"system.ui.role.view", "system.api.role.get.id"}
     )
     public R<SysRoleVO> getRoleById(@PathVariable("id") Long id){
         return R.ok(sysRoleService.getRoleById(id));
@@ -99,7 +99,7 @@ public class SysRoleController extends BaseController {
     @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.role.view", "system.api.role.delete"}
+            value = {"system.ui.role.view", "system.api.role.delete.id"}
     )
     public R<Void> deleteRole(@PathVariable("id") Long id){
         sysRoleService.deleteRole(id);
@@ -112,7 +112,7 @@ public class SysRoleController extends BaseController {
     @DeleteMapping("/batch")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.role.view", "system.api.role.delete"}
+            value = {"system.ui.role.view", "system.api.role.delete.batch"}
     )
     public R<Void> deleteRoleBatch(@RequestBody List<Long> ids){
         sysRoleService.deleteRoleBatch(ids);
@@ -125,7 +125,7 @@ public class SysRoleController extends BaseController {
     @GetMapping("/{id}/permission-groups")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.role.view","system.api.role.get"}
+            value = {"system.ui.role.view","system.api.role.get.permission-group"}
     )
     public R<List<SysPermGroupVO>> getRolePermissionGroup(@PathVariable("id") Long id){
         return R.ok(sysRoleService.getRolePermGroups(id));
@@ -137,7 +137,7 @@ public class SysRoleController extends BaseController {
     @PutMapping("/{id}/permission-groups")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.role.view","system.api.role.update"}
+            value = {"system.ui.role.view","system.api.role.update.permission-group"}
     )
     public R<Void> updateRoleGroup(@PathVariable("id") Long id, @RequestBody List<Long> groupIds){
         sysRoleService.updateRolePermGroups(id, groupIds);
