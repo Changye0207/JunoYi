@@ -18,7 +18,6 @@
         <module>junoyi-module-api</module>
         <module>junoyi-module</module>
         <module>junoyi-server</module>
-
     </modules>
 
     <properties>
