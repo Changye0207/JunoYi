@@ -155,23 +155,18 @@ public class XssFilter extends OncePerRequestFilter {
     }
 
     /**
+     * 标准请求头集合（不需要 XSS 检测）
+     */
+    private static final java.util.Set<String> STANDARD_HEADERS = java.util.Set.of(
+            "host", "connection", "accept", "accept-language", "accept-encoding",
+            "content-type", "content-length", "user-agent", "authorization",
+            "cookie", "origin", "referer", "cache-control", "pragma"
+    );
+
+    /**
      * 判断是否为标准请求头（不需要 XSS 检测）
      */
     private boolean isStandardHeader(String name) {
-        String lowerName = name.toLowerCase();
-        return lowerName.equals("host") ||
-                lowerName.equals("connection") ||
-                lowerName.equals("accept") ||
-                lowerName.equals("accept-language") ||
-                lowerName.equals("accept-encoding") ||
-                lowerName.equals("content-type") ||
-                lowerName.equals("content-length") ||
-                lowerName.equals("user-agent") ||
-                lowerName.equals("authorization") ||
-                lowerName.equals("cookie") ||
-                lowerName.equals("origin") ||
-                lowerName.equals("referer") ||
-                lowerName.equals("cache-control") ||
-                lowerName.equals("pragma");
+        return STANDARD_HEADERS.contains(name.toLowerCase());
     }
 }

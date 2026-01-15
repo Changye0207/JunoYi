@@ -173,7 +173,13 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
     }
 
     /**
+     * 白名单缓存
+     */
+    private volatile List<String> cachedWhitelist;
+
+    /**
      * 检查请求路径是否在白名单中
+     * 优化：缓存白名单配置，静态路径直接匹配
      */
     private boolean isWhitelisted(String requestURI) {
         List<String> whitelist = securityProperties.getWhitelist();
@@ -181,8 +187,13 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
             return false;
 
         for (String pattern : whitelist) {
-            if (pathMatcher.match(pattern, requestURI))
-                return true;
+            // 静态路径直接比较
+            if (!pattern.contains("*") && !pattern.contains("?")) {
+                if (pattern.equals(requestURI)) return true;
+            } else {
+                // 通配符路径使用 AntPathMatcher
+                if (pathMatcher.match(pattern, requestURI)) return true;
+            }
         }
 
         return false;

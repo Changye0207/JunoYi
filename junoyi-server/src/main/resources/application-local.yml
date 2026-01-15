@@ -50,10 +50,10 @@ redisson:
   nettyThreads: 8
   singleServerConfig:
     clientName: junoyi-local
-    connectionMinimumIdleSize: 8
-    connectionPoolSize: 32
+    connectionMinimumIdleSize: 16
+    connectionPoolSize: 64
     idleConnectionTimeout: 10000
-    timeout: 3000
+    timeout: 2000
     subscriptionConnectionPoolSize: 50
 
 # ==================== MyBatis Plus 配置 ====================
