@@ -34,7 +34,12 @@ public class SqlBeautifyInterceptor implements Interceptor {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SqlBeautifyInterceptor.class);
     private final DataSourceProperties properties;
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    
+    /**
+     * 使用 ThreadLocal 保证 SimpleDateFormat 线程安全
+     */
+    private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT_HOLDER = 
+            ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     public SqlBeautifyInterceptor(DataSourceProperties properties) {
         this.properties = properties;
@@ -128,7 +133,7 @@ public class SqlBeautifyInterceptor implements Interceptor {
             return "'" + value + "'";
         }
         if (value instanceof Date) {
-            return "'" + DATE_FORMAT.format((Date) value) + "'";
+            return "'" + DATE_FORMAT_HOLDER.get().format((Date) value) + "'";
         }
         if (value instanceof Boolean) {
             return (Boolean) value ? "1" : "0";
