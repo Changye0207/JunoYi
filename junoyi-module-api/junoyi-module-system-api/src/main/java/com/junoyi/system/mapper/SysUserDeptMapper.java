@@ -10,5 +10,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @author Fan
  */
 @Mapper
+@IgnoreDataScope
 public interface SysUserDeptMapper extends BaseMapper<SysUserDept> {
 }
