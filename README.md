@@ -221,10 +221,6 @@ http://localhost:7588/doc.html
 | 📝 开发指南 | 模块开发、对象转换、日志框架 |
 | 🔌 组件集成 | 验证码、API文档、缓存管理 |
 
----
-
-## 🏗️ 项目架构
-
 ```
 JunoYi
 ├── junoyi-dependencies        # 依赖版本管理
@@ -245,6 +241,84 @@ JunoYi
 ├── junoyi-module-api          # 模块 API 定义
 ├── junoyi-server              # 启动入口
 └── junoyi-ui                  # 前端项目
+```
+
+---
+
+## 🏗️ 项目架构
+
+```mermaid
+graph TB
+    subgraph "客户端层 Client Layer"
+        A1[Web前台]
+        A2[Web后台]
+        A3[移动端APP]
+        A4[小程序]
+        A5[桌面端]
+    end
+    
+    subgraph "应用层 Application Layer - junoyi-server"
+        B1[Spring Boot 内嵌 Tomcat<br/>端口: 7588]
+    end
+    
+    subgraph "过滤器链 Filter Chain"
+        C1[CorsFilter<br/>跨域处理]
+        C2[ApiEncryptFilter<br/>API加密解密]
+        C3[XssFilter<br/>XSS防护]
+        C4[SqlInjectionFilter<br/>SQL注入防护]
+        C5[TokenAuthenticationFilter<br/>Token认证]
+    end
+    
+    subgraph "业务模块层 Business Module Layer"
+        D1[junoyi-module-system<br/>系统管理模块]
+        D2[junoyi-module-generation<br/>代码生成模块]
+        D3[junoyi-module-demo<br/>示例模块]
+        D4[junoyi-module-xxx<br/>扩展模块...]
+    end
+    
+    subgraph "API定义层 API Definition Layer"
+        E1[system-api<br/>接口/实体/Mapper]
+        E2[generation-api<br/>接口/实体/Mapper]
+        E3[demo-api<br/>接口/实体/Mapper]
+    end
+
+    subgraph "框架层 Framework Layer"
+        F1[framework-web<br/>Web基础设施]
+        F2[framework-security<br/>安全认证]
+        F3[framework-permission<br/>权限控制]
+        F4[framework-datasource<br/>数据源管理]
+        F5[framework-redis<br/>缓存管理]
+        F6[framework-captcha<br/>验证码]
+        F7[framework-log<br/>日志框架]
+        F8[framework-excel<br/>Excel处理]
+        F9[framework-api-doc<br/>API文档]
+        F10[framework-json<br/>JSON处理]
+        F11[framework-event<br/>事件总线]
+        F12[framework-quartz<br/>定时任务]
+        F13[framework-core<br/>核心工具]
+    end
+    
+    subgraph "依赖管理层 Dependency Layer"
+        G1[junoyi-dependencies<br/>统一版本管理]
+    end
+    
+    subgraph "基础设施层 Infrastructure Layer"
+        H1[(MySQL 8.0+<br/>主数据库)]
+        H2[(Redis 7.0+<br/>缓存数据库)]
+        H3[本地文件存储<br/>日志/上传文件]
+    end
+    
+    A1 & A2 & A3 & A4 & A5 --> B1
+    B1 --> C1 --> C2 --> C3 --> C4 --> C5
+    C5 --> D1 & D2 & D3 & D4
+    D1 --> E1
+    D2 --> E2
+    D3 --> E3
+    E1 & E2 & E3 --> F1 & F2 & F3 & F4 & F5 & F6 & F7 & F8 & F9 & F10 & F11 & F12 & F13
+    F1 & F2 & F3 & F4 & F5 & F6 & F7 & F8 & F9 & F10 & F11 & F12 & F13 --> G1
+    F4 --> H1
+    F5 --> H2
+    B1 --> H3
 ```
 
 ---
