@@ -53,11 +53,47 @@ public class AliyunOssFileStorage implements FileStorage {
         log.info("[File] Initializing Aliyun OSS client, endpoint: {}, bucket: {}", 
                 config.getEndpoint(), config.getBucketName());
         
-        this.ossClient = new OSSClientBuilder().build(
-                config.getEndpoint(),
-                config.getAccessKeyId(),
-                config.getAccessKeySecret()
-        );
+        try {
+            // 创建OSS客户端
+            this.ossClient = new OSSClientBuilder().build(
+                    config.getEndpoint(),
+                    config.getAccessKeyId(),
+                    config.getAccessKeySecret()
+            );
+            
+            // 启动时测试连接：检查Bucket是否存在
+            log.info("[File] Testing OSS connection...");
+            boolean bucketExists = ossClient.doesBucketExist(config.getBucketName());
+            
+            if (!bucketExists) {
+                throw new IllegalStateException(
+                    String.format("阿里云OSS Bucket '%s' 不存在，请检查配置或在OSS控制台创建该Bucket", 
+                            config.getBucketName())
+                );
+            }
+            
+            log.info("[File] OSS connection test successful, bucket '{}' is accessible", 
+                    config.getBucketName());
+            
+        } catch (Exception e) {
+            // 如果是我们自己抛出的异常，直接抛出
+            if (e instanceof IllegalStateException || e instanceof IllegalArgumentException) {
+                throw e;
+            }
+            
+            // OSS SDK的异常，包装后抛出
+            String errorMsg = String.format(
+                "阿里云OSS连接失败: %s。请检查以下配置项：\n" +
+                "1. endpoint 是否正确: %s\n" +
+                "2. access-key-id 和 access-key-secret 是否有效\n" +
+                "3. 网络是否可以访问OSS服务\n" +
+                "原始错误: %s",
+                e.getMessage(), config.getEndpoint(), e.getClass().getSimpleName()
+            );
+            
+            log.error("[File] " + errorMsg, e);
+            throw new IllegalStateException(errorMsg, e);
+        }
     }
 
     @Override
