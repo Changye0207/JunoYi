@@ -9,8 +9,8 @@ import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.junoyi.framework.file.domain.FileInfo;
 import com.junoyi.framework.file.properties.FileStorageProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.junoyi.framework.log.core.JunoYiLog;
+import com.junoyi.framework.log.core.JunoYiLogFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
@@ -27,7 +27,7 @@ import java.util.Date;
  */
 public class AliyunOssFileStorage implements FileStorage {
 
-    private static final Logger log = LoggerFactory.getLogger(AliyunOssFileStorage.class);
+    private static final JunoYiLog log = JunoYiLogFactory.getLogger(AliyunOssFileStorage.class);
     
     private final FileStorageProperties properties;
     private final OSS ossClient;
@@ -36,64 +36,132 @@ public class AliyunOssFileStorage implements FileStorage {
         this.properties = properties;
         FileStorageProperties.AliyunOssConfig config = properties.getAliyunOss();
         
-        // 验证必要的配置项
+        // 验证配置
+        validateConfig(config);
+        
+        log.info("File Manager", "Initializing Aliyun OSS client, endpoint: "+ config.getEndpoint() + " bucket: "+ config.getBucketName());
+        
+        // 创建OSS客户端
+        this.ossClient = new OSSClientBuilder().build(
+                config.getEndpoint(),
+                config.getAccessKeyId(),
+                config.getAccessKeySecret()
+        );
+        
+        // 测试连接
+        testConnection(config);
+    }
+    
+    /**
+     * 验证OSS配置的完整性
+     */
+    private void validateConfig(FileStorageProperties.AliyunOssConfig config) {
         if (StrUtil.isBlank(config.getEndpoint())) {
-            throw new IllegalArgumentException("阿里云OSS配置错误: endpoint 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.endpoint");
+            throw new IllegalArgumentException(
+                "阿里云OSS配置错误: endpoint 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.endpoint"
+            );
         }
         if (StrUtil.isBlank(config.getAccessKeyId())) {
-            throw new IllegalArgumentException("阿里云OSS配置错误: access-key-id 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.access-key-id");
+            throw new IllegalArgumentException(
+                "阿里云OSS配置错误: access-key-id 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.access-key-id"
+            );
         }
         if (StrUtil.isBlank(config.getAccessKeySecret())) {
-            throw new IllegalArgumentException("阿里云OSS配置错误: access-key-secret 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.access-key-secret");
+            throw new IllegalArgumentException(
+                "阿里云OSS配置错误: access-key-secret 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.access-key-secret"
+            );
         }
         if (StrUtil.isBlank(config.getBucketName())) {
-            throw new IllegalArgumentException("阿里云OSS配置错误: bucket-name 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.bucket-name");
+            throw new IllegalArgumentException(
+                "阿里云OSS配置错误: bucket-name 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.bucket-name"
+            );
         }
-        
-        log.info("[File] Initializing Aliyun OSS client, endpoint: {}, bucket: {}", 
-                config.getEndpoint(), config.getBucketName());
-        
+    }
+    
+    /**
+     * 测试OSS连接
+     * 使用 getBucketInfo 方法，该方法在认证失败时会抛出异常
+     */
+    private void testConnection(FileStorageProperties.AliyunOssConfig config) {
+        log.info("File Manager","Testing OSS connection...");
         try {
-            // 创建OSS客户端
-            this.ossClient = new OSSClientBuilder().build(
-                    config.getEndpoint(),
-                    config.getAccessKeyId(),
-                    config.getAccessKeySecret()
-            );
-            
-            // 启动时测试连接：检查Bucket是否存在
-            log.info("[File] Testing OSS connection...");
-            boolean bucketExists = ossClient.doesBucketExist(config.getBucketName());
-            
-            if (!bucketExists) {
-                throw new IllegalStateException(
-                    String.format("阿里云OSS Bucket '%s' 不存在，请检查配置或在OSS控制台创建该Bucket", 
-                            config.getBucketName())
-                );
-            }
-            
-            log.info("[File] OSS connection test successful, bucket '{}' is accessible", 
-                    config.getBucketName());
-            
+            ossClient.getBucketInfo(config.getBucketName());
+            log.info("File Manager","OSS connection test successful, bucket '" + config.getBucketName() + "' is accessible");
         } catch (Exception e) {
-            // 如果是我们自己抛出的异常，直接抛出
-            if (e instanceof IllegalStateException || e instanceof IllegalArgumentException) {
-                throw e;
-            }
-            
-            // OSS SDK的异常，包装后抛出
-            String errorMsg = String.format(
-                "阿里云OSS连接失败: %s。请检查以下配置项：\n" +
-                "1. endpoint 是否正确: %s\n" +
-                "2. access-key-id 和 access-key-secret 是否有效\n" +
-                "3. 网络是否可以访问OSS服务\n" +
-                "原始错误: %s",
-                e.getMessage(), config.getEndpoint(), e.getClass().getSimpleName()
-            );
-            
-            log.error("[File] " + errorMsg, e);
+            shutdownClient();
+            String errorMsg = buildErrorMessage(e, config);
+            log.error("File Manager", errorMsg);
             throw new IllegalStateException(errorMsg, e);
         }
+    }
+    
+    /**
+     * 关闭OSS客户端
+     */
+    private void shutdownClient() {
+        try {
+            if (ossClient != null) {
+                ossClient.shutdown();
+            }
+        } catch (Exception e) {
+            log.warn("File Manager","Failed to shutdown OSS client", e);
+        }
+    }
+    
+    /**
+     * 根据异常类型构建友好的错误提示信息
+     */
+    private String buildErrorMessage(Exception e, FileStorageProperties.AliyunOssConfig config) {
+        String exceptionMsg = e.getMessage() != null ? e.getMessage() : "";
+        
+        if (exceptionMsg.contains("InvalidAccessKeyId") || exceptionMsg.contains("does not exist in our records")) {
+            return String.format(
+                "阿里云OSS认证失败: Access Key ID 无效或不存在\n" +
+                "配置的 access-key-id: %s\n" +
+                "提示：请确保使用正确的阿里云访问密钥，而不是示例配置中的占位符",
+                config.getAccessKeyId()
+            );
+        }
+        
+        if (exceptionMsg.contains("SignatureDoesNotMatch")) {
+            return "阿里云OSS认证失败: Access Key Secret 错误\n" +
+                   "请检查配置文件中的 access-key-secret 是否正确";
+        }
+        
+        if (exceptionMsg.contains("InvalidBucketName")) {
+            return String.format(
+                "阿里云OSS配置错误: Bucket名称 '%s' 不合法\n" +
+                "Bucket命名规则：只能包含小写字母、数字和短横线(-)，必须以小写字母或数字开头和结尾，长度3-63字符\n" +
+                "请检查配置文件中的 bucket-name 是否符合命名规范",
+                config.getBucketName()
+            );
+        }
+        
+        if (exceptionMsg.contains("NoSuchBucket")) {
+            return String.format(
+                "阿里云OSS Bucket '%s' 不存在\n" +
+                "请检查配置或在OSS控制台创建该Bucket", 
+                config.getBucketName()
+            );
+        }
+        
+        if (exceptionMsg.contains("Forbidden")) {
+            return String.format(
+                "阿里云OSS访问被拒绝: 当前密钥没有访问 Bucket '%s' 的权限\n" +
+                "请在阿里云控制台检查RAM权限配置",
+                config.getBucketName()
+            );
+        }
+        
+        return String.format(
+            "阿里云OSS连接测试失败: %s\n" +
+            "请检查以下配置项：\n" +
+            "1. endpoint 是否正确: %s\n" +
+            "2. access-key-id 和 access-key-secret 是否有效\n" +
+            "3. bucket-name 是否存在: %s\n" +
+            "4. 网络是否可以访问OSS服务",
+            exceptionMsg, config.getEndpoint(), config.getBucketName()
+        );
     }
 
     @Override
@@ -124,7 +192,7 @@ public class AliyunOssFileStorage implements FileStorage {
                     .build();
                     
         } catch (IOException e) {
-            log.error("OSS文件上传失败", e);
+            log.error("File Manager", "OSS文件上传失败: {}", e.getMessage());
             throw new RuntimeException("文件上传失败: " + e.getMessage());
         }
     }
@@ -169,7 +237,7 @@ public class AliyunOssFileStorage implements FileStorage {
                 return outputStream.toByteArray();
             }
         } catch (IOException e) {
-            log.error("OSS文件下载失败: {}", filePath, e);
+            log.error("File Manager","OSS文件下载失败: {}", filePath, e);
             throw new RuntimeException("文件下载失败: " + e.getMessage());
         }
     }
@@ -181,7 +249,7 @@ public class AliyunOssFileStorage implements FileStorage {
             ossClient.deleteObject(bucketName, filePath);
             return true;
         } catch (Exception e) {
-            log.error("OSS文件删除失败: {}", filePath, e);
+            log.error("File Manager","OSS文件删除失败: {}", filePath, e);
             return false;
         }
     }
@@ -192,7 +260,7 @@ public class AliyunOssFileStorage implements FileStorage {
             String bucketName = properties.getAliyunOss().getBucketName();
             return ossClient.doesObjectExist(bucketName, filePath);
         } catch (Exception e) {
-            log.error("OSS文件检查失败: {}", filePath, e);
+            log.error("File Manager","OSS文件检查失败: {}", filePath, e);
             return false;
         }
     }

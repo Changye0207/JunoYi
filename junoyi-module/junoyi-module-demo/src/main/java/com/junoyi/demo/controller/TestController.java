@@ -6,6 +6,8 @@ import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.datasource.datascope.DataScopeContextHolder;
 import com.junoyi.framework.datasource.datascope.DataScopeContextHolder.DataScopeContext;
 import com.junoyi.framework.event.core.EventBus;
+import com.junoyi.framework.file.domain.FileInfo;
+import com.junoyi.framework.file.helper.FileHelper;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.permission.annotation.Permission;
@@ -13,6 +15,7 @@ import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -24,6 +27,7 @@ import java.util.Map;
 public class TestController {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(TestController.class);
+    private final FileHelper fileHelper;
 
     @GetMapping("/event")
     public void testEvent(){
@@ -146,5 +150,137 @@ public class TestController {
         }
         
         return R.ok(result);
+    }
+
+    /**
+     * 测试文件上传
+     * <p>
+     * 上传文件到配置的存储服务（本地存储或阿里云OSS）
+     * 
+     * @param file 上传的文件
+     * @param path 可选的存储路径，不传则使用默认路径（按日期分类）
+     * @return 文件信息，包含文件URL、大小、类型等
+     */
+    @PostMapping("/upload")
+    public R<FileInfo> testUpload(@RequestParam("file") MultipartFile file,
+                                   @RequestParam(value = "path", required = false) String path) {
+        try {
+            log.info("Demo", "开始上传文件: {}, 大小: {} bytes", file.getOriginalFilename(), file.getSize());
+            
+            FileInfo fileInfo = fileHelper.upload(file, path);
+            
+            log.info("Demo", "文件上传成功: {}", fileInfo.getFileUrl());
+            return R.ok(fileInfo);
+        } catch (Exception e) {
+            log.error("Demo", "文件上传失败: {}", e.getMessage());
+            return R.fail("文件上传失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 测试获取文件访问URL
+     * <p>
+     * 根据文件路径获取可访问的URL
+     * 
+     * @param filePath 文件存储路径
+     * @param expireSeconds 可选的过期时间（秒），用于生成临时访问链接（仅OSS支持）
+     * @return 文件访问URL
+     */
+    @GetMapping("/file-url")
+    public R<Map<String, String>> testGetFileUrl(@RequestParam("filePath") String filePath,
+                                                   @RequestParam(value = "expireSeconds", required = false) Long expireSeconds) {
+        try {
+            String fileUrl;
+            if (expireSeconds != null && expireSeconds > 0) {
+                fileUrl = fileHelper.getFileUrl(filePath, expireSeconds);
+            } else {
+                fileUrl = fileHelper.getFileUrl(filePath);
+            }
+            
+            Map<String, String> result = new HashMap<>();
+            result.put("filePath", filePath);
+            result.put("fileUrl", fileUrl);
+            if (expireSeconds != null) {
+                result.put("expireSeconds", String.valueOf(expireSeconds));
+            }
+            
+            return R.ok(result);
+        } catch (Exception e) {
+            log.error("Demo", "获取文件URL失败: {}", e.getMessage());
+            return R.fail("获取文件URL失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 测试文件下载
+     * <p>
+     * 下载指定路径的文件内容
+     * 
+     * @param filePath 文件存储路径
+     * @return 文件字节数组和文件信息
+     */
+    @GetMapping("/download")
+    public R<Map<String, Object>> testDownload(@RequestParam("filePath") String filePath) {
+        try {
+            byte[] fileData = fileHelper.download(filePath);
+            
+            Map<String, Object> result = new HashMap<>();
+            result.put("filePath", filePath);
+            result.put("fileSize", fileData.length);
+            result.put("message", "文件下载成功，大小: " + fileData.length + " bytes");
+            
+            return R.ok(result);
+        } catch (Exception e) {
+            log.error("Demo", "文件下载失败: {}", e.getMessage());
+            return R.fail("文件下载失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 测试文件删除
+     * <p>
+     * 删除指定路径的文件
+     * 
+     * @param filePath 文件存储路径
+     * @return 删除结果
+     */
+    @DeleteMapping("/file")
+    public R<String> testDelete(@RequestParam("filePath") String filePath) {
+        try {
+            boolean success = fileHelper.delete(filePath);
+            if (success) {
+                return R.ok("文件删除成功");
+            } else {
+                return R.fail("文件删除失败");
+            }
+        } catch (Exception e) {
+            log.error("Demo", "文件删除失败: {}", e.getMessage());
+            return R.fail("文件删除失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 测试文件是否存在
+     * <p>
+     * 检查指定路径的文件是否存在
+     * 
+     * @param filePath 文件存储路径
+     * @return 文件是否存在
+     */
+    @GetMapping("/file-exists")
+    public R<Map<String, Object>> testExists(@RequestParam("filePath") String filePath) {
+        try {
+            boolean exists = fileHelper.exists(filePath);
+            
+            Map<String, Object> result = new HashMap<>();
+            result.put("filePath", filePath);
+            result.put("exists", exists);
+            result.put("message", exists ? "文件存在" : "文件不存在");
+            
+            return R.ok(result);
+        } catch (Exception e) {
+            log.error("Demo", "检查文件失败: {}", e.getMessage());
+            return R.fail("检查文件失败: " + e.getMessage());
+        }
     }
 }

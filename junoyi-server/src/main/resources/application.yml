@@ -293,6 +293,8 @@ junoyi:
       - /v3/api-docs/**
       - /webjars/**
       - /favicon.ico
+      # 资源文件地址
+      -
     # 登录机制
     login:
       # 最大登录失败次数
