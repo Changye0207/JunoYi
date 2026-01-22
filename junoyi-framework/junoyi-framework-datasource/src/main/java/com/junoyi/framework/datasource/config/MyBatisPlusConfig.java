@@ -9,11 +9,13 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.junoyi.framework.datasource.datascope.handler.DataScopeHandler;
 import com.junoyi.framework.datasource.interceptor.SqlBeautifyInterceptor;
 import com.junoyi.framework.datasource.interceptor.SlowSqlInterceptor;
+import com.junoyi.framework.datasource.properties.DataPermissionProperties;
 import com.junoyi.framework.datasource.properties.DataSourceProperties;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -33,7 +35,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @AutoConfiguration
 @EnableTransactionManagement
-@EnableConfigurationProperties(DataSourceProperties.class)
+@EnableConfigurationProperties({DataSourceProperties.class, DataPermissionProperties.class})
 @MapperScan("com.junoyi.**.mapper")
 public class MyBatisPlusConfig {
 
@@ -50,27 +52,35 @@ public class MyBatisPlusConfig {
      *   <li>防全表更新/删除插件：防止误操作导致的数据批量变更</li>
      * </ul>
      *
-     * @param properties 数据源配置属性
+     * @param dataPermissionProperties 数据权限配置属性
      * @return 初始化完成的 MybatisPlusInterceptor 实例
      */
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor(DataSourceProperties properties) {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(DataPermissionProperties dataPermissionProperties) {
         log.info("Start initializing MyBatis-Plus interceptor.");
 
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
 
         // 添加数据权限插件（必须在分页插件之前）
-        if (properties.getDataScope().isEnabled()) {
-            log.info("Initializing DataScope plugin (mode: {}).",
-                    properties.getDataScope().isGlobalEnabled() ? "global" : "annotation");
+        if (dataPermissionProperties.isEnabled()) {
+            DataPermissionProperties.DataScopeConfig dataScopeConfig = dataPermissionProperties.getDataScope();
+            boolean isGlobalMode = dataScopeConfig.getMode() == DataPermissionProperties.DataScopeConfig.Mode.GLOBAL;
+
+            log.info("Initializing DataPermission plugin (mode: {}, fieldCheck: {}, cache: {}).",
+                    dataScopeConfig.getMode(),
+                    dataScopeConfig.isFieldCheckEnabled(),
+                    dataScopeConfig.isCacheEnabled());
+
             DataPermissionInterceptor dataPermissionInterceptor = new DataPermissionInterceptor(
                     new DataScopeHandler(
-                            properties.getDataScope().isGlobalEnabled(),
-                            properties.getDataScope().getDefaultDeptField(),
-                            properties.getDataScope().getDefaultUserField()
+                            isGlobalMode,
+                            dataScopeConfig.getDeptField(),
+                            dataScopeConfig.getUserField()
                     )
             );
             interceptor.addInnerInterceptor(dataPermissionInterceptor);
+        } else {
+            log.info("DataPermission plugin is disabled.");
         }
 
         // 添加分页插件，并设置相关参数
@@ -99,9 +109,9 @@ public class MyBatisPlusConfig {
      * @return SqlBeautifyInterceptor 实例
      */
     @Bean
-    @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
-            prefix = "junoyi.datasource", 
-            name = "sql-beautify-enabled", 
+    @ConditionalOnProperty(
+            prefix = "junoyi.datasource",
+            name = "sql-beautify-enabled",
             havingValue = "true"
     )
     public SqlBeautifyInterceptor sqlBeautifyInterceptor(DataSourceProperties properties) {
@@ -119,9 +129,9 @@ public class MyBatisPlusConfig {
      * @return SlowSqlInterceptor 实例
      */
     @Bean
-    @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
-            prefix = "junoyi.datasource", 
-            name = "slow-sql-enabled", 
+    @ConditionalOnProperty(
+            prefix = "junoyi.datasource",
+            name = "slow-sql-enabled",
             havingValue = "true",
             matchIfMissing = true
     )

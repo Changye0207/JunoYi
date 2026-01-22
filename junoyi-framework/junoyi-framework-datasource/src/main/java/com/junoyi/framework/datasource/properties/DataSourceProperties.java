@@ -30,11 +30,6 @@ public class DataSourceProperties {
      */
     private boolean sqlLogEnabled = true;
 
-    /**
-     * 数据范围配置
-     */
-    private DataScopeConfig dataScope = new DataScopeConfig();
-
     public boolean isSqlBeautifyEnabled() {
         return sqlBeautifyEnabled;
     }
@@ -65,73 +60,5 @@ public class DataSourceProperties {
 
     public void setSqlLogEnabled(boolean sqlLogEnabled) {
         this.sqlLogEnabled = sqlLogEnabled;
-    }
-
-    public DataScopeConfig getDataScope() {
-        return dataScope;
-    }
-
-    public void setDataScope(DataScopeConfig dataScope) {
-        this.dataScope = dataScope;
-    }
-
-    /**
-     * 数据范围配置
-     */
-    public static class DataScopeConfig {
-
-        /**
-         * 是否启用数据范围
-         */
-        private boolean enabled = true;
-
-        /**
-         * 是否启用全局模式（对所有查询生效）
-         * false: 仅对标注 @DataScope 的方法生效
-         * true: 对所有查询生效
-         */
-        private boolean globalEnabled = false;
-
-        /**
-         * 默认部门字段名
-         */
-        private String defaultDeptField = "dept_id";
-
-        /**
-         * 默认用户字段名
-         */
-        private String defaultUserField = "create_by";
-
-        public boolean isEnabled() {
-            return enabled;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        public boolean isGlobalEnabled() {
-            return globalEnabled;
-        }
-
-        public void setGlobalEnabled(boolean globalEnabled) {
-            this.globalEnabled = globalEnabled;
-        }
-
-        public String getDefaultDeptField() {
-            return defaultDeptField;
-        }
-
-        public void setDefaultDeptField(String defaultDeptField) {
-            this.defaultDeptField = defaultDeptField;
-        }
-
-        public String getDefaultUserField() {
-            return defaultUserField;
-        }
-
-        public void setDefaultUserField(String defaultUserField) {
-            this.defaultUserField = defaultUserField;
-        }
     }
 }

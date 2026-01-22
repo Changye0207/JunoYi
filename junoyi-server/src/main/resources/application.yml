@@ -112,19 +112,25 @@ junoyi:
     slow-sql-threshold: 3000
     # 启用 SQL 日志
     sql-log-enabled: false
-    # 数据范围
+
+  # ==================== 数据权限配置 ====================
+  data-permission:
+    # 是否启用数据权限功能
+    enabled: true
+    # 数据范围配置
     data-scope:
-      # 是否启用数据范围（默认 true）
-      enabled: true
-      # 是否启用全局模式（默认 false）
-      # false: 仅对标注 @DataScope 的方法生效
-      # true: 对所有查询生效，包括 MyBatis-Plus 内置方法
-      # 启用全局模式，不用注解，会开销一些性能
-      global-enabled: false
-      # 默认部门字段名（默认 dept_id）
-      default-dept-field: dept_id
-      # 默认用户字段名（默认 create_by）
-      default-user-field: create_by
+      # 工作模式: ANNOTATION(注解模式) / GLOBAL(全局模式)
+      # ANNOTATION: 仅对标注 @DataScope 的方法生效（推荐，性能好）
+      # GLOBAL: 对所有查询生效（安全性高，但性能开销较大）
+      mode: ANNOTATION
+      # 默认部门字段名
+      dept-field: dept_id
+      # 默认用户字段名（用于 SELF 模式）
+      user-field: create_by
+      # 是否启用字段检查（自动检查表中是否存在数据范围字段）
+      field-check-enabled: true
+      # 是否启用缓存（缓存表字段信息和注解信息）
+      cache-enabled: true
 
   # ==================== 文件存储配置 ====================
   file:
