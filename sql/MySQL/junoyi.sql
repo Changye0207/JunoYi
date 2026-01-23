@@ -11,7 +11,7 @@
  Target Server Version : 80404 (8.4.4)
  File Encoding         : 65001
 
- Date: 21/01/2026 21:19:48
+ Date: 23/01/2026 20:15:50
 */
 
 SET NAMES utf8mb4;
@@ -120,9 +120,9 @@ INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`,
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (8, 5, 'UserCenter', 'user-center', '/system/user-center', 'menus.system.userCenter', 'ri:user-line', 1, 11, NULL, 1, 1, 1, 0, '', 0, 0, '', 0, '', 1, 'system', '2025-12-30 15:29:16', 'super_admin', '2026-01-20 16:58:58', '个人中心（隐藏）');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (9, 5, 'Menus', 'menu', '/system/menu', 'menus.system.menu', 'ri:menu-search-line', 1, 7, 'system.ui.menu.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, 'system', '2025-12-30 15:29:16', 'super_admin', '2026-01-20 16:58:58', '菜单管理');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (49, 0, 'Document', '', '', 'menus.document.title', 'ri:bill-line', 1, 5, '', 0, 0, 0, 0, 'https://doc.framework.junoyi.com/doc/what-is-junoyi', 0, 0, '', 0, '', 1, 'system', '2025-12-30 15:29:16', 'super_admin', '2026-01-20 16:58:58', '文档外链');
-INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (50, 0, 'ChangeLog', '/change/log', '/change/log', 'menus.plan.log', 'ri:gamepad-line', 1, 6, '', 0, 0, 1, 0, '', 0, 0, '', 0, 'v0.4.0-alpha', 1, 'system', '2025-12-30 15:29:16', 'super_admin', '2026-01-20 17:05:13', '更新日志');
+INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (50, 0, 'ChangeLog', '/change/log', '/change/log', 'menus.plan.log', 'ri:gamepad-line', 1, 6, '', 0, 0, 1, 0, '', 0, 0, '', 0, 'v0.4.2-alpha', 1, 'system', '2025-12-30 15:29:16', 'super_admin', '2026-01-23 19:55:11', '更新日志');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (93, 0, 'Monitor', '/monitor', '/index/index', 'menus.monitor.title', 'mdi:monitor-dashboard', 0, 3, '', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, 'system', '2025-12-31 13:13:18', 'super_admin', '2026-01-20 16:58:58', '');
-INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (94, 93, 'Cache', 'cache', '/system/cache', 'menus.monitor.cache', 'simple-icons:redis', 1, 2, '', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, 'system', '2025-12-31 13:13:18', 'super_admin', '2026-01-20 16:58:58', '');
+INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (94, 93, 'Cache', 'cache', '/system/cache', 'menus.monitor.cache', 'simple-icons:redis', 1, 2, 'system.ui.cache.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, 'system', '2025-12-31 13:13:18', 'super_admin', '2026-01-23 20:02:00', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (95, 0, 'Operation', '/operation', '/index/index', 'menus.operation.title', 'mdi:toolbox', 0, 4, '', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, 'system', '2025-12-31 13:13:18', 'super_admin', '2026-01-20 16:58:58', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (96, 95, 'Generate', 'generate', '/operation/generate', 'menus.operation.generate', 'mdi:robot-outline', 1, 1, '', 1, 0, 1, 0, '', 0, 0, '', 0, '', 1, 'system', '2025-12-31 13:13:18', 'super_admin', '2026-01-20 16:58:58', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (98, 5, 'Task', 'task', '/system/task', 'menus.system.task', 'ep:timer', 1, 9, 'system.ui.task.view', 1, 0, 1, 0, '', 0, 0, '', 0, '', 1, 'system', '2025-12-31 13:13:18', 'super_admin', '2026-01-20 16:58:58', '');
@@ -180,7 +180,7 @@ CREATE TABLE `sys_perm_group` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `sys_perm_group` (`id`, `group_code`, `group_name`, `parent_id`, `priority`, `description`, `status`, `permissions`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, 'default_user', '默认用户权限组', NULL, 10, '系统所有登录用户的基础权限', 1, '[]', 'system', '2025-12-29 21:02:33', 'super_admin', '2026-01-08 19:38:18', '默认用户权限组');
-INSERT INTO `sys_perm_group` (`id`, `group_code`, `group_name`, `parent_id`, `priority`, `description`, `status`, `permissions`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, 'default_admin', '默认管理权限组', 1, 100, '系统所有管理用户的基础权限', 1, '[\"system.ui.user.view\",\"system.ui.user.button.role\"]', 'system', '2025-12-29 21:04:58', 'super_admin', '2026-01-14 16:55:09', '默认管理权限组');
+INSERT INTO `sys_perm_group` (`id`, `group_code`, `group_name`, `parent_id`, `priority`, `description`, `status`, `permissions`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, 'default_admin', '默认管理权限组', 1, 100, '系统所有管理用户的基础权限', 1, '[\"system.ui.user.button.dept\",\"system.ui.cache.button.detail\",\"system.ui.user.button.edit\",\"system.ui.user.view\",\"system.ui.permission.pool.button.add\",\"system.ui.permission.view\",\"system.ui.permission.button.edit\",\"system.ui.cache.button.clear\",\"system.ui.menu.button.edit\",\"system.ui.dept.button.permission\",\"system.ui.role.view\",\"system.ui.menu.button.add\",\"system.ui.session.button.logout\",\"system.ui.session.view\",\"system.ui.role.button.permission\",\"system.ui.dept.button.add\",\"system.ui.cache.view\",\"system.ui.user.button.individual-perm\",\"system.ui.role.button.delete\",\"system.ui.dept.button.edit\",\"system.ui.cache.button.delete\",\"system.ui.permission.pool.view\",\"system.ui.user.button.permission\",\"system.ui.role.button.edit\",\"system.ui.dept.button.delete\",\"system.ui.user.button.role\",\"system.ui.dept.view\",\"system.ui.permission.button.add\",\"system.ui.user.button.delete\",\"system.ui.permission.button.delete\",\"system.ui.user.button.add\",\"system.ui.menu.view\",\"system.ui.menu.button.delete\",\"system.ui.permission.pool.button.delete\",\"system.ui.role.button.add\",\"system.ui.permission-pool.button.status\"]', 'system', '2025-12-29 21:04:58', 'super_admin', '2026-01-23 20:03:37', '默认管理权限组');
 COMMIT;
 
 -- ----------------------------
@@ -344,13 +344,13 @@ CREATE TABLE `sys_role_group` (
   `expire_time` datetime DEFAULT NULL COMMENT '过期时间（临时权限组使用）',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='角色-权限组关联表';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='角色-权限组关联表';
 
 -- ----------------------------
 -- Records of sys_role_group
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_role_group` (`id`, `role_id`, `group_id`, `expire_time`, `create_time`) VALUES (3, 2, 2, NULL, '2026-01-05 16:45:33');
+INSERT INTO `sys_role_group` (`id`, `role_id`, `group_id`, `expire_time`, `create_time`) VALUES (4, 2, 2, NULL, '2026-01-23 19:58:50');
 COMMIT;
 
 -- ----------------------------
@@ -439,29 +439,6 @@ INSERT INTO `sys_user_group` (`id`, `user_id`, `group_id`, `expire_time`, `creat
 COMMIT;
 
 -- ----------------------------
--- Table structure for sys_user_other_auth
--- ----------------------------
-DROP TABLE IF EXISTS `sys_user_other_auth`;
-CREATE TABLE `sys_user_other_auth` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` bigint DEFAULT NULL COMMENT '用户ID',
-  `auth_type` varchar(20) DEFAULT NULL COMMENT '登录类型',
-  `auth_key` varchar(255) DEFAULT NULL COMMENT '平台唯一标识符',
-  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `remark` varchar(500) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户第三登录绑定表';
-
--- ----------------------------
--- Records of sys_user_other_auth
--- ----------------------------
-BEGIN;
-COMMIT;
-
--- ----------------------------
 -- Table structure for sys_user_perm
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_user_perm`;
@@ -522,6 +499,29 @@ INSERT INTO `sys_user_role` (`id`, `user_id`, `role_id`) VALUES (5, 3, 6);
 INSERT INTO `sys_user_role` (`id`, `user_id`, `role_id`) VALUES (6, 4, 6);
 INSERT INTO `sys_user_role` (`id`, `user_id`, `role_id`) VALUES (27, 1, 1);
 INSERT INTO `sys_user_role` (`id`, `user_id`, `role_id`) VALUES (29, 2, 2);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_user_third_auth
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user_third_auth`;
+CREATE TABLE `sys_user_third_auth` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `user_id` bigint DEFAULT NULL COMMENT '用户ID',
+  `auth_type` varchar(20) DEFAULT NULL COMMENT '登录类型',
+  `auth_key` varchar(255) DEFAULT NULL COMMENT '平台唯一标识符',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `remark` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户第三登录绑定表';
+
+-- ----------------------------
+-- Records of sys_user_third_auth
+-- ----------------------------
+BEGIN;
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
