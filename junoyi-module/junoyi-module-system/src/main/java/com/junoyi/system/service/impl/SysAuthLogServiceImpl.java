@@ -1,5 +1,6 @@
 package com.junoyi.system.service.impl;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
@@ -81,8 +82,9 @@ public class SysAuthLogServiceImpl implements ISysAuthLogService {
      * 清空登录日志
      */
     @Override
+    @InterceptorIgnore(blockAttack = "true")
     public void clearLoginLog() {
-        sysAuthLogMapper.delete(new LambdaQueryWrapper<>());
+        sysAuthLogMapper.truncate();
     }
 
     /**
