@@ -11,11 +11,45 @@
  Target Server Version : 80404 (8.4.4)
  File Encoding         : 65001
 
- Date: 23/01/2026 20:15:50
+ Date: 02/02/2026 18:30:43
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for sys_auth_log
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_auth_log`;
+CREATE TABLE `sys_auth_log` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+  `user_id` bigint DEFAULT NULL COMMENT '用户ID',
+  `user_name` varchar(64) DEFAULT NULL COMMENT '用户名',
+  `nick_name` varchar(64) DEFAULT NULL COMMENT '用户昵称',
+  `login_ip` varchar(128) DEFAULT NULL COMMENT '登录IP',
+  `ip_region` varchar(255) DEFAULT NULL COMMENT 'IP归属地',
+  `session_id` varchar(128) DEFAULT NULL COMMENT '会话ID',
+  `identity` varchar(64) DEFAULT NULL COMMENT '身份（角色名称）',
+  `login_type` varchar(32) DEFAULT NULL COMMENT '登录方式（password-账号密码, wechat_work-企业微信）',
+  `browser` varchar(64) DEFAULT NULL COMMENT '浏览器',
+  `os` varchar(64) DEFAULT NULL COMMENT '操作系统',
+  `device_type` varchar(32) DEFAULT NULL COMMENT '设备类型（Desktop/Mobile/Tablet）',
+  `status` tinyint DEFAULT '0' COMMENT '登录状态（0-失败，1-成功）',
+  `msg` varchar(500) DEFAULT NULL COMMENT '提示消息（失败原因等）',
+  `login_time` datetime DEFAULT NULL COMMENT '登录时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_user_name` (`user_name`),
+  KEY `idx_login_time` (`login_time`),
+  KEY `idx_status` (`status`),
+  KEY `idx_login_ip` (`login_ip`)
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统登录日志表';
+
+-- ----------------------------
+-- Records of sys_auth_log
+-- ----------------------------
+BEGIN;
+COMMIT;
 
 -- ----------------------------
 -- Table structure for sys_dept
@@ -68,6 +102,36 @@ CREATE TABLE `sys_dept_group` (
 
 -- ----------------------------
 -- Records of sys_dept_group
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_dict_data
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_dict_data`;
+CREATE TABLE `sys_dict_data` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '字典数据主键ID',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统字典数据表';
+
+-- ----------------------------
+-- Records of sys_dict_data
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_dict_type
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_dict_type`;
+CREATE TABLE `sys_dict_type` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '字典类型主键ID',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统字典类型表';
+
+-- ----------------------------
+-- Records of sys_dict_type
 -- ----------------------------
 BEGIN;
 COMMIT;
@@ -132,7 +196,7 @@ INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`,
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (115, 93, 'Session', 'session', '/system/session', 'menus.monitor.session', 'ri:chat-settings-line', 1, 1, 'system.ui.session.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-05 16:28:14', 'super_admin', '2026-01-20 16:58:58', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (116, 5, 'PermissionPool', 'permission-pool', '/system/permission-pool', 'menus.system.permissionPool', '', 1, 5, 'system.ui.permission.pool.view', 1, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-07 16:43:49', 'super_admin', '2026-01-20 16:58:58', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (118, 93, 'System-Info', 'info', '/system/info', '系统信息', 'ri:information-2-line', 1, 3, 'system.ui.info.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-18 18:50:03', 'super_admin', '2026-01-20 16:58:58', '');
-INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (119, 122, 'AuthLog', 'auth-log', '/system/log/auth', '登录日志', 'ri:book-ai-line', 1, 1, 'system.ui.authlog.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-18 18:53:23', 'super_admin', '2026-01-20 16:58:58', '');
+INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (119, 122, 'AuthLog', 'auth-log', '/system/log/auth', '登录日志', 'ri:book-ai-line', 1, 1, 'system.ui.auth-log.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-18 18:53:23', 'super_admin', '2026-02-01 17:02:57', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (120, 122, 'OperLog', 'oper-log', '/system/log/oper', '操作日志', 'ri:book-read-line', 1, 2, 'system.ui.oper-log.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-18 18:54:15', 'super_admin', '2026-01-20 16:58:58', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (121, 5, 'Dictionary', 'dict', '/system/dict', '字典管理', 'ri:book-2-fill', 1, 6, 'system.ui.dict.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-18 19:02:45', 'super_admin', '2026-01-20 16:58:58', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (122, 5, 'LogManage', 'log', '', '日志管理', 'ri:survey-line', 0, 10, '', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-18 19:07:31', 'super_admin', '2026-01-20 16:58:58', '');
