@@ -1,0 +1,44 @@
+package com.junoyi.system.controller;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.junoyi.framework.core.domain.module.R;
+import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.framework.log.core.JunoYiLog;
+import com.junoyi.framework.log.core.JunoYiLogFactory;
+import com.junoyi.framework.permission.annotation.Permission;
+import com.junoyi.framework.security.annotation.PlatformScope;
+import com.junoyi.framework.security.enums.PlatformType;
+import com.junoyi.framework.web.domain.BaseController;
+import com.junoyi.system.domain.dto.SysAuthLogQueryDTO;
+import com.junoyi.system.domain.po.SysAuthLog;
+import com.junoyi.system.service.ISysAuthLogService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 系统登录日志控制器
+ *
+ * @author Fan
+ */
+@RestController
+@RequestMapping("/system/auth-log")
+@RequiredArgsConstructor
+public class SysAuthLogController extends BaseController {
+
+    private final JunoYiLog log = JunoYiLogFactory.getLogger(SysAuthLogController.class);
+
+    private final ISysAuthLogService sysAuthLogService;
+
+    /**
+     * 分页查询登录日志
+     */
+    @GetMapping("/list")
+    @Permission(value = {"system.ui.auth-log.view", "system.api.auth-log.get.list"})
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    public R<PageResult<?>> list(SysAuthLogQueryDTO queryDTO) {
+        Page<SysAuthLog> page = buildPage();
+        return R.ok(sysAuthLogService.getLoginLogList(queryDTO, page));
+    }
+}
