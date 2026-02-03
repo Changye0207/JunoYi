@@ -11,7 +11,7 @@
  Target Server Version : 80404 (8.4.4)
  File Encoding         : 65001
 
- Date: 03/02/2026 20:00:46
+ Date: 03/02/2026 23:26:23
 */
 
 SET NAMES utf8mb4;
@@ -43,17 +43,13 @@ CREATE TABLE `sys_auth_log` (
   KEY `idx_login_time` (`login_time`),
   KEY `idx_status` (`status`),
   KEY `idx_login_ip` (`login_ip`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统登录日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统登录日志表';
 
 -- ----------------------------
 -- Records of sys_auth_log
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (1, 1, 'super_admin', '超级管理员', '127.0.0.1', '内网IP', 'adae064d570848d78db2a4e22b68a90e', '超级管理员', 'password', 'Chrome 143', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-03 19:35:09');
-INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (2, 1, 'super_admin', '超级管理员', '127.0.0.1', '内网IP', '33fdf2a35e1a4396ad3a71ae8478cd29', '超级管理员', 'password', 'Chrome 143', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-03 19:37:21');
-INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (3, NULL, 'super_admin', NULL, '127.0.0.1', '内网IP', NULL, NULL, 'password', 'Chrome 143', 'macOS 10.15.7', 'Desktop', 0, '登录失败次数过多，账号已被锁定', '2026-02-03 19:37:58');
-INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (4, 2, 'admin', '用户管理员', '127.0.0.1', '内网IP', 'da61042b05ed4d779a2f69f9d41abed2', '普通用户', 'password', 'Chrome 143', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-03 19:38:11');
-INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (5, 1, 'super_admin', '超级管理员', '127.0.0.1', '内网IP', '00300015950f4b789638c4bd4afc37ee', '超级管理员', 'password', 'Chrome 143', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-03 19:38:41');
+INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (1, 1, 'super_admin', '超级管理员', '127.0.0.1', '内网IP', '46d60cfea18c4ec4bc64bfc8091a8229', '超级管理员', 'password', 'Chrome 143', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-03 22:54:14');
 COMMIT;
 
 -- ----------------------------
@@ -213,9 +209,29 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_oper_log`;
 CREATE TABLE `sys_oper_log` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'info' COMMENT '日志级别：info/warn/error',
+  `action` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '动作：view/create/update/delete/export/import',
+  `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '模块：vulnerability/webshell/project/user等',
+  `user_id` bigint DEFAULT NULL COMMENT '操作用户ID',
+  `user_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '用户名',
+  `nick_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '昵称',
+  `message` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '详情描述',
+  `target_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '对象ID',
+  `target_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '对象名称',
+  `path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '请求路径',
+  `method` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '请求方法：GET/POST/PUT/DELETE',
+  `ip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '操作IP',
+  `raw_data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '原始数据JSON',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_module` (`module`),
+  KEY `idx_action` (`action`),
+  KEY `idx_level` (`level`),
+  KEY `idx_target_id` (`target_id`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='操作日志表';
 
 -- ----------------------------
 -- Records of sys_oper_log
