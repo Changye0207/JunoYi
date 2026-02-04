@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.framework.core.utils.DateUtils;
 import com.junoyi.framework.event.core.EventBus;
+import com.junoyi.framework.json.utils.JsonUtils;
 import com.junoyi.framework.security.utils.PasswordUtils;
 import com.junoyi.framework.security.utils.SecurityUtils;
 import com.junoyi.system.convert.SysDeptConverter;
@@ -29,6 +30,7 @@ import com.junoyi.system.domain.vo.SysUserPermVO;
 import com.junoyi.system.domain.vo.SysUserVO;
 import com.junoyi.system.enums.SysUserStatus;
 import com.junoyi.system.event.PermissionChangedEvent;
+import com.junoyi.system.event.UserOperationEvent;
 import com.junoyi.system.exception.UserEmailAlreadyExistsException;
 import com.junoyi.system.exception.UserNameAlreadyExistsException;
 import com.junoyi.system.exception.UserPhoneAlreadyExistsException;
@@ -143,6 +145,13 @@ public class SysUserServiceImpl implements ISysUserService {
 
         // 插入用户
         sysUserMapper.insert(sysUser);
+
+        // 发布操作日志事件（记录用户信息，排除密码）
+        userDTO.setPassword(null);
+        EventBus.get().callEvent(UserOperationEvent.withRawData("create", "user",
+                "创建了用户「" + sysUser.getUserName() + "」",
+                String.valueOf(sysUser.getUserId()), sysUser.getUserName(),
+                JsonUtils.toJsonString(userDTO)));
     }
 
     /**
@@ -163,6 +172,13 @@ public class SysUserServiceImpl implements ISysUserService {
         sysUser.setUpdateTime(DateUtils.getNowDate());
         sysUser.setUpdateBy(SecurityUtils.getUserName());
         sysUserMapper.updateById(sysUser);
+
+        // 发布操作日志事件（记录用户信息，排除密码）
+        userDTO.setPassword(null);
+        EventBus.get().callEvent(UserOperationEvent.withRawData("update", "user",
+                "更新了用户「" + userDTO.getUserName() + "」",
+                String.valueOf(userDTO.getId()), userDTO.getUserName(),
+                JsonUtils.toJsonString(userDTO)));
     }
 
     /**
@@ -245,6 +261,13 @@ public class SysUserServiceImpl implements ISysUserService {
         // 删除用户部门关联
         sysUserDeptMapper.delete(new LambdaQueryWrapper<SysUserDept>()
                 .eq(SysUserDept::getUserId, id));
+
+        // 发布操作日志事件
+        SysUser user = sysUserMapper.selectById(id);
+        String userName = user != null ? user.getUserName() : String.valueOf(id);
+        EventBus.get().callEvent(UserOperationEvent.of("delete", "user",
+                "删除了用户「" + userName + "」",
+                String.valueOf(id), userName));
     }
 
     /**
@@ -274,6 +297,11 @@ public class SysUserServiceImpl implements ISysUserService {
         // 批量删除用户部门关联
         sysUserDeptMapper.delete(new LambdaQueryWrapper<SysUserDept>()
                 .in(SysUserDept::getUserId, ids));
+
+        // 发布操作日志事件
+        EventBus.get().callEvent(UserOperationEvent.of("delete", "user",
+                "批量删除了 " + ids.size() + " 个用户",
+                ids.toString(), null));
     }
 
     /**
