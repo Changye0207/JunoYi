@@ -1,8 +1,9 @@
-package com.junoyi.system.service;
+package com.junoyi.system.service.impl;
 
 import com.junoyi.framework.captcha.domain.CaptchaResult;
 import com.junoyi.framework.captcha.enums.CaptchaType;
 import com.junoyi.framework.captcha.helper.CaptchaHelper;
+import com.junoyi.system.service.ISysCaptchaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

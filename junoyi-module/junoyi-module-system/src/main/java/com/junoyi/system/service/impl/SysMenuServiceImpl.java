@@ -1,4 +1,4 @@
-package com.junoyi.system.service;
+package com.junoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -18,6 +18,7 @@ import com.junoyi.system.domain.po.SysMenu;
 import com.junoyi.system.domain.vo.SysMenuVO;
 import com.junoyi.system.enums.SysMenuStatus;
 import com.junoyi.system.mapper.SysMenuMapper;
+import com.junoyi.system.service.ISysMenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,4 +1,4 @@
-package com.junoyi.system.service;
+package com.junoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,6 +14,7 @@ import com.junoyi.system.domain.po.SysPermGroup;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
 import com.junoyi.system.event.PermissionChangedEvent;
 import com.junoyi.system.mapper.SysPermGroupMapper;
+import com.junoyi.system.service.ISysPermGroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;

@@ -1,4 +1,4 @@
-package com.junoyi.system.service;
+package com.junoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -12,6 +12,7 @@ import com.junoyi.system.domain.dto.SysPermissionQueryDTO;
 import com.junoyi.system.domain.po.SysPermission;
 import com.junoyi.system.domain.vo.SysPermissionVO;
 import com.junoyi.system.mapper.SysPermissionMapper;
+import com.junoyi.system.service.ISysPermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;

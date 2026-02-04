@@ -1,4 +1,4 @@
-package com.junoyi.system.service;
+package com.junoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.junoyi.framework.log.core.JunoYiLog;
@@ -11,6 +11,7 @@ import com.junoyi.system.domain.vo.RouterMetaVO;
 import com.junoyi.system.enums.SysMenuStatus;
 import com.junoyi.system.enums.SysMenuType;
 import com.junoyi.system.mapper.SysMenuMapper;
+import com.junoyi.system.service.ISysRouterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

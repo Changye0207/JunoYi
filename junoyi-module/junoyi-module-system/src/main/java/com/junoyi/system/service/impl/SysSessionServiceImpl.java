@@ -1,4 +1,4 @@
-package com.junoyi.system.service;
+package com.junoyi.system.service.impl;
 
 import com.junoyi.framework.core.domain.page.PageQuery;
 import com.junoyi.framework.core.domain.page.PageResult;
@@ -7,6 +7,7 @@ import com.junoyi.framework.security.helper.SessionHelper;
 import com.junoyi.framework.security.module.UserSession;
 import com.junoyi.system.domain.dto.SysSessionQueryDTO;
 import com.junoyi.system.domain.po.SysSession;
+import com.junoyi.system.service.ISysSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

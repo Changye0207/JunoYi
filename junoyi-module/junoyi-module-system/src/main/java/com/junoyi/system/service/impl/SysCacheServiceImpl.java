@@ -1,4 +1,4 @@
-package com.junoyi.system.service;
+package com.junoyi.system.service.impl;
 
 import com.junoyi.framework.core.domain.page.PageQuery;
 import com.junoyi.framework.core.domain.page.PageResult;
@@ -7,6 +7,7 @@ import com.junoyi.system.domain.dto.CacheKeyQueryDTO;
 import com.junoyi.system.domain.vo.CacheKeyDetailVO;
 import com.junoyi.system.domain.vo.CacheKeyVO;
 import com.junoyi.system.domain.vo.RedisInfoVO;
+import com.junoyi.system.service.ISysCacheService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

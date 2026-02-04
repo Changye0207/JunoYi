@@ -1,4 +1,4 @@
-package com.junoyi.system.service;
+package com.junoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -21,6 +21,7 @@ import com.junoyi.system.event.PermissionChangedEvent;
 import com.junoyi.system.mapper.SysPermGroupMapper;
 import com.junoyi.system.mapper.SysRoleGroupMapper;
 import com.junoyi.system.mapper.SysRoleMapper;
+import com.junoyi.system.service.ISysRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-public class SysRoleServiceImpl implements ISysRoleService{
+public class SysRoleServiceImpl implements ISysRoleService {
 
     private final SysRoleMapper sysRoleMapper;
     private final SysRoleGroupMapper sysRoleGroupMapper;
