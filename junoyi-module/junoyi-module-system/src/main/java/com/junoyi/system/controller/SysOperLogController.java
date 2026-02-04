@@ -14,9 +14,7 @@ import com.junoyi.system.domain.po.SysOperLog;
 import com.junoyi.system.domain.vo.SysOperLogVO;
 import com.junoyi.system.service.ISysOperLogService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 系统操作日志控制器
@@ -37,11 +35,37 @@ public class SysOperLogController extends BaseController {
      */
     @GetMapping("/list")
     @Permission(
-            value = {"system.ui.oper-log.view", "system.ui.oper-log.get.list"}
+            value = {"system.ui.oper-log.view", "system.api.oper-log.get.list"}
     )
     @PlatformScope(PlatformType.ADMIN_WEB)
     public R<PageResult<SysOperLogVO>> list(SysOperLogQueryDTO queryDTO) {
         Page<SysOperLog> page = buildPage();
         return R.ok(sysOperLogService.getOperationLogList(queryDTO, page));
+    }
+
+    /**
+     * 删除操作日志
+     */
+    @DeleteMapping("/{ids}")
+    @Permission(
+            value = {"system.ui.oper-log.view","system.api.oper-log.delete.batch"}
+    )
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    public R<Void> delete(@PathVariable("ids") Long[] ids) {
+//        sysOperLogService.deleteOperationLog(ids);
+        return R.ok();
+    }
+
+    /**
+     * 清空操作日志
+     */
+    @DeleteMapping("/clear")
+    @Permission(
+            value = {"system.ui.oper-log.view", "system.api.oper-log.clear"}
+    )
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    public R<Void> clear() {
+//        sysOperationLogService.clearOperationLog();
+        return R.ok();
     }
 }

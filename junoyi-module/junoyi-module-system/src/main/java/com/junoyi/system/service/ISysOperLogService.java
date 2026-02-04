@@ -21,4 +21,18 @@ public interface ISysOperLogService {
      * @return 分页结果
      */
     PageResult<SysOperLogVO> getOperationLogList(SysOperLogQueryDTO queryDTO, Page<SysOperLog> page);
+
+    /**
+     * 删除操作日志
+     *
+     * @param ids 日志ID数组
+     */
+    void deleteOperationLog(Long[] ids);
+
+    /**
+     * 清空操作日志
+     */
+    void clearOperationLog();
+
+
 }

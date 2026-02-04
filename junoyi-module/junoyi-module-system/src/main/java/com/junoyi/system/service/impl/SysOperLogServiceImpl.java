@@ -13,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,25 @@ public class SysOperLogServiceImpl implements ISysOperLogService {
                 resultPage.getTotal(),
                 (int) resultPage.getCurrent(),
                 (int) resultPage.getSize());
+    }
+
+    /**
+     * 清空操作日志
+     */
+    @Override
+    public void clearOperationLog() {
+        sysOperLogMapper.truncate();
+    }
+
+
+    /**
+     * 删除操作日志
+     *
+     * @param ids 日志ID数组
+     */
+    @Override
+    public void deleteOperationLog(Long[] ids) {
+        sysOperLogMapper.deleteBatchIds(Arrays.asList(ids));
     }
 
 
