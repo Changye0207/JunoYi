@@ -3,6 +3,8 @@ package com.junoyi.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.framework.json.utils.JsonUtils;
+import com.junoyi.system.event.UserOperationEvent;
 import com.junoyi.system.exception.PermGroupHasChildrenException;
 import com.junoyi.framework.core.utils.DateUtils;
 import com.junoyi.framework.event.core.EventBus;
@@ -127,6 +129,12 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
         permGroup.setCreateBy(SecurityUtils.getUserName());
         permGroup.setCreateTime(DateUtils.getNowDate());
         sysPermGroupMapper.insert(permGroup);
+
+        // 发布操作日志事件
+        EventBus.get().callEvent(UserOperationEvent.withRawData("create", "perm_group",
+                "创建了权限组「" + permGroup.getGroupName() + "」",
+                String.valueOf(permGroup.getId()), permGroup.getGroupName(),
+                JsonUtils.toJsonString(dto)));
     }
 
     /**
@@ -145,6 +153,12 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
                 PermissionChangedEvent.ChangeType.PERM_GROUP_UPDATE, 
                 dto.getId()
         ));
+
+        // 发布操作日志事件
+        EventBus.get().callEvent(UserOperationEvent.withRawData("update", "perm_group",
+                "更新了权限组「" + dto.getGroupName() + "」",
+                String.valueOf(dto.getId()), dto.getGroupName(),
+                JsonUtils.toJsonString(dto)));
     }
 
     /**
@@ -169,6 +183,13 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
                 PermissionChangedEvent.ChangeType.PERM_GROUP_DELETE, 
                 id
         ));
+
+        // 发布操作日志事件
+        SysPermGroup group = sysPermGroupMapper.selectById(id);
+        String groupName = group != null ? group.getGroupName() : String.valueOf(id);
+        EventBus.get().callEvent(UserOperationEvent.of("delete", "perm_group",
+                "删除了权限组「" + groupName + "」",
+                String.valueOf(id), groupName));
     }
 
     /**
@@ -198,6 +219,11 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
                     id
             ));
         }
+
+        // 发布操作日志事件
+        EventBus.get().callEvent(UserOperationEvent.of("delete", "perm_group",
+                "批量删除了 " + ids.size() + " 个权限组",
+                ids.toString(), null));
     }
 
 }
