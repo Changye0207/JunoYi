@@ -11,7 +11,7 @@
  Target Server Version : 80404 (8.4.4)
  File Encoding         : 65001
 
- Date: 03/02/2026 23:26:23
+ Date: 05/02/2026 23:01:13
 */
 
 SET NAMES utf8mb4;
@@ -43,13 +43,12 @@ CREATE TABLE `sys_auth_log` (
   KEY `idx_login_time` (`login_time`),
   KEY `idx_status` (`status`),
   KEY `idx_login_ip` (`login_ip`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统登录日志表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统登录日志表';
 
 -- ----------------------------
 -- Records of sys_auth_log
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (1, 1, 'super_admin', '超级管理员', '127.0.0.1', '内网IP', '46d60cfea18c4ec4bc64bfc8091a8229', '超级管理员', 'password', 'Chrome 143', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-03 22:54:14');
 COMMIT;
 
 -- ----------------------------
@@ -231,12 +230,13 @@ CREATE TABLE `sys_oper_log` (
   KEY `idx_level` (`level`),
   KEY `idx_target_id` (`target_id`),
   KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='操作日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='操作日志表';
 
 -- ----------------------------
 -- Records of sys_oper_log
 -- ----------------------------
 BEGIN;
+INSERT INTO `sys_oper_log` (`id`, `level`, `action`, `module`, `user_id`, `user_name`, `nick_name`, `message`, `target_id`, `target_name`, `path`, `method`, `ip`, `raw_data`, `create_time`) VALUES (1, 'info', 'update', 'perm_group', 1, 'super_admin', '超级管理员', '更新了权限组「默认管理权限组」', '2', '默认管理权限组', '/system/permission', 'PUT', '127.0.0.1', '{\"id\":2,\"groupCode\":\"default_admin\",\"groupName\":\"默认管理权限组\",\"parentId\":1,\"priority\":100,\"description\":\"系统所有管理用户的基础权限\",\"status\":1,\"permissions\":[\"system.ui.user.button.dept\",\"system.ui.cache.button.detail\",\"system.ui.user.button.edit\",\"system.ui.user.view\",\"system.ui.auth-log.view\",\"system.ui.oper-log.view\",\"system.ui.permission.pool.button.add\",\"system.ui.permission.view\",\"system.ui.permission.button.edit\",\"system.ui.auth-log.button.clear\",\"system.ui.cache.button.clear\",\"system.ui.menu.button.edit\",\"system.ui.dept.button.permission\",\"system.ui.role.view\",\"system.ui.menu.button.add\",\"system.ui.session.button.logout\",\"system.ui.auth-log.button.delete\",\"system.ui.session.view\",\"system.ui.role.button.permission\",\"system.ui.dept.button.add\",\"system.ui.cache.view\",\"system.ui.user.button.individual-perm\",\"system.ui.role.button.delete\",\"system.ui.dept.button.edit\",\"system.ui.cache.button.delete\",\"system.ui.permission.pool.view\",\"system.ui.user.button.permission\",\"system.ui.role.button.edit\",\"system.ui.dept.button.delete\",\"system.ui.oper-log.button.clear\",\"system.ui.user.button.role\",\"system.ui.dept.view\",\"system.ui.permission.button.add\",\"system.ui.user.button.delete\",\"system.ui.permission.button.delete\",\"system.ui.user.button.add\",\"system.ui.menu.view\",\"system.ui.menu.button.delete\",\"system.ui.permission.pool.button.delete\",\"system.ui.role.button.add\",\"system.ui.oper-log.button.delete\",\"system.ui.permission-pool.button.status\"]}', '2026-02-05 23:00:29');
 COMMIT;
 
 -- ----------------------------
@@ -265,7 +265,7 @@ CREATE TABLE `sys_perm_group` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `sys_perm_group` (`id`, `group_code`, `group_name`, `parent_id`, `priority`, `description`, `status`, `permissions`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, 'default_user', '默认用户权限组', NULL, 10, '系统所有登录用户的基础权限', 1, '[]', 'system', '2025-12-29 21:02:33', 'super_admin', '2026-01-08 19:38:18', '默认用户权限组');
-INSERT INTO `sys_perm_group` (`id`, `group_code`, `group_name`, `parent_id`, `priority`, `description`, `status`, `permissions`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, 'default_admin', '默认管理权限组', 1, 100, '系统所有管理用户的基础权限', 1, '[\"system.ui.user.button.dept\",\"system.ui.cache.button.detail\",\"system.ui.user.button.edit\",\"system.ui.user.view\",\"system.ui.auth-log.view\",\"system.ui.permission.pool.button.add\",\"system.ui.permission.view\",\"system.ui.permission.button.edit\",\"system.ui.auth-log.button.clear\",\"system.ui.cache.button.clear\",\"system.ui.menu.button.edit\",\"system.ui.dept.button.permission\",\"system.ui.role.view\",\"system.ui.menu.button.add\",\"system.ui.session.button.logout\",\"system.ui.auth-log.button.delete\",\"system.ui.session.view\",\"system.ui.role.button.permission\",\"system.ui.dept.button.add\",\"system.ui.cache.view\",\"system.ui.user.button.individual-perm\",\"system.ui.role.button.delete\",\"system.ui.dept.button.edit\",\"system.ui.cache.button.delete\",\"system.ui.permission.pool.view\",\"system.ui.user.button.permission\",\"system.ui.role.button.edit\",\"system.ui.dept.button.delete\",\"system.ui.user.button.role\",\"system.ui.dept.view\",\"system.ui.permission.button.add\",\"system.ui.user.button.delete\",\"system.ui.permission.button.delete\",\"system.ui.user.button.add\",\"system.ui.menu.view\",\"system.ui.menu.button.delete\",\"system.ui.permission.pool.button.delete\",\"system.ui.role.button.add\",\"system.ui.permission-pool.button.status\"]', 'system', '2025-12-29 21:04:58', 'super_admin', '2026-02-03 19:50:33', '默认管理权限组');
+INSERT INTO `sys_perm_group` (`id`, `group_code`, `group_name`, `parent_id`, `priority`, `description`, `status`, `permissions`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, 'default_admin', '默认管理权限组', 1, 100, '系统所有管理用户的基础权限', 1, '[\"system.ui.user.button.dept\",\"system.ui.cache.button.detail\",\"system.ui.user.button.edit\",\"system.ui.user.view\",\"system.ui.auth-log.view\",\"system.ui.oper-log.view\",\"system.ui.permission.pool.button.add\",\"system.ui.permission.view\",\"system.ui.permission.button.edit\",\"system.ui.auth-log.button.clear\",\"system.ui.cache.button.clear\",\"system.ui.menu.button.edit\",\"system.ui.dept.button.permission\",\"system.ui.role.view\",\"system.ui.menu.button.add\",\"system.ui.session.button.logout\",\"system.ui.auth-log.button.delete\",\"system.ui.session.view\",\"system.ui.role.button.permission\",\"system.ui.dept.button.add\",\"system.ui.cache.view\",\"system.ui.user.button.individual-perm\",\"system.ui.role.button.delete\",\"system.ui.dept.button.edit\",\"system.ui.cache.button.delete\",\"system.ui.permission.pool.view\",\"system.ui.user.button.permission\",\"system.ui.role.button.edit\",\"system.ui.dept.button.delete\",\"system.ui.oper-log.button.clear\",\"system.ui.user.button.role\",\"system.ui.dept.view\",\"system.ui.permission.button.add\",\"system.ui.user.button.delete\",\"system.ui.permission.button.delete\",\"system.ui.user.button.add\",\"system.ui.menu.view\",\"system.ui.menu.button.delete\",\"system.ui.permission.pool.button.delete\",\"system.ui.role.button.add\",\"system.ui.oper-log.button.delete\",\"system.ui.permission-pool.button.status\"]', 'system', '2025-12-29 21:04:58', 'super_admin', '2026-02-05 23:00:29', '默认管理权限组');
 COMMIT;
 
 -- ----------------------------
@@ -283,7 +283,7 @@ CREATE TABLE `sys_permission` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统权限池（开发期与运维期的权限注册表）';
+) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统权限池（开发期与运维期的权限注册表）';
 
 -- ----------------------------
 -- Records of sys_permission
@@ -390,6 +390,9 @@ INSERT INTO `sys_permission` (`id`, `permission`, `description`, `status`, `crea
 INSERT INTO `sys_permission` (`id`, `permission`, `description`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (100, 'system.api.auth-log.get.list', '系统日志管理登录日志获取日志列表接口权限', 1, 'super_admin', '2026-02-03 19:45:59', NULL, NULL, NULL);
 INSERT INTO `sys_permission` (`id`, `permission`, `description`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (101, 'system.api.auth-log.del', '系统日志管理登录日志删除接口权限', 1, 'super_admin', '2026-02-03 19:47:02', NULL, NULL, NULL);
 INSERT INTO `sys_permission` (`id`, `permission`, `description`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (102, 'system.api.auth-log.clear', '系统日志管理登录日志清理接口权限', 1, 'super_admin', '2026-02-03 19:47:35', NULL, NULL, NULL);
+INSERT INTO `sys_permission` (`id`, `permission`, `description`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (103, 'system.ui.oper-log.view', '系统日志管理操作日志页面接口权限', 1, 'super_admin', '2026-02-05 22:57:51', NULL, NULL, NULL);
+INSERT INTO `sys_permission` (`id`, `permission`, `description`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (104, 'system.ui.oper-log.button.delete', '系统日志管理操作日志删除按钮权限', 1, 'super_admin', '2026-02-05 22:58:21', NULL, NULL, NULL);
+INSERT INTO `sys_permission` (`id`, `permission`, `description`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (105, 'system.ui.oper-log.button.clear', '系统日志管理操作日志清空按钮权限', 1, 'super_admin', '2026-02-05 22:59:39', NULL, NULL, NULL);
 COMMIT;
 
 -- ----------------------------
@@ -479,7 +482,7 @@ BEGIN;
 INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, 'super_admin', '超级管理员', NULL, 'exmple@junoyi.com', '18899887871', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'system', '2025-12-05 08:13:00', 'super_admin', '2026-01-06 15:25:13', '');
 INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, 'admin', '用户管理员', NULL, 'admin@junoyi.com', '18899887872', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'super_admin', '2025-12-26 08:22:32', 'super_admin', '2026-01-02 22:08:40', '');
 INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (3, 'user1', '钧逸用户1', NULL, 'user1@junoyi.com', '18899887873', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'admin', '2025-12-26 09:02:10', 'admin', '2025-12-26 09:02:15', '钧逸用户');
-INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (4, 'user2', '钧逸用户2', NULL, 'user2@junoyi.com', '18822334454', '0', '2QEBgS3NRYr0BK1IDLbJBeu7N+4a/Dmqt+uk/OfLZKE=', '+/gh5ppNj92gnzr7nK4HpQ==', 1, 0, NULL, 'super_admin', '2026-01-02 20:54:39', 'super_admin', '2026-01-03 05:03:28', '');
+INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (4, 'user2', '钧逸用户2', NULL, 'user2@junoyi.com', '18822334459', '0', '2QEBgS3NRYr0BK1IDLbJBeu7N+4a/Dmqt+uk/OfLZKE=', '+/gh5ppNj92gnzr7nK4HpQ==', 1, 0, NULL, 'super_admin', '2026-01-02 20:54:39', 'super_admin', '2026-02-05 04:02:44', '');
 INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (5, 'test1', '测试用户1', NULL, 'test1@junoyi.com', '18866776675', '0', '3ljua1Xq5gFzwIZvOnZFzM0z0q03DsoHCjSyjZ9CUm0=', 'bickL1fDbw3dlFzWEOVahw==', 0, 1, NULL, 'super_admin', '2026-01-03 00:08:38', 'super_admin', '2026-01-03 00:11:02', '测试1');
 INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (6, 'test2', '测试用户2', NULL, 'test2@junoyi.com', '19988776676', '1', '4E2Iup83NXU8WbQaV9VKxzqFt66YkhKix1EkCGLR+Gs=', 'b6+tSxzDuUH4iVzpKuelxg==', 0, 1, NULL, 'super_admin', '2026-01-03 00:09:10', 'super_admin', '2026-01-03 00:11:09', '测试2');
 INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (7, 'test3', '测试用户3', NULL, 'test3@junoyi.com', '18877887676', '0', 'v16QwJwNASg+2zXHOZsD2jo8UewWi0A6xfj9+3TCbgg=', 'Pa8+xWPBWZRbjbn/1Vw7pg==', 0, 1, NULL, 'super_admin', '2026-01-03 00:09:48', 'super_admin', '2026-01-03 00:11:09', '测试用户3');
