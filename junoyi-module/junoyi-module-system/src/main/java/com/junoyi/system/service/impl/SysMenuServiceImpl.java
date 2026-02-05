@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.framework.event.core.EventBus;
+import com.junoyi.system.event.UserOperationEvent;
 import com.junoyi.system.exception.MenuHasChildrenException;
 import com.junoyi.framework.core.utils.DateUtils;
 import com.junoyi.framework.core.utils.StringUtils;
@@ -119,6 +121,12 @@ public class SysMenuServiceImpl implements ISysMenuService {
             menu.setStatus(SysMenuStatus.ENABLE.getCode());
         menu.setCreateTime(DateUtils.getNowDate());
         sysMenuMapper.insert(menu);
+
+        // 发布操作日志事件
+        EventBus.get().callEvent(UserOperationEvent.of("create", "menu",
+                "创建了菜单「" + menu.getTitle() + "」",
+                String.valueOf(menu.getId()), menu.getTitle()));
+
         return menu.getId();
     }
 
@@ -134,7 +142,16 @@ public class SysMenuServiceImpl implements ISysMenuService {
             return false;
         SysMenu menu = sysMenuConverter.toEntity(menuDTO);
         menu.setUpdateTime(DateUtils.getNowDate());
-        return sysMenuMapper.updateById(menu) > 0;
+        boolean result = sysMenuMapper.updateById(menu) > 0;
+
+        // 发布操作日志事件
+        if (result) {
+            EventBus.get().callEvent(UserOperationEvent.of("update", "menu",
+                    "更新了菜单「" + menuDTO.getTitle() + "」",
+                    String.valueOf(menuDTO.getId()), menuDTO.getTitle()));
+        }
+
+        return result;
     }
 
     /**
@@ -152,7 +169,21 @@ public class SysMenuServiceImpl implements ISysMenuService {
         );
         if (childCount > 0)
             throw new MenuHasChildrenException("存在子菜单，无法删除");
-        return sysMenuMapper.deleteById(id) > 0;
+
+        // 获取菜单信息用于日志
+        SysMenu menu = sysMenuMapper.selectById(id);
+        String menuTitle = menu != null ? menu.getTitle() : String.valueOf(id);
+
+        boolean result = sysMenuMapper.deleteById(id) > 0;
+
+        // 发布操作日志事件
+        if (result) {
+            EventBus.get().callEvent(UserOperationEvent.of("delete", "menu",
+                    "删除了菜单「" + menuTitle + "」",
+                    String.valueOf(id), menuTitle));
+        }
+
+        return result;
     }
 
     /**
@@ -172,7 +203,17 @@ public class SysMenuServiceImpl implements ISysMenuService {
         );
         if (childCount > 0)
             throw new MenuHasChildrenException("存在子菜单，无法删除");
-        return sysMenuMapper.deleteBatchIds(ids) > 0;
+
+        boolean result = sysMenuMapper.deleteBatchIds(ids) > 0;
+
+        // 发布操作日志事件
+        if (result) {
+            EventBus.get().callEvent(UserOperationEvent.of("delete", "menu",
+                    "批量删除了 " + ids.size() + " 个菜单",
+                    ids.toString(), null));
+        }
+
+        return result;
     }
 
     /**
