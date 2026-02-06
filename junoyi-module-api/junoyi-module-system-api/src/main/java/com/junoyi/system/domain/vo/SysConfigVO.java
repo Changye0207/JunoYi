@@ -56,7 +56,7 @@ public class SysConfigVO {
      * 系统内置（Y是 N否）
      */
     @JsonProperty("isSystem")
-    private Integer isSystem;
+    private String isSystem;
 
     /**
      * 状态（0正常 1停用）

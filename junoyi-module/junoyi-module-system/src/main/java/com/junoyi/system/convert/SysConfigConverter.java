@@ -16,17 +16,17 @@ import org.mapstruct.Mapping;
 public interface SysConfigConverter extends BaseConverter<SysConfigDTO, SysConfig, SysConfigVO> {
 
     /**
-     * PO转VO，将isSystem(0/1)转换为configType(Y/N)
+     * PO转VO，将isSystem(0/1)转换为isSystem(Y/N)
      */
     @Override
-    @Mapping(target = "configType", expression = "java(entity.getIsSystem() != null && entity.getIsSystem() == 1 ? \"Y\" : \"N\")")
+    @Mapping(target = "isSystem", expression = "java(entity.getIsSystem() != null && entity.getIsSystem() == 1 ? \"Y\" : \"N\")")
     SysConfigVO toVo(SysConfig entity);
 
     /**
-     * DTO转PO，将configType(Y/N)转换为isSystem(0/1)
+     * DTO转PO，将isSystem(Y/N)转换为isSystem(0/1)
      */
     @Override
-    @Mapping(target = "isSystem", expression = "java(\"Y\".equals(dto.getConfigType()) ? 1 : 0)")
+    @Mapping(target = "isSystem", expression = "java(\"Y\".equals(dto.getIsSystem()) ? 1 : 0)")
     @Mapping(target = "createBy", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
@@ -34,7 +34,7 @@ public interface SysConfigConverter extends BaseConverter<SysConfigDTO, SysConfi
     SysConfig toEntity(SysConfigDTO dto);
 
     /**
-     * DTO转VO，将isSystem直接传递
+     * DTO转VO，直接映射
      */
     @Override
     @Mapping(target = "createTime", ignore = true)
@@ -42,10 +42,10 @@ public interface SysConfigConverter extends BaseConverter<SysConfigDTO, SysConfi
     SysConfigVO dtoToVo(SysConfigDTO dto);
 
     /**
-     * 更新实体，将configType(Y/N)转换为isSystem(0/1)
+     * 更新实体，将isSystem(Y/N)转换为isSystem(0/1)
      */
     @Override
-    @Mapping(target = "isSystem", expression = "java(\"Y\".equals(dto.getConfigType()) ? 1 : 0)")
+    @Mapping(target = "isSystem", expression = "java(\"Y\".equals(dto.getIsSystem()) ? 1 : 0)")
     @Mapping(target = "createBy", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
