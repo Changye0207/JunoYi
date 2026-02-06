@@ -47,7 +47,9 @@ public class SysConfigServiceImpl implements ISysConfigService {
         LambdaQueryWrapper<SysConfig> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(StringUtils.isNotBlank(queryDTO.getConfigName()), SysConfig::getSettingName, queryDTO.getConfigName())
                 .like(StringUtils.isNotBlank(queryDTO.getConfigKey()), SysConfig::getSettingKey, queryDTO.getConfigKey())
-                .eq(StringUtils.isNotBlank(queryDTO.getConfigType()), SysConfig::getIsSystem, "Y".equals(queryDTO.getConfigType()) ? 1 : 0)
+                .eq(StringUtils.isNotBlank(queryDTO.getSettingType()), SysConfig::getSettingType, queryDTO.getSettingType())
+                .eq(StringUtils.isNotBlank(queryDTO.getSettingGroup()), SysConfig::getSettingGroup, queryDTO.getSettingGroup())
+                .eq(queryDTO.getIsSystem() != null, SysConfig::getIsSystem, queryDTO.getIsSystem())
                 .orderByAsc(SysConfig::getSort)
                 .orderByDesc(SysConfig::getCreateTime);
 

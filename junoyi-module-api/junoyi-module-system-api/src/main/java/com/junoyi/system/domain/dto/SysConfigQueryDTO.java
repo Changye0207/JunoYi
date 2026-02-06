@@ -24,7 +24,17 @@ public class SysConfigQueryDTO extends PageQuery {
     private String configKey;
 
     /**
-     * 系统内置（Y是 N否）
+     * 参数类型（text/number/boolean/json）
      */
-    private String configType;
+    private String settingType;
+
+    /**
+     * 参数分组
+     */
+    private String settingGroup;
+
+    /**
+     * 系统内置（1是 0否）
+     */
+    private Integer isSystem;
 }
