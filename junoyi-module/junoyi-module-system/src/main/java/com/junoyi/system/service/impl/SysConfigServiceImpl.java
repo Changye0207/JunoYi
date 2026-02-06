@@ -36,6 +36,12 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
     private static final String CACHE_KEY_PREFIX = "sys:config:";
 
+    /**
+     * 分页查询系统参数配置列表
+     *
+     * @param queryDTO 查询条件DTO
+     * @return 分页结果对象，包含VO列表、总数、当前页码、每页大小
+     */
     @Override
     public PageResult<SysConfigVO> getConfigList(SysConfigQueryDTO queryDTO) {
         LambdaQueryWrapper<SysConfig> wrapper = new LambdaQueryWrapper<>();
@@ -47,17 +53,29 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
         Page<SysConfig> page = new Page<>(queryDTO.getCurrent(), queryDTO.getSize());
         Page<SysConfig> resultPage = sysConfigMapper.selectPage(page, wrapper);
-        
+
         List<SysConfigVO> voList = sysConfigConverter.toVoList(resultPage.getRecords());
         return PageResult.of(voList, resultPage.getTotal(), (int) resultPage.getCurrent(), (int) resultPage.getSize());
     }
 
+    /**
+     * 根据ID获取系统参数配置信息
+     *
+     * @param id 参数配置ID
+     * @return 系统参数配置VO对象，如果不存在则返回null
+     */
     @Override
     public SysConfigVO getConfigById(Long id) {
         SysConfig config = sysConfigMapper.selectById(id);
         return config != null ? sysConfigConverter.toVo(config) : null;
     }
 
+    /**
+     * 根据参数键名获取参数值
+     *
+     * @param configKey 参数键名
+     * @return 参数值，如果不存在则返回null
+     */
     @Override
     public String getConfigByKey(String configKey) {
         // 先从缓存获取
@@ -83,6 +101,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
         return null;
     }
 
+    /**
+     * 新增系统参数配置
+     *
+     * @param configDTO 系统参数配置DTO
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addConfig(SysConfigDTO configDTO) {
@@ -95,12 +118,18 @@ public class SysConfigServiceImpl implements ISysConfigService {
         }
 
         SysConfig config = sysConfigConverter.toEntity(configDTO);
+
+        // 设置默认值
+        if (config.getIsSystem() == null) {
+            config.setIsSystem(0); // 默认非系统内置参数
+        }
         if (config.getStatus() == null) {
             config.setStatus(0); // 默认正常状态
         }
         if (config.getSort() == null) {
             config.setSort(0); // 默认排序
         }
+
         sysConfigMapper.insert(config);
 
         // 清除缓存
@@ -108,6 +137,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
         log.info("Config", "添加系统参数: {}", config.getSettingKey());
     }
 
+    /**
+     * 更新系统参数配置
+     *
+     * @param configDTO 系统参数配置DTO
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateConfig(SysConfigDTO configDTO) {
@@ -124,8 +158,9 @@ public class SysConfigServiceImpl implements ISysConfigService {
         // 转换DTO到实体
         SysConfig config = sysConfigConverter.toEntity(configDTO);
         config.setSettingId(configDTO.getSettingId());
-        
+
         // 保留原有的字段值（DTO中没有的字段）
+        config.setIsSystem(oldConfig.getIsSystem()); // 不允许修改是否为系统内置
         if (config.getSettingType() == null) {
             config.setSettingType(oldConfig.getSettingType());
         }
@@ -138,7 +173,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
         if (config.getStatus() == null) {
             config.setStatus(oldConfig.getStatus());
         }
-        
+
         sysConfigMapper.updateById(config);
 
         // 清除缓存
@@ -150,6 +185,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
         log.info("Config", "更新系统参数: {}", config.getSettingKey());
     }
 
+    /**
+     * 删除系统参数配置
+     *
+     * @param id 系统参数配置ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteConfig(Long id) {
@@ -170,6 +210,11 @@ public class SysConfigServiceImpl implements ISysConfigService {
         log.info("Config", "删除系统参数: {}", config.getSettingKey());
     }
 
+    /**
+     * 批量删除系统参数配置
+     *
+     * @param ids 系统参数配置ID列表
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteConfigBatch(List<Long> ids) {
@@ -195,6 +240,9 @@ public class SysConfigServiceImpl implements ISysConfigService {
         log.info("Config", "批量删除系统参数: {} 条", ids.size());
     }
 
+    /**
+     * 刷新系统参数缓存
+     */
     @Override
     public void refreshCache() {
         // 清除所有配置缓存
@@ -204,6 +252,8 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
     /**
      * 清除指定键名的缓存
+     *
+     * @param configKey 配置键名
      */
     private void clearCache(String configKey) {
         String cacheKey = CACHE_KEY_PREFIX + configKey;
