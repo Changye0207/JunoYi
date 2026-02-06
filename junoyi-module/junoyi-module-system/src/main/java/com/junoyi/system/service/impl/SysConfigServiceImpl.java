@@ -3,6 +3,7 @@ package com.junoyi.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.framework.core.utils.DateUtils;
 import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.event.core.EventBus;
 import com.junoyi.framework.log.core.JunoYiLog;
@@ -143,18 +144,16 @@ public class SysConfigServiceImpl implements ISysConfigService {
         SysConfig config = sysConfigConverter.toEntity(configDTO);
 
         // 设置默认值
-        if (config.getIsSystem() == null) {
-            config.setIsSystem(0); // 默认非系统内置参数
-        }
-        if (config.getStatus() == null) {
-            config.setStatus(0); // 默认正常状态
-        }
-        if (config.getSort() == null) {
-            config.setSort(0); // 默认排序
-        }
-        if (config.getConfigType() == null) {
-            config.setConfigType(ConfigType.TEXT.getCode()); // 默认文本类型
-        }
+        if (config.getIsSystem() == null)
+            config.setIsSystem(0);
+        if (config.getStatus() == null)
+            config.setStatus(0);
+        if (config.getSort() == null)
+            config.setSort(0);
+        if (config.getConfigType() == null)
+            config.setConfigType(ConfigType.TEXT.getCode());
+        config.setCreateBy(SecurityUtils.getUserName());
+        config.setCreateTime(DateUtils.getNowDate());
 
         sysConfigMapper.insert(config);
 
@@ -208,15 +207,14 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
         // 保留原有的字段值（DTO中没有的字段）
         config.setIsSystem(oldConfig.getIsSystem()); // 不允许修改是否为系统内置
-        if (config.getConfigType() == null) {
+        if (config.getConfigType() == null)
             config.setConfigType(oldConfig.getConfigType());
-        }
-        if (config.getSort() == null) {
+        if (config.getSort() == null)
             config.setSort(oldConfig.getSort());
-        }
-        if (config.getStatus() == null) {
+        if (config.getStatus() == null)
             config.setStatus(oldConfig.getStatus());
-        }
+        config.setUpdateBy(SecurityUtils.getUserName());
+        config.setUpdateTime(DateUtils.getNowDate());
 
         sysConfigMapper.updateById(config);
 
