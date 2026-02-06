@@ -17,31 +17,6 @@ public class JunoYiProperties {
      */
     private String version;
 
-    /**
-     * 服务器名称
-     */
-    private String name;
-
-    /**
-     * 版权年号
-     */
-    private String copyrightYear;
-
-    /**
-     * 版权归属
-     */
-    private String copyright;
-
-    /**
-     * 网站备案号
-     */
-    private String registration;
-
-    /**
-     * 品牌logo
-     */
-    private String logo;
-
     public String getVersion() {
         return version;
     }
@@ -49,46 +24,4 @@ public class JunoYiProperties {
     public void setVersion(String version) {
         this.version = version;
     }
-
-    public String getName(){
-        return name;
-    }
-
-    public void setName(String name){
-        this.name = name;
-    }
-
-    public String getCopyrightYear(){
-        return copyrightYear;
-    }
-
-    public void setCopyrightYear(String copyrightYear){
-        this.copyrightYear = copyrightYear;
-    }
-
-    public String getCopyright(){
-        return copyright;
-    }
-
-    public void setCopyright(String copyright){
-        this.copyright = copyright;
-    }
-
-    public String getRegistration(){
-        return registration;
-    }
-
-    public void setRegistration(String registration){
-        this.registration = registration;
-    }
-
-    public String getLogo(){
-        return logo;
-    }
-
-    public void setLogo(String logo){
-        this.logo = logo;
-    }
-
-
 }

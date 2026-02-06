@@ -11,15 +11,6 @@
 junoyi:
   # 框架版本号
   version: 0.4.5-alpha
-  # 框架名称（可选）
-  name: JunoYi
-  # 版权年份（可选）
-  copyrightYear: 2025
-  copyright: JunoYi钧逸
-  # 网站备案号
-  registration: 皖ICP备xxxxxxxx
-  # LOGO 图片文件（在resources/public/目录中存放，这里指定文件名）
-  logo: LOGO.png
 
   # ==================== 日志配置 ====================
   log:

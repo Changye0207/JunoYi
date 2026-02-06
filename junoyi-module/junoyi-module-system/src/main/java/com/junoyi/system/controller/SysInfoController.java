@@ -3,8 +3,10 @@ package com.junoyi.system.controller;
 import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
-import com.junoyi.framework.core.properties.JunoYiProperties;
 import com.junoyi.system.domain.vo.SystemInfoVO;
+import com.junoyi.system.service.ISysConfigService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,27 +24,28 @@ import java.net.URLConnection;
  *
  * @author Fan
  */
+@Tag(name = "系统信息管理")
 @RestController
 @RequestMapping("/system/info")
 @RequiredArgsConstructor
 public class SysInfoController {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SysInfoController.class);
-
-    private final JunoYiProperties junoYiProperties;
+    private final ISysConfigService configService;
 
     /**
-     * 获取系统信息
+     * 获取系统信息（从配置中读取）
      */
+    @Operation(summary = "获取系统信息")
     @GetMapping
-    public R<SystemInfoVO> getSystemInfo(){
+    public R<SystemInfoVO> getSystemInfo() {
         SystemInfoVO systemInfoVo = SystemInfoVO.builder()
-                .name(junoYiProperties.getName())
-                .version(junoYiProperties.getVersion())
-                .copyrightYear(junoYiProperties.getCopyrightYear())
-                .copyright(junoYiProperties.getCopyright())
-                .registration(junoYiProperties.getRegistration())
-                .logo("/system/info/logo")
+                .name(configService.getConfigByKey("sys.system.name"))
+                .version(configService.getConfigByKey("sys.system.version"))
+                .copyrightYear(configService.getConfigByKey("sys.system.copyrightYear"))
+                .copyright(configService.getConfigByKey("sys.system.copyright"))
+                .registration(configService.getConfigByKey("sys.system.registration"))
+                .logo(configService.getConfigByKey("sys.system.logo"))
                 .build();
         return R.ok(systemInfoVo);
     }
@@ -51,20 +54,29 @@ public class SysInfoController {
      * 获取LOGO图片
      * 直接将图片响应
      */
+    @Operation(summary = "获取系统Logo")
     @GetMapping("/logo")
     public ResponseEntity<byte[]> getLogo() {
         try {
-            ClassPathResource logoResource = new ClassPathResource("public/" + junoYiProperties.getLogo());
+            String logoPath = configService.getConfigByKey("sys.system.logo");
+            if (logoPath == null || logoPath.isEmpty()) {
+                log.error("Logo path not configured");
+                return ResponseEntity.notFound().build();
+            }
+
+            // 如果是相对路径，从 classpath 读取
+            ClassPathResource logoResource = new ClassPathResource("public/" + logoPath);
             if (!logoResource.exists()) {
-                log.error("Logo file does not exist: public/" + junoYiProperties.getLogo());
+                log.error("Logo file does not exist: public/{}", logoPath);
                 return ResponseEntity.notFound().build();
             }
 
             byte[] bytes = StreamUtils.copyToByteArray(logoResource.getInputStream());
 
-            String contentType = URLConnection.guessContentTypeFromName(junoYiProperties.getLogo());
-            if (contentType == null)
+            String contentType = URLConnection.guessContentTypeFromName(logoPath);
+            if (contentType == null) {
                 contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            }
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
