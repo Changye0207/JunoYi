@@ -50,11 +50,6 @@ public class SysConfigDTO {
     private String configType;
 
     /**
-     * 参数分组
-     */
-    private String configGroup;
-
-    /**
      * 排序
      */
     @Min(value = 0, message = "排序值不能小于0")

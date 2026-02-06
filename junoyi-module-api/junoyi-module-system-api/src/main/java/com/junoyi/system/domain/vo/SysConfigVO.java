@@ -43,11 +43,6 @@ public class SysConfigVO {
     private String configType;
 
     /**
-     * 参数分组
-     */
-    private String configGroup;
-
-    /**
      * 排序
      */
     private Integer sort;

@@ -1,9 +1,7 @@
 package com.junoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.event.core.EventBus;
@@ -16,14 +14,12 @@ import com.junoyi.system.domain.dto.SysConfigDTO;
 import com.junoyi.system.domain.dto.SysConfigQueryDTO;
 import com.junoyi.system.domain.po.SysConfig;
 import com.junoyi.system.domain.vo.SysConfigVO;
-import com.junoyi.system.enums.ConfigGroup;
 import com.junoyi.system.enums.ConfigType;
 import com.junoyi.system.event.ConfigChangedEvent;
 import com.junoyi.system.mapper.SysConfigMapper;
 import com.junoyi.system.service.ISysConfigService;
 import com.junoyi.system.util.ConfigValueValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +54,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
         wrapper.like(StringUtils.isNotBlank(queryDTO.getConfigName()), SysConfig::getConfigName, queryDTO.getConfigName())
                 .like(StringUtils.isNotBlank(queryDTO.getConfigKey()), SysConfig::getConfigKey, queryDTO.getConfigKey())
                 .eq(StringUtils.isNotBlank(queryDTO.getConfigType()), SysConfig::getConfigType, queryDTO.getConfigType())
-                .eq(StringUtils.isNotBlank(queryDTO.getConfigGroup()), SysConfig::getConfigGroup, queryDTO.getConfigGroup())
                 .eq(queryDTO.getIsSystem() != null, SysConfig::getIsSystem, queryDTO.getIsSystem())
                 .orderByAsc(SysConfig::getSort)
                 .orderByDesc(SysConfig::getCreateTime);
@@ -135,12 +130,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
             throw new IllegalArgumentException("不支持的配置类型: " + configType);
         }
 
-        // 验证配置分组
-        String configGroup = configDTO.getConfigGroup();
-        if (StringUtils.isNotBlank(configGroup) && !ConfigGroup.isValid(configGroup)) {
-            throw new IllegalArgumentException("不支持的配置分组: " + configGroup);
-        }
-
         // 验证配置值
         ConfigValueValidator.validate(
                 configType != null ? configType : ConfigType.TEXT.getCode(),
@@ -161,9 +150,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
         }
         if (config.getConfigType() == null) {
             config.setConfigType(ConfigType.TEXT.getCode()); // 默认文本类型
-        }
-        if (config.getConfigGroup() == null) {
-            config.setConfigGroup(ConfigGroup.DEFAULT.getCode()); // 默认分组
         }
 
         sysConfigMapper.insert(config);
@@ -206,12 +192,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
             throw new IllegalArgumentException("不支持的配置类型: " + configType);
         }
 
-        // 验证配置分组
-        String configGroup = configDTO.getConfigGroup();
-        if (StringUtils.isNotBlank(configGroup) && !ConfigGroup.isValid(configGroup)) {
-            throw new IllegalArgumentException("不支持的配置分组: " + configGroup);
-        }
-
         // 验证配置值
         ConfigValueValidator.validate(
                 configType != null ? configType : oldConfig.getConfigType(),
@@ -226,9 +206,6 @@ public class SysConfigServiceImpl implements ISysConfigService {
         config.setIsSystem(oldConfig.getIsSystem()); // 不允许修改是否为系统内置
         if (config.getConfigType() == null) {
             config.setConfigType(oldConfig.getConfigType());
-        }
-        if (config.getConfigGroup() == null) {
-            config.setConfigGroup(oldConfig.getConfigGroup());
         }
         if (config.getSort() == null) {
             config.setSort(oldConfig.getSort());

@@ -44,11 +44,6 @@ public class SysConfig extends BaseEntity {
     private String configType;
 
     /**
-     * 配置分组
-     */
-    private String configGroup;
-
-    /**
      * 排序
      */
     private Integer sort;

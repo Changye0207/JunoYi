@@ -127,4 +127,12 @@ public class SysConfigController extends BaseController {
         sysConfigService.refreshCache();
         return R.ok();
     }
+
+    /**
+     * 获取系统应用配置
+     */
+    @GetMapping("/app")
+    public R<List<SysConfigVO>> getSystemAppConfig(){
+        return R.ok();
+    }
 }

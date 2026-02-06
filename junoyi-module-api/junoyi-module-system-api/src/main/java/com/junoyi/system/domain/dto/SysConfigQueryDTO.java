@@ -29,11 +29,6 @@ public class SysConfigQueryDTO extends PageQuery {
     private String configType;
 
     /**
-     * 参数分组
-     */
-    private String configGroup;
-
-    /**
      * 系统内置（1是 0否）
      */
     private Integer isSystem;
