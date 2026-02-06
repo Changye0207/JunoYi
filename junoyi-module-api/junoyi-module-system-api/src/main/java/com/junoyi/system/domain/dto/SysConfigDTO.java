@@ -23,7 +23,7 @@ public class SysConfigDTO {
      */
     @JsonProperty("configKey")
     @NotBlank(message = "配置键名不能为空")
-    @Pattern(regexp = "^[a-z0-9.]+$", message = "配置键名只能包含小写字母、数字和点")
+    @Pattern(regexp = "^[a-zA-Z0-9.]+$", message = "配置键名只能包含字母、数字和点")
     @Size(max = 100, message = "配置键名长度不能超过100")
     private String configKey;
 
