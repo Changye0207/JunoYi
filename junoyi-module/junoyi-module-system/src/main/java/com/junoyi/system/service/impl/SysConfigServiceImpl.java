@@ -16,6 +16,10 @@ import com.junoyi.system.domain.po.SysConfig;
 import com.junoyi.system.domain.vo.SysConfigVO;
 import com.junoyi.system.enums.ConfigType;
 import com.junoyi.system.event.ConfigChangedEvent;
+import com.junoyi.system.exception.ConfigKeyExistsException;
+import com.junoyi.system.exception.ConfigNotFoundException;
+import com.junoyi.system.exception.ConfigSystemProtectedException;
+import com.junoyi.system.exception.ConfigTypeInvalidException;
 import com.junoyi.system.mapper.SysConfigMapper;
 import com.junoyi.system.service.ISysConfigService;
 import com.junoyi.system.util.ConfigValueValidator;
@@ -121,13 +125,13 @@ public class SysConfigServiceImpl implements ISysConfigService {
         wrapper.eq(SysConfig::getConfigKey, configDTO.getConfigKey());
         Long count = sysConfigMapper.selectCount(wrapper);
         if (count > 0) {
-            throw new IllegalArgumentException("参数键名已存在");
+            throw new ConfigKeyExistsException(configDTO.getConfigKey());
         }
 
         // 验证配置类型
         String configType = configDTO.getConfigType();
         if (StringUtils.isNotBlank(configType) && !ConfigType.isValid(configType)) {
-            throw new IllegalArgumentException("不支持的配置类型: " + configType);
+            throw new ConfigTypeInvalidException(configType);
         }
 
         // 验证配置值
@@ -178,18 +182,18 @@ public class SysConfigServiceImpl implements ISysConfigService {
     public void updateConfig(SysConfigDTO configDTO) {
         SysConfig oldConfig = sysConfigMapper.selectById(configDTO.getConfigId());
         if (oldConfig == null) {
-            throw new IllegalArgumentException("参数不存在");
+            throw new ConfigNotFoundException();
         }
 
         // 系统内置参数不允许修改键名
         if (oldConfig.getIsSystem() == 1 && !oldConfig.getConfigKey().equals(configDTO.getConfigKey())) {
-            throw new IllegalArgumentException("系统内置参数不允许修改键名");
+            throw new ConfigSystemProtectedException("系统内置参数不允许修改键名");
         }
 
         // 验证配置类型
         String configType = configDTO.getConfigType();
         if (StringUtils.isNotBlank(configType) && !ConfigType.isValid(configType)) {
-            throw new IllegalArgumentException("不支持的配置类型: " + configType);
+            throw new ConfigTypeInvalidException(configType);
         }
 
         // 验证配置值
@@ -243,12 +247,12 @@ public class SysConfigServiceImpl implements ISysConfigService {
     public void deleteConfig(Long id) {
         SysConfig config = sysConfigMapper.selectById(id);
         if (config == null) {
-            throw new IllegalArgumentException("参数不存在");
+            throw new ConfigNotFoundException();
         }
 
         // 系统内置参数不允许删除
         if (config.getIsSystem() == 1) {
-            throw new IllegalArgumentException("系统内置参数不允许删除");
+            throw new ConfigSystemProtectedException("系统内置参数不允许删除");
         }
 
         sysConfigMapper.deleteById(id);
@@ -281,7 +285,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
                 .eq(SysConfig::getIsSystem, 1);
         Long count = sysConfigMapper.selectCount(wrapper);
         if (count > 0) {
-            throw new IllegalArgumentException("不能删除系统内置参数");
+            throw new ConfigSystemProtectedException("不能删除系统内置参数");
         }
 
         // 获取所有配置的键名，用于清除缓存和发布事件

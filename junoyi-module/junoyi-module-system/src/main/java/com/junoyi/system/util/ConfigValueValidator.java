@@ -3,6 +3,8 @@ package com.junoyi.system.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.system.enums.ConfigType;
+import com.junoyi.system.exception.ConfigTypeInvalidException;
+import com.junoyi.system.exception.ConfigValueInvalidException;
 
 /**
  * 配置值验证工具类
@@ -18,7 +20,8 @@ public class ConfigValueValidator {
      *
      * @param configType  配置类型
      * @param configValue 配置值
-     * @throws IllegalArgumentException 如果验证失败
+     * @throws ConfigTypeInvalidException  如果配置类型无效
+     * @throws ConfigValueInvalidException 如果配置值验证失败
      */
     public static void validate(String configType, String configValue) {
         if (StringUtils.isBlank(configValue)) {
@@ -27,7 +30,7 @@ public class ConfigValueValidator {
 
         ConfigType type = ConfigType.fromCode(configType);
         if (type == null) {
-            throw new IllegalArgumentException("不支持的配置类型: " + configType);
+            throw new ConfigTypeInvalidException(configType);
         }
 
         switch (type) {
@@ -54,7 +57,7 @@ public class ConfigValueValidator {
         try {
             Double.parseDouble(value);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("配置值必须是有效的数字类型");
+            throw new ConfigValueInvalidException("配置值必须是有效的数字类型");
         }
     }
 
@@ -63,7 +66,7 @@ public class ConfigValueValidator {
      */
     private static void validateBoolean(String value) {
         if (!"true".equalsIgnoreCase(value) && !"false".equalsIgnoreCase(value)) {
-            throw new IllegalArgumentException("配置值必须是 true 或 false");
+            throw new ConfigValueInvalidException("配置值必须是 true 或 false");
         }
     }
 
@@ -74,7 +77,7 @@ public class ConfigValueValidator {
         try {
             OBJECT_MAPPER.readTree(value);
         } catch (Exception e) {
-            throw new IllegalArgumentException("配置值必须是有效的 JSON 格式: " + e.getMessage());
+            throw new ConfigValueInvalidException("配置值必须是有效的 JSON 格式: " + e.getMessage());
         }
     }
 }
