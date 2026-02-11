@@ -11,8 +11,10 @@ import com.junoyi.framework.security.utils.SecurityUtils;
 import com.junoyi.system.convert.SysDictTypeConverter;
 import com.junoyi.system.domain.dto.SysDictTypeDTO;
 import com.junoyi.system.domain.dto.SysDictTypeQueryDTO;
+import com.junoyi.system.domain.po.SysDictData;
 import com.junoyi.system.domain.po.SysDictType;
 import com.junoyi.system.domain.vo.SysDictTypeVO;
+import com.junoyi.system.mapper.SysDictDataMapper;
 import com.junoyi.system.mapper.SysDictTypeMapper;
 import com.junoyi.system.service.ISysDictTypeService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SysDictTypeServiceImpl.class);
     private final SysDictTypeMapper sysDictTypeMapper;
     private final SysDictTypeConverter sysDictTypeConverter;
+    private final SysDictDataMapper sysDictDataMapper;
 
     /**
      * 分页查询字典类型列表
@@ -145,6 +148,16 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
             throw new RuntimeException("字典类型不存在");
         }
 
+        // 先删除该类型下的所有字典数据
+        LambdaQueryWrapper<SysDictData> dataWrapper = new LambdaQueryWrapper<>();
+        dataWrapper.eq(SysDictData::getDictType, dictType.getDictType());
+        Long dataCount = sysDictDataMapper.selectCount(dataWrapper);
+        if (dataCount > 0) {
+            sysDictDataMapper.delete(dataWrapper);
+            log.info("DictType", "删除字典类型 {} 关联的字典数据: {} 条", dictType.getDictType(), dataCount);
+        }
+
+        // 再删除字典类型
         sysDictTypeMapper.deleteById(dictId);
 
         log.info("DictType", "删除字典类型: {}", dictType.getDictType());
@@ -158,7 +171,21 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteDictTypes(List<Long> dictIds) {
-        // 批量删除
+        // 获取所有字典类型
+        List<SysDictType> dictTypes = sysDictTypeMapper.selectBatchIds(dictIds);
+        
+        // 先删除所有关联的字典数据
+        for (SysDictType dictType : dictTypes) {
+            LambdaQueryWrapper<SysDictData> dataWrapper = new LambdaQueryWrapper<>();
+            dataWrapper.eq(SysDictData::getDictType, dictType.getDictType());
+            Long dataCount = sysDictDataMapper.selectCount(dataWrapper);
+            if (dataCount > 0) {
+                sysDictDataMapper.delete(dataWrapper);
+                log.info("DictType", "删除字典类型 {} 关联的字典数据: {} 条", dictType.getDictType(), dataCount);
+            }
+        }
+
+        // 批量删除字典类型
         for (Long dictId : dictIds) {
             sysDictTypeMapper.deleteById(dictId);
         }
