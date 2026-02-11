@@ -23,13 +23,13 @@ public class DictCacheInitListener implements ApplicationListener<ApplicationRea
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        log.info("DictCache", "应用启动完成，开始预加载字典缓存...");
+        log.info("DictCache", "Application started, preloading dictionary cache...");
         
         try {
             sysDictApi.refreshAllDictCache();
-            log.info("DictCache", "字典缓存预加载完成");
+            log.info("DictCache", "Dictionary cache preload completed");
         } catch (Exception e) {
-            log.error("DictCache", "字典缓存预加载失败: {}", e.getMessage(), e);
+            log.error("DictCache", "Dictionary cache preload failed: {}", e.getMessage(), e);
         }
     }
 }

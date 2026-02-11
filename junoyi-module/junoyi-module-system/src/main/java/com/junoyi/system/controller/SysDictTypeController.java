@@ -128,8 +128,8 @@ public class SysDictTypeController extends BaseController {
     @Permission(value = {"system.ui.dict.view", "system.api.dict.update"})
     public R<Void> refreshDictCache(@Parameter(description = "字典类型") @PathVariable("dictType") String dictType) {
         sysDictApi.refreshDictCache(dictType);
-        log.info("DictCache", "手动刷新字典缓存: {}", dictType);
-        return R.ok("字典缓存刷新成功");
+        log.info("DictCache", "Manually refreshed dictionary cache: {}", dictType);
+        return R.ok("Dictionary cache refreshed successfully");
     }
 
     /**
@@ -141,7 +141,7 @@ public class SysDictTypeController extends BaseController {
     @Permission(value = {"system.ui.dict.view", "system.api.dict.update"})
     public R<Void> refreshAllDictCache() {
         sysDictApi.refreshAllDictCache();
-        log.info("DictCache", "手动刷新所有字典缓存");
-        return R.ok("所有字典缓存刷新成功");
+        log.info("DictCache", "Manually refreshed all dictionary caches");
+        return R.ok("All dictionary caches refreshed successfully");
     }
 }

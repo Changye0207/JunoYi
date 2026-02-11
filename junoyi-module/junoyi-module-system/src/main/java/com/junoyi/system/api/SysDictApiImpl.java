@@ -53,12 +53,12 @@ public class SysDictApiImpl implements SysDictApi {
         String cacheKey = CacheConstants.DICT_DATA + dictType;
         List<SysDictDataVO> cachedData = RedisUtils.getCacheList(cacheKey);
         if (cachedData != null && !cachedData.isEmpty()) {
-            log.debug("从缓存获取字典数据: {}", dictType);
+            log.debug("Retrieved dictionary data from cache: {}", dictType);
             return cachedData;
         }
 
         // 缓存未命中,查询数据库
-        log.debug("缓存未命中,从数据库查询字典数据: {}", dictType);
+        log.debug("Cache miss, querying dictionary data from database: {}", dictType);
         LambdaQueryWrapper<SysDictData> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysDictData::getDictType, dictType)
                 .eq(SysDictData::getStatus, "0")
@@ -70,7 +70,7 @@ public class SysDictApiImpl implements SysDictApi {
         // 存入缓存
         if (!voList.isEmpty()) {
             RedisUtils.setCacheList(cacheKey, voList);
-            log.debug("字典数据已缓存: {}", dictType);
+            log.debug("Dictionary data cached: {}", dictType);
         }
 
         return voList;
@@ -211,7 +211,7 @@ public class SysDictApiImpl implements SysDictApi {
             return;
         }
 
-        log.info("刷新字典缓存: {}", dictType);
+        log.info("Refreshing dictionary cache: {}", dictType);
 
         // 删除字典数据列表缓存
         String dataCacheKey = CacheConstants.DICT_DATA + dictType;
@@ -226,14 +226,14 @@ public class SysDictApiImpl implements SysDictApi {
         // 重新加载到缓存
         getDictDataByType(dictType);
 
-        log.info("字典缓存刷新完成: {}", dictType);
+        log.info("Dictionary cache refresh completed: {}", dictType);
     }
 
     /**
      * 刷新所有字典缓存
      */
     public void refreshAllDictCache() {
-        log.info("开始刷新所有字典缓存");
+        log.info("Starting to refresh all dictionary caches");
 
         // 删除所有字典相关缓存
         RedisUtils.deleteKeys(CacheConstants.DICT_DATA + "*");
@@ -268,6 +268,6 @@ public class SysDictApiImpl implements SysDictApi {
             }
         }
 
-        log.info("所有字典缓存刷新完成,共缓存 {} 个字典类型", groupedData.size());
+        log.info("All dictionary caches refreshed, total {} dictionary types cached", groupedData.size());
     }
 }
