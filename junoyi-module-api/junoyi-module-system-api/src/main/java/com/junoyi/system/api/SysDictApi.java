@@ -54,4 +54,13 @@ public interface SysDictApi {
      * @return 字典类型为key，字典数据列表为value的Map
      */
     java.util.Map<String, List<SysDictDataVO>> getDictDataByTypes(List<String> dictTypes);
+
+    /**
+     * 根据字典类型和字典值获取字典项（包含listClass等完整信息）
+     *
+     * @param dictType 字典类型
+     * @param dictValue 字典值
+     * @return 字典数据VO,如果不存在返回 null
+     */
+    SysDictDataVO getDictItem(String dictType, String dictValue);
 }

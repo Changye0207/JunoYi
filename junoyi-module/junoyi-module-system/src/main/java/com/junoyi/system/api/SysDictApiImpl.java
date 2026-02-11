@@ -270,4 +270,27 @@ public class SysDictApiImpl implements SysDictApi {
 
         log.info("All dictionary caches refreshed, total {} dictionary types cached", groupedData.size());
     }
+
+    /**
+     * 根据字典类型和字典值获取字典项（包含listClass等完整信息）
+     *
+     * @param dictType 字典类型
+     * @param dictValue 字典值
+     * @return 字典数据VO,如果不存在返回 null
+     */
+    @Override
+    public SysDictDataVO getDictItem(String dictType, String dictValue) {
+        if (StringUtils.isBlank(dictType) || StringUtils.isBlank(dictValue)) {
+            return null;
+        }
+
+        // 获取该字典类型的所有数据
+        List<SysDictDataVO> dictDataList = getDictDataByType(dictType);
+        
+        // 查找匹配的字典项
+        return dictDataList.stream()
+                .filter(item -> dictValue.equals(item.getDictValue()))
+                .findFirst()
+                .orElse(null);
+    }
 }

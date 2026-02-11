@@ -67,6 +67,11 @@ public class SysUserVO {
     private String sexLabel;
 
     /**
+     * 性别标签类型（用于前端标签颜色）
+     */
+    private String sexType;
+
+    /**
      * 状态
      */
     private Integer status;
@@ -75,6 +80,11 @@ public class SysUserVO {
      * 状态标签（字典翻译）
      */
     private String statusLabel;
+
+    /**
+     * 状态标签类型（用于前端标签颜色）
+     */
+    private String statusType;
 
     /**
      * 创建时间

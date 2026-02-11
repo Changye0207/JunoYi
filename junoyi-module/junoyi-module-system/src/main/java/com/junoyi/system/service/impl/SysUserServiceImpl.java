@@ -26,6 +26,7 @@ import com.junoyi.system.domain.po.SysUserGroup;
 import com.junoyi.system.domain.po.SysUserPerm;
 import com.junoyi.system.domain.po.SysUserRole;
 import com.junoyi.system.domain.vo.SysDeptVO;
+import com.junoyi.system.domain.vo.SysDictDataVO;
 import com.junoyi.system.domain.vo.SysPermGroupVO;
 import com.junoyi.system.domain.vo.SysRoleVO;
 import com.junoyi.system.domain.vo.SysUserPermVO;
@@ -115,13 +116,21 @@ public class SysUserServiceImpl implements ISysUserService {
         Page<SysUser> resultPage = sysUserMapper.selectPage(page, wrapper);
         List<SysUserVO> userVOList = sysUserConverter.toVoList(resultPage.getRecords());
         
-        // 使用字典API翻译性别和状态标签
+        // 使用字典API翻译性别和状态标签，并获取标签类型（颜色）
         for (SysUserVO userVO : userVOList) {
             if (userVO.getSex() != null) {
-                userVO.setSexLabel(sysDictApi.getDictLabel(DictTypeConstants.SYS_USER_SEX, userVO.getSex()));
+                SysDictDataVO sexDict = sysDictApi.getDictItem(DictTypeConstants.SYS_USER_SEX, userVO.getSex());
+                if (sexDict != null) {
+                    userVO.setSexLabel(sexDict.getDictLabel());
+                    userVO.setSexType(sexDict.getListClass());
+                }
             }
             if (userVO.getStatus() != null) {
-                userVO.setStatusLabel(sysDictApi.getDictLabel(DictTypeConstants.SYS_USER_STATUS, String.valueOf(userVO.getStatus())));
+                SysDictDataVO statusDict = sysDictApi.getDictItem(DictTypeConstants.SYS_USER_STATUS, String.valueOf(userVO.getStatus()));
+                if (statusDict != null) {
+                    userVO.setStatusLabel(statusDict.getDictLabel());
+                    userVO.setStatusType(statusDict.getListClass());
+                }
             }
         }
         
