@@ -65,7 +65,7 @@ public class SysDictTypeController extends BaseController {
     @GetMapping("/{dictId}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(value = {"system.ui.dict.view", "system.api.dict.get"})
-    public R<SysDictTypeVO> getDictTypeById(@Parameter(description = "字典类型ID") @PathVariable Long dictId) {
+    public R<SysDictTypeVO> getDictTypeById(@Parameter(description = "字典类型ID") @PathVariable("dictId") Long dictId) {
         return R.ok(dictTypeService.getDictTypeById(dictId));
     }
 
@@ -100,7 +100,7 @@ public class SysDictTypeController extends BaseController {
     @DeleteMapping("/{dictId}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(value = {"system.ui.dict.view", "system.api.dict.delete"})
-    public R<Void> deleteDictType(@Parameter(description = "字典类型ID") @PathVariable Long dictId) {
+    public R<Void> deleteDictType(@Parameter(description = "字典类型ID") @PathVariable("dictId") Long dictId) {
         dictTypeService.deleteDictType(dictId);
         return R.ok();
     }

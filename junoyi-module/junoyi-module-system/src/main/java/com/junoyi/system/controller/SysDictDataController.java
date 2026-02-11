@@ -53,7 +53,7 @@ public class SysDictDataController extends BaseController {
     @GetMapping("/type/{dictType}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(value = {"system.ui.dict.view", "system.api.dict.get"})
-    public R<List<SysDictDataVO>> getDictDataByType(@Parameter(description = "字典类型") @PathVariable String dictType) {
+    public R<List<SysDictDataVO>> getDictDataByType(@Parameter(description = "字典类型") @PathVariable("dictType") String dictType) {
         return R.ok(dictDataService.getDictDataByType(dictType));
     }
 
@@ -64,7 +64,7 @@ public class SysDictDataController extends BaseController {
     @GetMapping("/{dictCode}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(value = {"system.ui.dict.view", "system.api.dict.get"})
-    public R<SysDictDataVO> getDictDataById(@Parameter(description = "字典数据编码") @PathVariable Long dictCode) {
+    public R<SysDictDataVO> getDictDataById(@Parameter(description = "字典数据编码") @PathVariable("dictCode") Long dictCode) {
         return R.ok(dictDataService.getDictDataById(dictCode));
     }
 
@@ -99,7 +99,7 @@ public class SysDictDataController extends BaseController {
     @DeleteMapping("/{dictCode}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(value = {"system.ui.dict.view", "system.api.dict.delete"})
-    public R<Void> deleteDictData(@Parameter(description = "字典数据编码") @PathVariable Long dictCode) {
+    public R<Void> deleteDictData(@Parameter(description = "字典数据编码") @PathVariable("dictCode") Long dictCode) {
         dictDataService.deleteDictData(dictCode);
         return R.ok();
     }
