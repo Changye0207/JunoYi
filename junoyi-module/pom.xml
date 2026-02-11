@@ -15,7 +15,6 @@
     <modules>
         <module>junoyi-module-system</module>
         <module>junoyi-module-generation</module>
-        <module>junoyi-module-demo</module>
     </modules>
 
     <dependencies>
