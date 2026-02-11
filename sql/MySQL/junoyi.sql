@@ -11,7 +11,7 @@
  Target Server Version : 80404 (8.4.4)
  File Encoding         : 65001
 
- Date: 11/02/2026 15:33:36
+ Date: 11/02/2026 16:33:37
 */
 
 SET NAMES utf8mb4;
@@ -43,7 +43,7 @@ CREATE TABLE `sys_auth_log` (
   KEY `idx_login_time` (`login_time`),
   KEY `idx_status` (`status`),
   KEY `idx_login_ip` (`login_ip`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统登录日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统登录日志表';
 
 -- ----------------------------
 -- Records of sys_auth_log
@@ -61,6 +61,8 @@ INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip
 INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (10, 1, 'super_admin', '超级管理员', '127.0.0.1', '内网IP', 'f01d6d5e86af429b884c4a9dbd9002a3', '超级管理员', 'password', 'Chrome 144', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-07 01:51:44');
 INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (11, 1, 'super_admin', '超级管理员', '127.0.0.1', '内网IP', '7102f4031e73458e83755c4ab0dc1f41', '超级管理员', 'password', 'Chrome 144', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-07 02:53:39');
 INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (12, 1, 'super_admin', '超级管理员', '127.0.0.1', '内网IP', '6aad1ce2e2344e9f9ed63ba8ee2f59c3', '超级管理员', 'password', 'Chrome 144', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-07 03:01:09');
+INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (13, 1, 'super_admin', '超级管理员', '127.0.0.1', '内网IP', 'bdc42d07a39c48a38104436a175b6683', '超级管理员', 'password', 'Chrome 144', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-11 15:55:07');
+INSERT INTO `sys_auth_log` (`id`, `user_id`, `user_name`, `nick_name`, `login_ip`, `ip_region`, `session_id`, `identity`, `login_type`, `browser`, `os`, `device_type`, `status`, `msg`, `login_time`) VALUES (14, 1, 'super_admin', '超级管理员', '127.0.0.1', '内网IP', 'f7812065ff694efebcb5a975d4979a69', '超级管理员', 'password', 'Chrome 144', 'macOS 10.15.7', 'Desktop', 1, '登录成功', '2026-02-11 15:55:20');
 COMMIT;
 
 -- ----------------------------
@@ -176,7 +178,7 @@ CREATE TABLE `sys_dict_data` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `remark` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`dict_code`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=163 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='字典数据表';
+) ENGINE=InnoDB AUTO_INCREMENT=164 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='字典数据表';
 
 -- ----------------------------
 -- Records of sys_dict_data
@@ -200,7 +202,7 @@ CREATE TABLE `sys_dict_type` (
   `remark` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`dict_id`) USING BTREE,
   UNIQUE KEY `dict_type` (`dict_type`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='字典类型表';
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='字典类型表';
 
 -- ----------------------------
 -- Records of sys_dict_type
@@ -270,7 +272,7 @@ INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`,
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (118, 93, 'System-Info', 'info', '/system/info', '系统信息', 'ri:information-2-line', 1, 3, 'system.ui.info.view', 1, 0, 1, 0, '', 0, 0, '', 0, '', 0, NULL, '2026-01-18 18:50:03', 'super_admin', '2026-02-07 01:46:44', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (119, 122, 'AuthLog', 'auth-log', '/system/log/auth', '登录日志', 'ri:book-ai-line', 1, 1, 'system.ui.auth-log.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-18 18:53:23', 'super_admin', '2026-02-06 12:24:17', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (120, 122, 'OperLog', 'oper-log', '/system/log/oper', '操作日志', 'ri:book-read-line', 1, 2, 'system.ui.oper-log.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-18 18:54:15', 'super_admin', '2026-02-06 12:24:17', '');
-INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (121, 5, 'Dictionary', 'dict', '/system/dict', '字典管理', 'ri:book-2-fill', 1, 6, 'system.ui.dict.view', 1, 0, 1, 0, '', 0, 0, '', 0, '', 0, NULL, '2026-01-18 19:02:45', 'super_admin', '2026-02-07 01:46:33', '');
+INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (121, 5, 'Dictionary', 'dict', '/system/dict', '字典管理', 'ri:book-2-fill', 1, 6, 'system.ui.dict.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-18 19:02:45', 'super_admin', '2026-02-11 15:45:04', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (122, 5, 'LogManage', 'log', '', '日志管理', 'ri:survey-line', 0, 11, '', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-01-18 19:07:31', 'super_admin', '2026-02-06 12:24:17', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (123, 5, 'File', 'file', '/system/file', '文件管理', 'ri:file-ai-2-line', 1, 9, 'system.ui.file.view', 1, 0, 1, 0, '', 0, 0, '', 0, '', 0, NULL, '2026-01-20 16:58:24', 'super_admin', '2026-02-07 01:46:59', '');
 INSERT INTO `sys_menu` (`id`, `parent_id`, `name`, `path`, `component`, `title`, `icon`, `menu_type`, `sort`, `permission`, `is_hide`, `is_hide_tab`, `keep_alive`, `is_iframe`, `link`, `is_full_page`, `fixed_tab`, `active_path`, `show_badge`, `show_text_badge`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (124, 5, 'Config', 'config', '/system/config', '系统参数', 'ri:settings-4-line', 1, 8, 'system.ui.config.view', 0, 0, 1, 0, '', 0, 0, '', 0, '', 1, NULL, '2026-02-06 12:24:07', 'super_admin', '2026-02-06 12:24:17', '');
@@ -303,7 +305,7 @@ CREATE TABLE `sys_oper_log` (
   KEY `idx_level` (`level`),
   KEY `idx_target_id` (`target_id`),
   KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='操作日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='操作日志表';
 
 -- ----------------------------
 -- Records of sys_oper_log
@@ -321,6 +323,7 @@ INSERT INTO `sys_oper_log` (`id`, `level`, `action`, `module`, `user_id`, `user_
 INSERT INTO `sys_oper_log` (`id`, `level`, `action`, `module`, `user_id`, `user_name`, `nick_name`, `message`, `target_id`, `target_name`, `path`, `method`, `ip`, `raw_data`, `create_time`) VALUES (10, 'info', 'update', 'menu', 1, 'super_admin', '超级管理员', '更新了菜单「文件管理」', '123', '文件管理', '/system/menu', 'PUT', '127.0.0.1', NULL, '2026-02-07 01:46:59');
 INSERT INTO `sys_oper_log` (`id`, `level`, `action`, `module`, `user_id`, `user_name`, `nick_name`, `message`, `target_id`, `target_name`, `path`, `method`, `ip`, `raw_data`, `create_time`) VALUES (11, 'info', 'update', 'menu', 1, 'super_admin', '超级管理员', '更新了菜单「menus.system.task」', '98', 'menus.system.task', '/system/menu', 'PUT', '127.0.0.1', NULL, '2026-02-07 01:47:05');
 INSERT INTO `sys_oper_log` (`id`, `level`, `action`, `module`, `user_id`, `user_name`, `nick_name`, `message`, `target_id`, `target_name`, `path`, `method`, `ip`, `raw_data`, `create_time`) VALUES (12, 'info', 'update', 'menu', 1, 'super_admin', '超级管理员', '更新了菜单「menus.plan.log」', '50', 'menus.plan.log', '/system/menu', 'PUT', '127.0.0.1', NULL, '2026-02-07 02:54:05');
+INSERT INTO `sys_oper_log` (`id`, `level`, `action`, `module`, `user_id`, `user_name`, `nick_name`, `message`, `target_id`, `target_name`, `path`, `method`, `ip`, `raw_data`, `create_time`) VALUES (13, 'info', 'update', 'menu', 1, 'super_admin', '超级管理员', '更新了菜单「字典管理」', '121', '字典管理', '/system/menu', 'PUT', '127.0.0.1', NULL, '2026-02-11 15:45:04');
 COMMIT;
 
 -- ----------------------------
