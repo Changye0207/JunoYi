@@ -4,7 +4,9 @@ import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.system.domain.vo.SystemInfoVO;
+import com.junoyi.system.domain.vo.SystemMonitorVO;
 import com.junoyi.system.service.ISysConfigService;
+import com.junoyi.system.service.ISysMonitorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ public class SysInfoController {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SysInfoController.class);
     private final ISysConfigService configService;
+    private final ISysMonitorService monitorService;
 
     /**
      * 获取系统信息（从配置中读取）
@@ -47,6 +50,16 @@ public class SysInfoController {
                 .logo(configService.getConfigByKey("sys.system.logo"))
                 .build();
         return R.ok(systemInfoVo);
+    }
+
+    /**
+     * 获取系统监控信息
+     */
+    @Operation(summary = "获取系统监控信息")
+    @GetMapping("/monitor")
+    public R<SystemMonitorVO> getSystemMonitor() {
+        SystemMonitorVO monitorInfo = monitorService.getSystemMonitorInfo();
+        return R.ok(monitorInfo);
     }
 
     /**
