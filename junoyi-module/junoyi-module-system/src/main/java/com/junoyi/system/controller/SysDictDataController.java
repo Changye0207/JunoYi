@@ -41,7 +41,7 @@ public class SysDictDataController extends BaseController {
     @Operation(summary = "获取字典数据列表", description = "分页查询字典数据列表")
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.get"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.get.list"})
     public R<PageResult<SysDictDataVO>> getDictDataList(SysDictDataQueryDTO queryDTO) {
         return R.ok(dictDataService.getDictDataList(queryDTO));
     }
@@ -52,7 +52,7 @@ public class SysDictDataController extends BaseController {
     @Operation(summary = "根据字典类型查询字典数据", description = "根据字典类型查询所有启用状态的字典数据")
     @GetMapping("/type/{dictType}")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.get"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.get.all"})
     public R<List<SysDictDataVO>> getDictDataByType(@Parameter(description = "字典类型") @PathVariable("dictType") String dictType) {
         return R.ok(dictDataService.getDictDataByType(dictType));
     }
@@ -63,7 +63,7 @@ public class SysDictDataController extends BaseController {
     @Operation(summary = "获取字典数据详情", description = "根据ID获取字典数据详情")
     @GetMapping("/{dictCode}")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.get"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.get.id"})
     public R<SysDictDataVO> getDictDataById(@Parameter(description = "字典数据编码") @PathVariable("dictCode") Long dictCode) {
         return R.ok(dictDataService.getDictDataById(dictCode));
     }
@@ -74,7 +74,7 @@ public class SysDictDataController extends BaseController {
     @Operation(summary = "新增字典数据", description = "新增字典数据")
     @PostMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.add"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.add.data"})
     public R<Void> addDictData(@RequestBody @Valid SysDictDataDTO dictDataDTO) {
         dictDataService.addDictData(dictDataDTO);
         return R.ok();
@@ -86,7 +86,7 @@ public class SysDictDataController extends BaseController {
     @Operation(summary = "修改字典数据", description = "修改字典数据")
     @PutMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.update"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.update.data"})
     public R<Void> updateDictData(@RequestBody @Valid SysDictDataDTO dictDataDTO) {
         dictDataService.updateDictData(dictDataDTO);
         return R.ok();
@@ -98,7 +98,7 @@ public class SysDictDataController extends BaseController {
     @Operation(summary = "删除字典数据", description = "根据ID删除字典数据")
     @DeleteMapping("/{dictCode}")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.delete"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.delete.data.code"})
     public R<Void> deleteDictData(@Parameter(description = "字典数据编码") @PathVariable("dictCode") Long dictCode) {
         dictDataService.deleteDictData(dictCode);
         return R.ok();
@@ -110,7 +110,7 @@ public class SysDictDataController extends BaseController {
     @Operation(summary = "批量删除字典数据", description = "批量删除字典数据")
     @DeleteMapping("/batch")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.delete"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.delete.code.batch"})
     public R<Void> deleteDictDataList(@RequestBody List<Long> dictCodes) {
         dictDataService.deleteDictDataList(dictCodes);
         return R.ok();

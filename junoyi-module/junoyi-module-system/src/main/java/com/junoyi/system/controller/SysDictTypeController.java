@@ -44,7 +44,7 @@ public class SysDictTypeController extends BaseController {
     @Operation(summary = "获取字典类型列表", description = "分页查询字典类型列表")
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.get"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.get.list"})
     public R<PageResult<SysDictTypeVO>> getDictTypeList(SysDictTypeQueryDTO queryDTO) {
         return R.ok(dictTypeService.getDictTypeList(queryDTO));
     }
@@ -55,7 +55,7 @@ public class SysDictTypeController extends BaseController {
     @Operation(summary = "查询所有字典类型", description = "查询所有启用状态的字典类型")
     @GetMapping("/all")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.get"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.get.all"})
     public R<List<SysDictTypeVO>> getAllDictTypes() {
         return R.ok(dictTypeService.getAllDictTypes());
     }
@@ -66,7 +66,7 @@ public class SysDictTypeController extends BaseController {
     @Operation(summary = "获取字典类型详情", description = "根据ID获取字典类型详情")
     @GetMapping("/{dictId}")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.get"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.get.id"})
     public R<SysDictTypeVO> getDictTypeById(@Parameter(description = "字典类型ID") @PathVariable("dictId") Long dictId) {
         return R.ok(dictTypeService.getDictTypeById(dictId));
     }
@@ -77,7 +77,7 @@ public class SysDictTypeController extends BaseController {
     @Operation(summary = "新增字典类型", description = "新增字典类型")
     @PostMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.add"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.add.type"})
     public R<Void> addDictType(@RequestBody @Valid SysDictTypeDTO dictTypeDTO) {
         dictTypeService.addDictType(dictTypeDTO);
         return R.ok();
@@ -89,7 +89,7 @@ public class SysDictTypeController extends BaseController {
     @Operation(summary = "修改字典类型", description = "修改字典类型")
     @PutMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.update"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.update.type"})
     public R<Void> updateDictType(@RequestBody @Valid SysDictTypeDTO dictTypeDTO) {
         dictTypeService.updateDictType(dictTypeDTO);
         return R.ok();
@@ -101,7 +101,7 @@ public class SysDictTypeController extends BaseController {
     @Operation(summary = "删除字典类型", description = "根据ID删除字典类型")
     @DeleteMapping("/{dictId}")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.delete"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.delete.type.id"})
     public R<Void> deleteDictType(@Parameter(description = "字典类型ID") @PathVariable("dictId") Long dictId) {
         dictTypeService.deleteDictType(dictId);
         return R.ok();
@@ -113,7 +113,7 @@ public class SysDictTypeController extends BaseController {
     @Operation(summary = "批量删除字典类型", description = "批量删除字典类型")
     @DeleteMapping("/batch")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.delete"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.delete.type.batch"})
     public R<Void> deleteDictTypes(@RequestBody List<Long> dictIds) {
         dictTypeService.deleteDictTypes(dictIds);
         return R.ok();
@@ -125,7 +125,7 @@ public class SysDictTypeController extends BaseController {
     @Operation(summary = "刷新字典缓存", description = "刷新指定字典类型的Redis缓存")
     @PostMapping("/refresh/{dictType}")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.update"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.refresh.type"})
     public R<Void> refreshDictCache(@Parameter(description = "字典类型") @PathVariable("dictType") String dictType) {
         sysDictApi.refreshDictCache(dictType);
         log.info("DictCache", "Manually refreshed dictionary cache: {}", dictType);
@@ -138,7 +138,7 @@ public class SysDictTypeController extends BaseController {
     @Operation(summary = "刷新所有字典缓存", description = "刷新所有字典类型的Redis缓存")
     @PostMapping("/refresh/all")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    @Permission(value = {"system.ui.dict.view", "system.api.dict.update"})
+    @Permission(value = {"system.ui.dict.view", "system.api.dict.refresh.all"})
     public R<Void> refreshAllDictCache() {
         sysDictApi.refreshAllDictCache();
         log.info("DictCache", "Manually refreshed all dictionary caches");
