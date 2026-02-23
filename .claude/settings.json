@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(javac:*)"
+    ],
+    "additionalDirectories": [
+      "F:\\VScode project\\JunoYi\\junoyi-framework\\junoyi-framework-permission\\src\\main\\java\\com\\junoyi\\framework\\permission\\enums"
+    ]
+  }
+}
