@@ -1,4 +1,4 @@
-package com.junoyi.common.util;
+package com.junoyi.framework.file.util;
 
 import com.junoyi.framework.file.properties.FileStorageProperties;
 import io.minio.*;
@@ -22,7 +22,7 @@ public class MinioUtil {
     private MinioClient minioClient;
 
     @Autowired
-    private FileStorageProperties.MinioConfig minioConfig;
+    private FileStorageProperties fileStorageProperties;  // 注入外层 Bean
 
     /**
      * 上传文件
@@ -32,6 +32,8 @@ public class MinioUtil {
      */
     public String uploadFile(MultipartFile file) {
         try {
+            FileStorageProperties.MinioConfig minioConfig = fileStorageProperties.getMinio();
+
             // 检查存储桶是否存在
             boolean found = minioClient.bucketExists(
                     BucketExistsArgs.builder().bucket(minioConfig.getBucketName()).build()
@@ -73,6 +75,8 @@ public class MinioUtil {
      */
     public void deleteFile(String fileName) {
         try {
+            FileStorageProperties.MinioConfig minioConfig = fileStorageProperties.getMinio();
+
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
                             .bucket(minioConfig.getBucketName())
@@ -94,6 +98,8 @@ public class MinioUtil {
      */
     public String getPresignedUrl(String fileName, int expiry) {
         try {
+            FileStorageProperties.MinioConfig minioConfig = fileStorageProperties.getMinio();
+
             return minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .bucket(minioConfig.getBucketName())
@@ -116,6 +122,8 @@ public class MinioUtil {
      */
     public InputStream getFileInputStream(String fileName) {
         try {
+            FileStorageProperties.MinioConfig minioConfig = fileStorageProperties.getMinio();
+
             return minioClient.getObject(
                     GetObjectArgs.builder()
                             .bucket(minioConfig.getBucketName())

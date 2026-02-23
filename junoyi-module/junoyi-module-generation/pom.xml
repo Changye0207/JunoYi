@@ -11,5 +11,27 @@
     </parent>
 
     <artifactId>junoyi-module-generation</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.junoyi</groupId>
+            <artifactId>junoyi-framework-file</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

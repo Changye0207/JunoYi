@@ -96,24 +96,29 @@ public class FileStorageProperties {
     @Data
     public static class MinioConfig {
         /**
-         * 端点地址
+         * 服务地址
          */
         private String endpoint;
 
         /**
-         * 访问密钥
+         * 用户名
          */
         private String accessKey;
 
         /**
-         * 密钥
+         * 密码
          */
         private String secretKey;
 
         /**
-         * Bucket名称
+         * 存储桶名称
          */
         private String bucketName;
+
+        /**
+         * 是否使用 HTTPS
+         */
+        private boolean secure = false;
     }
 
     /**

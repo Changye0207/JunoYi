@@ -296,6 +296,8 @@ junoyi:
       - /favicon.ico
       # 资源文件地址
       - /files/**
+      # 文件上传和删除接口
+      - /common/file/**
     # 登录机制
     login:
       # 最大登录失败次数
@@ -391,11 +393,19 @@ spring:
   profiles:
     active: local
 
+  # 文件上传配置
+  servlet:
+    multipart:
+      # 单个文件最大上传大小
+      max-file-size: 100MB
+      # 整个请求最大上传大小
+      max-request-size: 100MB
+
   # 自动配置排除
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-  
+
   # DevTools 配置
   devtools:
     livereload:

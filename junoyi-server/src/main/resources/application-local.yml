@@ -70,9 +70,21 @@ mybatis-plus:
     db-config:
       id-type: auto
 
-#====================
-minio:
-  endpoint: http://localhost:9000
-  accessKey: minioadmin
-  secretKey: minioadmin
-  bucketName: kids-activity
+#==================== MinIO 配置（独立配置前缀）====================
+junoyi:
+  file:
+    minio:
+      # MinIO服务地址
+      endpoint: http://localhost:9000
+      # 访问密钥
+      accessKey: minioadmin
+      # 密钥（注意：本项目使用 12345678）
+      secretKey: 12345678
+      # 存储桶名称
+      bucketName: kids-activity
+      # 是否使用HTTPS（可选，默认false）
+      secure: false
+      # 可选超时配置
+      connectTimeout: 10000
+      writeTimeout: 60000
+      readTimeout: 60000
